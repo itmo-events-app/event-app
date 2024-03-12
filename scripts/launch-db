@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run --rm --name db -e POSTGRES_DB=db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 6432:5432 postgres:16.0
