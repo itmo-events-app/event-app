@@ -26,7 +26,7 @@ jobs:
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v5
         with:
-          context: ./${{ env.APP_NAME }}
+          context: .
           file: ./Dockerfile-github-actions
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.APP_NAME }}:latest
