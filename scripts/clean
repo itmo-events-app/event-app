@@ -1,0 +1,6 @@
+#!/bin/bash
+# clean gradle build, stop and remove containers, remove images after docker-compose
+cd ..
+gradle clean
+docker container rm -f db event-app
+docker image rm event-app
