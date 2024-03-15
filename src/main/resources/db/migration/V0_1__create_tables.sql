@@ -77,3 +77,5 @@ create table if not exists task
     deadline timestamp not null,
     place_id int not null
 );
+
+
