@@ -27,4 +27,5 @@ jobs:
           paths: |
             ${{ github.workspace }}/**/build/reports/jacocoReport/test/jacocoTestReport.xml
           token: ${{ secrets.TOKEN }}
-          min-coverage-changed-files: 0
+          min-coverage-overall: 50
+          min-coverage-changed-files: 50
