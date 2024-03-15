@@ -29,7 +29,12 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql:42.6.0")
     annotationProcessor("org.projectlombok:lombok")
+
+    // tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.testcontainers:testcontainers:1.19.1")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.1")
+    testImplementation("org.testcontainers:postgresql:1.19.1")
 }
 
 tasks.test {
