@@ -1,28 +1,31 @@
-create table if not exists RegistrationRequest(
+create table if not exists registration_request
+(
     id int generated always as identity primary key not null,
     password varchar(256) not null ,
     name varchar(128) not null ,
     surname varchar(128) not null,
     email varchar(128) not null
 );
-create table if not exists Privilege
+create table if not exists privilege
 (
     id int generated always as identity primary key not null,
     name varchar(256) not null,
     description text not null
 );
-create table if not exists Role
+create table if not exists role
 (
     id int generated always as identity primary key not null,
     name varchar(256) not null,
     description text not null
 );
-create table if not exists RolePrivilege(
+create table if not exists role_privilege
+(
     id int generated always as identity primary key not null,
     role_id int not null references Role(id),
     privilege_id int not null references Privilege(id)
 );
-create table if not exists "User"(
+create table if not exists "user"
+(
     id int generated always as identity primary key not null,
     email varchar(256) not null,
     name varchar(256) not null,
@@ -32,12 +35,14 @@ create table if not exists "User"(
     last_login_date date not null,
     role_id int not null references Role(id)
 );
-create table if not exists Place(
+create table if not exists place
+(
     id int generated always as identity primary key not null ,
     address varchar(512) not null,
     name varchar(256) not null
 );
-create table if not exists Event(
+create table if not exists event
+(
     id int generated always as identity primary key not null,
     place_id integer not null references Place(id),
     start timestamp not null ,
@@ -55,18 +60,18 @@ create table if not exists Event(
     participant_age_highest int not null,
     photo bytea not null
 );
-create table if not exists EventRole(
+create table if not exists event_role(
     id int generated always as identity primary key not null,
-    user_id integer not null references "User"(id),
+    user_id integer not null references "user"(id),
     event_id integer not null references Event(id),
     role_id integer not null references role(id)
 );
-create table if not exists Task
+create table if not exists task
 (
     id int generated always as identity primary key not null,
     event_id integer not null references Event(id),
-    assignee_id integer not null references "User"(id),
-    assigner_id integer not null references "User"(id),
+    assignee_id integer not null references "user"(id),
+    assigner_id integer not null references "user"(id),
     description text not null,
     status varchar not null,
     deadline timestamp not null,
