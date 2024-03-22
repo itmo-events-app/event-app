@@ -46,19 +46,19 @@ create table if not exists user_notifications_info(
     enable_push_notifications boolean not null default true,
     enable_email_notifications boolean not null default true
 );
-create table if not exists Notifications(
-    user_id int not null references "user"(id),
-    title varchar(256) not null,
-    description text not null ,
-    sent boolean not null default FALSE,
-    read_time timestamp
-);
 create table if not exists "user"
 (
     id int generated always as identity primary key not null,
     role_id int not null references Role(id),
     notifications_info_id int not null references user_notifications_info(id),
     login_info_id int not null references user_login_info(id)
+);
+create table if not exists Notifications(
+    user_id int not null references "user"(id),
+    title varchar(256) not null,
+    description text not null ,
+    sent boolean not null default FALSE,
+    read_time timestamp
 );
 create table if not exists place
 (
@@ -69,14 +69,6 @@ create table if not exists place
     latitude float not null ,
     longitude float not null,
     render_info text
-);
-create table if not exists participants(
-    id int generated always as identity primary key not null,
-    name varchar(256) not null ,
-    email varchar(256) not null ,
-    additional_info text,
-    visited boolean not null ,
-    event_id int references event(id)
 );
 create table if not exists event
 (
@@ -99,6 +91,14 @@ create table if not exists event
     preparing_start timestamp not null ,
     preparing_end timestamp not null
 );
+create table if not exists participants(
+    id int generated always as identity primary key not null,
+    name varchar(256) not null ,
+    email varchar(256) not null ,
+    additional_info text,
+    visited boolean not null ,
+    event_id int references event(id)
+);
 create table if not exists event_role(
     id int generated always as identity primary key not null,
     user_id integer not null references "user"(id),
@@ -118,4 +118,3 @@ create table if not exists task
     place_id int references place(id),
     notification_deadline timestamp not null
 );
-
