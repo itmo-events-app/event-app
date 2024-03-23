@@ -20,6 +20,8 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew test
+      - name: Print TOKEN
+        run: echo ${{ secrets.TOKEN }}
       - name: Add coverage to PR
         id: jacoco
         uses: madrapps/jacoco-report@v1.6.1
