@@ -2,7 +2,7 @@ create table if not exists registration_request
 (
     id int generated always as identity primary key not null,
     email varchar(128) not null unique,
-    encrypted_password varchar(256) not null,
+    password_hash varchar(256) not null,
     name varchar(128) not null ,
     surname varchar(128),
     status registration_request_status not null,
@@ -25,8 +25,8 @@ create table if not exists role
 create table if not exists role_privilege
 (
     id int generated always as identity primary key not null,
-    role_id int not null references Role(id),
-    privilege_id int not null references Privilege(id)
+    role_id int not null references role(id),
+    privilege_id int not null references privilege(id)
 );
 create table if not exists user_login_info(
     id int generated always as identity primary key not null,
@@ -40,20 +40,20 @@ create table if not exists user_login_info(
     last_login_date date,
     registration_id int not null references registration_request(id)
 );
-create table if not exists user_notifications_info(
+create table if not exists user_notification_info(
     id int generated always as identity primary key not null,
-    devices varchar(128)[] not null,
+    devices varchar(64)[] not null,
     enable_push_notifications boolean not null default true,
     enable_email_notifications boolean not null default true
 );
 create table if not exists "user"
 (
     id int generated always as identity primary key not null,
-    role_id int not null references Role(id),
-    notifications_info_id int not null references user_notifications_info(id),
+    role_id int not null references role(id),
+    notifications_info_id int not null references user_notification_info(id),
     login_info_id int not null references user_login_info(id)
 );
-create table if not exists Notifications(
+create table if not exists notifications(
     user_id int not null references "user"(id),
     title varchar(256) not null,
     description text not null ,
@@ -73,7 +73,7 @@ create table if not exists place
 create table if not exists event
 (
     id int generated always as identity primary key not null,
-    place_id integer not null references Place(id),
+    place_id integer not null references place(id),
     start timestamp not null,
     "end" timestamp not null,
     title varchar(256) not null ,
@@ -84,7 +84,7 @@ create table if not exists event
     public boolean not null ,
     registration_start timestamp not null ,
     registration_end timestamp not null ,
-    parent_id integer references Event(id),
+    parent_id integer references event(id),
     participant_limit int,
     participant_age_lowest int,
     participant_age_highest int,
@@ -102,14 +102,14 @@ create table if not exists participants(
 create table if not exists event_role(
     id int generated always as identity primary key not null,
     user_id integer not null references "user"(id),
-    event_id integer not null references Event(id),
+    event_id integer not null references event(id),
     role_id integer not null references role(id)
 );
 create table if not exists task
 (
     id int generated always as identity primary key not null,
     name varchar(256) not null ,
-    event_id integer not null references Event(id),
+    event_id integer not null references event(id),
     assignee_id integer not null references "user"(id),
     assigner_id integer not null references "user"(id),
     description text not null,
