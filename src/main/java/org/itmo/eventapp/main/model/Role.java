@@ -1,32 +1,17 @@
 package org.itmo.eventapp.main.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Converter(autoApply = true)
-class RoleTypeConverter implements AttributeConverter<RoleType, String> {
-    @Override
-    public String convertToDatabaseColumn(RoleType color) {
-        if (color == null) {
-            return null;
-        }
-        return color.name().toLowerCase();
-    }
-
-    @Override
-    public RoleType convertToEntityAttribute(String value) {
-        if (value == null) {
-            return null;
-        }
-        return RoleType.valueOf(value.toUpperCase());
-    }
-}
-
 @Entity
 @Table(name = "role")
+@Getter
+@Setter
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,8 +24,7 @@ public class Role {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "role_type", name = "type")
-    @Convert(converter = RoleTypeConverter.class)
+    @Column(name = "type")
     private RoleType type;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -56,41 +40,5 @@ public class Role {
         this.name = name;
         this.description = description;
         this.type = type;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public RoleType getType() {
-        return type;
-    }
-
-    public void setType(RoleType type) {
-        this.type = type;
-    }
-
-    public Set<Privilege> getPrivileges() {
-        return privileges;
-    }
-
-    public void setPrivileges(Set<Privilege> privileges) {
-        this.privileges = privileges;
     }
 }

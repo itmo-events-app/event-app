@@ -2,9 +2,13 @@ package org.itmo.eventapp.main.model;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "event_role")
+@Getter
+@Setter
 public class EventRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,34 +32,6 @@ public class EventRole {
     public EventRole(User user, Role role, Event event) {
         this.user = user;
         this.role = role;
-        this.event = event;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public void setEvent(Event event) {
         this.event = event;
     }
 }
