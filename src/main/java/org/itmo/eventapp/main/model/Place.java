@@ -13,29 +13,21 @@ public class Place {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "address")
     private String address;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "format")
     private PlaceFormat format;
 
-    @Column(name = "room")
     private String room;
 
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "latitude")
     private float latitude;
 
-    @Column(name = "longtude")
     private float longtude;
 
-    @Column(name = "render_info")
     private String renderInfo;
 
     public Place() {

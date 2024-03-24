@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -20,7 +21,6 @@ public class UserLoginInfo {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "email")
     private String email;
 
     @Enumerated(EnumType.STRING)
@@ -39,12 +39,12 @@ public class UserLoginInfo {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_login_date")
-    private Date lastLoginDate;
+    private LocalDateTime lastLoginDate;
 
     public UserLoginInfo() {
     }
 
-    public UserLoginInfo(User user, String email, EmailStatus emailStatus, String passwordHash, String resetToken, RegistrationRequest registration, Date lastLoginDate) {
+    public UserLoginInfo(User user, String email, EmailStatus emailStatus, String passwordHash, String resetToken, RegistrationRequest registration, LocalDateTime lastLoginDate) {
         this.user = user;
         this.email = email;
         this.emailStatus = emailStatus;

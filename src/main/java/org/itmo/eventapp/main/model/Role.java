@@ -17,14 +17,11 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
     private RoleType type;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

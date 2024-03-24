@@ -13,16 +13,13 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "email")
     private String email;
 
     @Column(name = "additional_info")
     private String additionalInfo;
 
-    @Column(name = "visited")
     private boolean visited;
 
     @ManyToOne(fetch = FetchType.EAGER)

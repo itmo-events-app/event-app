@@ -2,10 +2,11 @@ package org.itmo.eventapp.main.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "notifications")
+@Table(name = "notification")
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,16 +16,13 @@ public class Notification {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "title")
     private String title;
 
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "sent")
     private boolean sent;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "read_time")
-    private Date readTime;
+    private LocalDateTime readTime;
 }

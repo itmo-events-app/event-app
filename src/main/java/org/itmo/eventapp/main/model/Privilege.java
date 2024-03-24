@@ -14,14 +14,11 @@ public class Privilege {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
     private PrivilegeType type;
 
     public Privilege() {

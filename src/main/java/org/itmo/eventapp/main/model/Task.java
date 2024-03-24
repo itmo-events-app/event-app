@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -28,10 +29,8 @@ public class Task {
     @JoinColumn(name = "assigner_id")
     private User assigner;
 
-    @Column(name = "title")
     private String title;
 
-    @Column(name = "description")
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -43,12 +42,11 @@ public class Task {
     private Place place;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "deadline")
-    private Date deadline;
+    private LocalDateTime deadline;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "notification_deadline")
-    private Date notificationDeadline;
+    private LocalDateTime notificationDeadline;
 
     public Task() {
     }
@@ -61,8 +59,8 @@ public class Task {
             String description,
             TaskStatus taskStatus,
             Place place,
-            Date deadline,
-            Date notificationDeadline) {
+            LocalDateTime deadline,
+            LocalDateTime notificationDeadline) {
         this.event = event;
         this.assignee = assignee;
         this.assigner = assigner;

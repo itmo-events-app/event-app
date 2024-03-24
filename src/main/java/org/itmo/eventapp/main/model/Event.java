@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -22,14 +23,11 @@ public class Event {
     private Place place;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "start")
-    private Date start;
+    private LocalDateTime start;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "end")
-    private Date end;
+    private LocalDateTime end;
 
-    @Column(name = "title")
     private String title;
 
     @Column(name = "short_description")
@@ -39,20 +37,18 @@ public class Event {
     private String fullDescription;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "format")
     private EventFormat format;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
     private EventStatus status;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "registration_start")
-    private Date registrationStart;
+    private LocalDateTime registrationStart;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "registration_end")
-    private Date registrationEnd;
+    private LocalDateTime registrationEnd;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id")
@@ -69,32 +65,32 @@ public class Event {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "preparing_start")
-    private Date preparingStart;
+    private LocalDateTime preparingStart;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "preparing_end")
-    private Date preparingEnd;
+    private LocalDateTime preparingEnd;
 
     public Event() {
     }
 
     public Event(
             Place place,
-            Date start,
-            Date end,
+            LocalDateTime start,
+            LocalDateTime end,
             String title,
             String shortDescription,
             String fullDescription,
             EventFormat format,
             EventStatus status,
-            Date registrationStart,
-            Date registrationEnd,
+            LocalDateTime registrationStart,
+            LocalDateTime registrationEnd,
             Event parent,
             int participantsLimit,
             int participantsAgeLowest,
             int participantsAgeHighest,
-            Date preparingStart,
-            Date preparingEnd) {
+            LocalDateTime preparingStart,
+            LocalDateTime preparingEnd) {
         this.place = place;
         this.start = start;
         this.end = end;
