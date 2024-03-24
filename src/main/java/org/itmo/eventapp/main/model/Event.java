@@ -22,10 +22,8 @@ public class Event {
     @JoinColumn(name = "place_id")
     private Place place;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime start;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime end;
 
     private String title;
@@ -42,11 +40,9 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventStatus status;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "registration_start")
     private LocalDateTime registrationStart;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "registration_end")
     private LocalDateTime registrationEnd;
 
@@ -63,11 +59,9 @@ public class Event {
     @Column(name = "participants_age_highest")
     private int participantsAgeHighest;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "preparing_start")
     private LocalDateTime preparingStart;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "preparing_end")
     private LocalDateTime preparingEnd;
 

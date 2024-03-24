@@ -29,7 +29,6 @@ public class RegistrationRequest {
     @Enumerated(EnumType.STRING)
     private RegistrationRequestStatus status;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "sent_time")
     private LocalDateTime sentTime;
 

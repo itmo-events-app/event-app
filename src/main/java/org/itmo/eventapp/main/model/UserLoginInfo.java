@@ -37,7 +37,6 @@ public class UserLoginInfo {
     @JoinColumn(name = "registration_id")
     private RegistrationRequest registration;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_login_date")
     private LocalDateTime lastLoginDate;
 

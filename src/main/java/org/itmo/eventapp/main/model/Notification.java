@@ -22,7 +22,6 @@ public class Notification {
 
     private boolean sent;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "read_time")
     private LocalDateTime readTime;
 }

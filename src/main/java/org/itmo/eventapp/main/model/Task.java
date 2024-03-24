@@ -41,10 +41,8 @@ public class Task {
     @JoinColumn(name = "place_id")
     private Place place;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deadline;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "notification_deadline")
     private LocalDateTime notificationDeadline;
 
