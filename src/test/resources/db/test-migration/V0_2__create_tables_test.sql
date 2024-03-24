@@ -28,18 +28,6 @@ create table if not exists role_privilege
     role_id int not null references role(id),
     privilege_id int not null references privilege(id)
 );
-create table if not exists user_login_info(
-    id int generated always as identity primary key not null,
-    login varchar(256) not null ,
-    email varchar(256) not null unique,
-    email_status email_status not null,
-    name varchar(256) not null,
-    surname varchar(256),
-    password_hash varchar(512) not null,
-    ressettoken varchar(512),
-    last_login_date date,
-    registration_id int not null references registration_request(id)
-);
 create table if not exists user_notification_info(
     id int generated always as identity primary key not null,
     devices varchar(64)[] not null,
@@ -51,20 +39,34 @@ create table if not exists "user"
     id int generated always as identity primary key not null,
     role_id int not null references role(id),
     notifications_info_id int not null references user_notification_info(id),
-    login_info_id int not null references user_login_info(id)
+    name varchar(256) not null,
+    surname varchar(256)
 );
-create table if not exists notifications(
+create table if not exists notification(
     user_id int not null references "user"(id),
     title varchar(256) not null,
     description text not null ,
     sent boolean not null default FALSE,
     read_time timestamp
 );
+create table if not exists user_login_info(
+    id int generated always as identity primary key not null,
+    user_id int not null references "user"(id),
+    login varchar(256) not null ,
+    email varchar(256) not null unique,
+    email_status email_status not null,
+    password_hash varchar(512) not null,
+    ressettoken varchar(512),
+    last_login_date date,
+    registration_id int not null references registration_request(id)
+);
 create table if not exists place
 (
     id int generated always as identity primary key not null ,
     address varchar(512) not null,
     name varchar(256) not null,
+    format place_format not null,
+    description text not null,
     room varchar(128),
     latitude float not null ,
     longitude float not null,
@@ -81,7 +83,6 @@ create table if not exists event
     full_description text not null,
     format event_format not null,
     status varchar(64) not null ,
-    public boolean not null ,
     registration_start timestamp not null ,
     registration_end timestamp not null ,
     parent_id integer references event(id),
@@ -91,13 +92,13 @@ create table if not exists event
     preparing_start timestamp not null ,
     preparing_end timestamp not null
 );
-create table if not exists participants(
+create table if not exists participant(
     id int generated always as identity primary key not null,
     name varchar(256) not null ,
     email varchar(256) not null ,
     additional_info text,
     visited boolean not null ,
-    event_id int references event(id)
+    event_id int references event(id) not null
 );
 create table if not exists event_role(
     id int generated always as identity primary key not null,
@@ -108,13 +109,14 @@ create table if not exists event_role(
 create table if not exists task
 (
     id int generated always as identity primary key not null,
-    name varchar(256) not null ,
     event_id integer not null references event(id),
     assignee_id integer not null references "user"(id),
     assigner_id integer not null references "user"(id),
     description text not null,
     status task_status not null,
+    title varchar(128) not null,
     deadline timestamp not null,
     place_id int references place(id),
+    name varchar(256) not null ,
     notification_deadline timestamp not null
 );

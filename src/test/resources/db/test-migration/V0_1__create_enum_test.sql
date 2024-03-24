@@ -3,7 +3,11 @@ CREATE TYPE event_format AS ENUM (
     'OFFLINE',
     'HYBRID'
     );
-
+CREATE TYPE place_format AS ENUM (
+    'ONLINE',
+    'OFFLINE',
+    'HYBRID'
+    );
 CREATE TYPE task_status AS ENUM (
     'NEW',
     'IN_PROGRESS',
