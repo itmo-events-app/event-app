@@ -1,3 +1,5 @@
+import org.gradle.internal.impldep.bsh.commands.dir
+
 plugins {
     id("java")
     id("org.springframework.boot") version "3.2.3"
@@ -47,6 +49,11 @@ tasks.jacocoTestReport {
     reports {
         xml.required = true
     }
+    classDirectories.setFrom(files(classDirectories.files.map {
+        fileTree(it) {
+            setExcludes(listOf("org/itmo/eventapp/main/model/**"))
+        }
+    }))
 }
 
 tasks.jacocoTestCoverageVerification {
