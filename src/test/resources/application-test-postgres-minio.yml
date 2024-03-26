@@ -3,17 +3,21 @@ spring.application.name: event-app
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:6432/db
-    username: postgres
-    password: postgres
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show_sql: true
+  flyway:
+    enabled: true
+    locations:
+      - 'classpath:db/test-migration'
 
 minio:
-  url: http://localhost:9000
-  accessKey: minio-admin
-  secretKey: minio-admin
+  url: ${MINIO_URL}
+  accessKey: ${MINIO_ACCESS_KEY}
+  secretKey: ${MINIO_SECRET_KEY}

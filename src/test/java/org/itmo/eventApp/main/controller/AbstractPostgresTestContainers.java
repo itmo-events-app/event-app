@@ -1,14 +1,13 @@
 package org.itmo.eventApp.main.controller;
 
+import io.minio.MinioClient;
 import org.itmo.eventapp.main.Main;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,17 +22,28 @@ import java.io.IOException;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("test-postgres")
 @ContextConfiguration(classes = Main.class)
-public class AbstractTestContainers {
+public abstract class AbstractPostgresTestContainers {
+    @MockBean
+    MinioClient minioClient;
+
     @Autowired
     private DataSource dataSource;
 
     @Autowired
     protected MockMvc mockMvc;
 
+    private final static String POSTGRES_VERSION = "postgres:16.0";
+
+    private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(POSTGRES_VERSION)
+            .withUsername("test_user")
+            .withPassword("test_password")
+            .withDatabaseName("test_db")
+            .withReuse(true);
+
     @BeforeAll
-    public static void start() {
+    public static void startPostgres() {
         postgreSQLContainer.start();
         System.setProperty("DB_URL", postgreSQLContainer.getJdbcUrl());
         System.setProperty("DB_USERNAME", postgreSQLContainer.getUsername());
@@ -70,7 +80,6 @@ public class AbstractTestContainers {
         return everything;
     }
 
-
     /**
      * @param sqlFileName full path from resources directory with filename.
      *                    Example /sql/cleanTables.sql
@@ -80,23 +89,5 @@ public class AbstractTestContainers {
         resourceDatabasePopulator.addScript(new ClassPathResource(sqlFileName));
         resourceDatabasePopulator.setSeparator("@@");
         resourceDatabasePopulator.execute(dataSource);
-    }
-
-    private final static String POSTGRES_VERSION = "postgres:16.0";
-
-    private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(POSTGRES_VERSION)
-            .withUsername("test_user")
-            .withPassword("test_password")
-            .withDatabaseName("test_db")
-            .withReuse(true);
-
-    private static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
-            TestPropertyValues.of(
-                    "spring.datasource.url=" + postgreSQLContainer.getJdbcUrl(),
-                    "spring.datasource.username=" + postgreSQLContainer.getUsername(),
-                    "spring.datasource.password=" + postgreSQLContainer.getPassword()
-            ).applyTo(configurableApplicationContext.getEnvironment());
-        }
     }
 }

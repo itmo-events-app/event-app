@@ -16,3 +16,8 @@ spring:
     enabled: true
     locations:
       - 'classpath:db/test-migration'
+
+minio:
+  url:
+  accessKey:
+  secretKey:
