@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class TestControllerTest extends AbstractPostgresMinioTestContainers {
+public class TestControllerTest extends AbstractTestContainers {
     @Test
     public void sayHelloTest() throws Exception {
         mockMvc.perform(get("/hello").param("s", "test"))
@@ -81,7 +81,7 @@ public class TestControllerTest extends AbstractPostgresMinioTestContainers {
     private boolean isObjectExist(String object) {
         try {
             minioClient.statObject(StatObjectArgs.builder()
-                    .bucket(AbstractPostgresMinioTestContainers.MINIO_BUCKET)
+                    .bucket(AbstractTestContainers.MINIO_BUCKET)
                     .object(object).build());
             return true;
         } catch (ErrorResponseException e) {
