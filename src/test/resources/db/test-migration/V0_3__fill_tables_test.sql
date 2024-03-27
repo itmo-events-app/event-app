@@ -1,8 +1,8 @@
 INSERT INTO role (name, description, type)
-VALUES ('Administrator', 'Has full system access', 'SYSTEM'),
+VALUES ('Administrator', 'Имеет полный доступ к системе', 'SYSTEM'),
        ('Reader', 'Basic user system', 'SYSTEM'),
-       ('Organizer', 'Can manage events', 'EVENT'),
-       ('Participant', 'Can participate in events', 'EVENT');
+       ('Organizer', 'Базовая пользовательская система', 'EVENT'),
+       ('Helper', 'Помощь в мероприятиях', 'EVENT');
 
 
 INSERT INTO privilege (name, type)
@@ -52,42 +52,7 @@ VALUES
     ('EXPORT_PARTICIPANT_LIST_XLSX', 'EVENT'),
     ('WORK_WITH_PARTICIPANT_LIST', 'EVENT');
 
-CREATE OR REPLACE FUNCTION assign_all_privileges_to_administrator()
-    RETURNS VOID AS $$
-DECLARE
-    admin_role_id INT;
-BEGIN
-    SELECT id INTO admin_role_id FROM role WHERE name = 'Administrator';
-
-    INSERT INTO role_privilege (role_id, privilege_id)
-    SELECT admin_role_id, id FROM privilege;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION assign_participant_privileges_to_participant()
-    RETURNS VOID AS $$
-DECLARE
-    participant_role_id INT;
-BEGIN
-    SELECT id INTO participant_role_id FROM role WHERE name = 'Participant';
-
-    INSERT INTO role_privilege (role_id, privilege_id)
-    SELECT participant_role_id, id FROM privilege WHERE name = 'Participate in Events';
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION assign_event_privileges_to_organizer()
-    RETURNS VOID AS $$
-DECLARE
-    organizer_role_id INT;
-BEGIN
-    SELECT id INTO organizer_role_id FROM role WHERE name = 'Organizer';
-
-    INSERT INTO role_privilege (role_id, privilege_id)
-    SELECT organizer_role_id, id FROM privilege WHERE type = 'EVENT';
-END;
-$$ LANGUAGE plpgsql;
-Insert into role_privilege(role_id, privilege_id) VALUES (2,3),(2,5),(2,6),(2,8),(2,28);
-SELECT assign_all_privileges_to_administrator();
-SELECT assign_event_privileges_to_organizer();
-SELECT assign_participant_privileges_to_participant();
+INSERT INTO role_privilege(role_id, privilege_id) SELECT 1, generate_series(1, 28) ON CONFLICT DO NOTHING;
+Insert into role_privilege(role_id, privilege_id) VALUES (2,3),(2,5),(2,6),(2,8),(2,9),(2,28);
+Insert into role_privilege(role_id, privilege_id) VALUES (3,10),(3,20),(3,21),(3,22),(3,23),(3,24),(3,25),(3,26),(3,27),(3,29),(3,30),(3,31),(3,32),(3,33),(3,34),(3,35),(3,36),(3,37),(3,38),(3,39),(3,40),(3,41),(3,42),(3,43),(3,44);
+Insert into role_privilege(role_id, privilege_id) VALUES (4,23),(4,24),(4,37),(4,38),(4,39),(4,40),(4,41),(4,42),(4,43),(4,44);
