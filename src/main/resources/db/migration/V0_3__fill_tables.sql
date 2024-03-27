@@ -24,8 +24,8 @@ VALUES
     ('CREATE_ROLE', 'EVENT'),
     ('DELETE_ROLE', 'EVENT'),
     ('EDIT_ROLE', 'EVENT'),
-    ('ASSIGN_SYSTEM_ROLE', 'EVENT'),
-    ('REVOKE_SYSTEM_ROLE', 'EVENT'),
+    ('ASSIGN_SYSTEM_ROLE', 'SYSTEM'),
+    ('REVOKE_SYSTEM_ROLE', 'SYSTEM'),
     ('EDIT_EVENT_INFO', 'EVENT'),
     ('ASSIGN_ASSISTANT_ROLE', 'EVENT'),
     ('REVOKE_ASSISTANT_ROLE', 'EVENT'),
@@ -51,7 +51,6 @@ VALUES
     ('IMPORT_PARTICIPANT_LIST_XLSX', 'EVENT'),
     ('EXPORT_PARTICIPANT_LIST_XLSX', 'EVENT'),
     ('WORK_WITH_PARTICIPANT_LIST', 'EVENT');
-
 INSERT INTO role_privilege(role_id, privilege_id) SELECT 1, generate_series(1, 28) ON CONFLICT DO NOTHING;
 Insert into role_privilege(role_id, privilege_id) VALUES (2,3),(2,5),(2,6),(2,8),(2,9),(2,28);
 Insert into role_privilege(role_id, privilege_id) VALUES (3,10),(3,20),(3,21),(3,22),(3,23),(3,24),(3,25),(3,26),(3,27),(3,29),(3,30),(3,31),(3,32),(3,33),(3,34),(3,35),(3,36),(3,37),(3,38),(3,39),(3,40),(3,41),(3,42),(3,43),(3,44);
