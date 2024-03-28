@@ -17,3 +17,9 @@ minio:
   url: http://minio:9000
   accessKey: minio-admin
   secretKey: minio-admin
+
+springdoc:
+  api-docs:
+    path: /event-app/v3/api-docs
+  swagger-ui:
+    path: /event-app/api
