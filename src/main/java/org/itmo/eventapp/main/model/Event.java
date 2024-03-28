@@ -24,6 +24,7 @@ public class Event {
 
     private LocalDateTime start;
 
+    @Column(name = "\"end\"")
     private LocalDateTime end;
 
     private String title;
@@ -50,13 +51,13 @@ public class Event {
     @JoinColumn(name = "parent_id")
     private Event parent;
 
-    @Column(name = "participants_limit")
-    private int participantsLimit;
+    @Column(name = "participant_limit")
+    private int participantLimit;
 
-    @Column(name = "participants_age_lowest")
+    @Column(name = "participant_age_lowest")
     private int participantsAgeLowest;
 
-    @Column(name = "participants_age_highest")
+    @Column(name = "participant_age_highest")
     private int participantsAgeHighest;
 
     @Column(name = "preparing_start")
@@ -80,7 +81,7 @@ public class Event {
             LocalDateTime registrationStart,
             LocalDateTime registrationEnd,
             Event parent,
-            int participantsLimit,
+            int participantLimit,
             int participantsAgeLowest,
             int participantsAgeHighest,
             LocalDateTime preparingStart,
@@ -96,7 +97,7 @@ public class Event {
         this.registrationStart = registrationStart;
         this.registrationEnd = registrationEnd;
         this.parent = parent;
-        this.participantsLimit = participantsLimit;
+        this.participantLimit = participantLimit;
         this.participantsAgeLowest = participantsAgeLowest;
         this.participantsAgeHighest = participantsAgeHighest;
         this.preparingStart = preparingStart;

@@ -26,21 +26,21 @@ public class Place {
 
     private float latitude;
 
-    private float longtude;
+    private float longitude;
 
     private String renderInfo;
 
     public Place() {
     }
 
-    public Place(String name, String address, PlaceFormat format, String room, String description, float latitude, float longtude, String renderInfo) {
+    public Place(String name, String address, PlaceFormat format, String room, String description, float latitude, float longitude, String renderInfo) {
         this.name = name;
         this.address = address;
         this.format = format;
         this.room = room;
         this.description = description;
         this.latitude = latitude;
-        this.longtude = longtude;
+        this.longitude = longitude;
         this.renderInfo = renderInfo;
     }
 }
