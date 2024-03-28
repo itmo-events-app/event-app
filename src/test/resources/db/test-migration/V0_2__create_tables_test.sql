@@ -12,7 +12,7 @@ create table if not exists privilege
 (
     id int generated always as identity primary key not null,
     name varchar(256) not null,
-    description text,
+    description text not null,
     type privilege_type not null
 );
 create table if not exists role
