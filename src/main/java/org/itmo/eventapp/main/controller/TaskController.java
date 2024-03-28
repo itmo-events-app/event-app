@@ -119,7 +119,7 @@ public class TaskController {
     }
 
     @GetMapping("/show/where-assignee/{eventId}")
-    public ResponseEntity<List<TaskDto>> taskListAtEventShowWhereAssignee(@Min(1) @PathVariable Integer eventId) {
+    public ResponseEntity<List<TaskDto>> taskListShowInEventWhereAssignee(@Min(1) @PathVariable Integer eventId) {
         List<TaskDto> eventUserTasks = new ArrayList<>();
         // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
         return ResponseEntity.ok().body(eventUserTasks);
