@@ -29,6 +29,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-mail:3.2.4")
     implementation("org.flywaydb:flyway-core:9.22.3")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
     runtimeOnly("org.postgresql:postgresql:42.6.0")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
