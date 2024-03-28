@@ -1,8 +1,8 @@
 INSERT INTO role (name, description, type)
-VALUES ('Administrator', 'Имеет полный доступ к системе', 'SYSTEM'),
-       ('Reader', 'Basic user system', 'SYSTEM'),
-       ('Organizer', 'Базовая пользовательская система', 'EVENT'),
-       ('Helper', 'Помощь в мероприятиях', 'EVENT');
+VALUES ('Администратор ', 'Имеет полный доступ к системе', 'SYSTEM'),
+       ('Читатель', 'Базовая пользовательская система', 'SYSTEM'),
+       ('Организатор', 'Организатор мероприятия', 'EVENT'),
+       ('Помощник', 'Помощь в мероприятиях', 'EVENT');
 
 
 INSERT INTO privilege (name, type,description)
@@ -12,12 +12,12 @@ VALUES
     ('MODIFY_PROFILE_DATA', 'SYSTEM','Изменение данных в личном кабинете'),
     ('VIEW_OTHER_USERS_PROFILE', 'SYSTEM','Просмотр личного кабинета других пользователей'),
     ('VIEW_ALL_EVENTS_AND_ACTIVITIES', 'SYSTEM','Просмотр списка всех мероприятий и активностей'),
-    ('SEARCH_EVENTS_AND_ACTIVITIES', 'SYSTEM','Поиск мероприятий и активностей (фильтрация по названию, срокам проведения, формату, статусу)'),
+    ('SEARCH_EVENTS_AND_ACTIVITIES', 'SYSTEM','Поиск мероприятий и активностей'),
     ('CREATE_EVENT', 'EVENT','Создание мероприятия'),
-    ('VIEW_EVENT_PLACE', 'EVENT','Просмотр списка площадок проведения мероприятия'),
-    ('VIEW_ROUTE_BETWEEN_ROOMS', 'EVENT','Просмотр маршрута между помещениями'),
+    ('VIEW_EVENT_PLACE', 'SYSTEM','Просмотр списка площадок проведения мероприятия'),
+    ('VIEW_ROUTE_BETWEEN_ROOMS', 'SYSTEM','Просмотр маршрута между помещениями'),
     ('ASSIGN_ORGANIZER_ROLE', 'EVENT','Назначение пользователю роли Организатор'),
-    ('REVOKE_ORGANIZER_ROLE', 'EVENT','Лишение пользователя роли Организатор'),
+    ('REVOKE_ORGANIZER_ROLE', 'SYSTEM','Лишение пользователя роли Организатор'),
     ('CREATE_EVENT_VENUE', 'EVENT','создание площадки проведения мероприятия'),
     ('DELETE_EVENT_VENUE', 'EVENT','Удаление площадки проведения мероприятия'),
     ('EDIT_EVENT_VENUE', 'EVENT','Редактирование площадки проведения мероприятия'),
@@ -50,7 +50,7 @@ VALUES
     ('DECLINE_TASK_EXECUTION', 'EVENT','Отказ от исполнения задачи'),
     ('IMPORT_PARTICIPANT_LIST_XLSX', 'EVENT','Импорт списка участников в формате xlsx'),
     ('EXPORT_PARTICIPANT_LIST_XLSX', 'EVENT','Экспорт списка участников в формате xlsx'),
-    ('WORK_WITH_PARTICIPANT_LIST', 'EVENT','Работа со списком участников (например, отметка явки)');
+    ('WORK_WITH_PARTICIPANT_LIST', 'EVENT','Работа со списком участников');
 
 
 INSERT INTO role_privilege(role_id, privilege_id) values (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),(1,12),(1,13),(1,14),(1,15),(1,16),(1,17),(1,18),(1,19),(1,23),(1,24),(1,28);

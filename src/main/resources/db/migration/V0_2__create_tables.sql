@@ -117,6 +117,5 @@ create table if not exists task
     title varchar(128) not null,
     deadline timestamp not null,
     place_id int references place(id),
-    name varchar(256) not null ,
     notification_deadline timestamp not null
 );

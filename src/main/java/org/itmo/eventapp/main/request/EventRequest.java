@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class EventRequest {
-    private Integer place;
+    private Integer placeId;
 
     private LocalDateTime start;
 

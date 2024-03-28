@@ -19,8 +19,8 @@ public class EventService {
     @Autowired
     private PlaceRepo placeRepo;
     public ResponseEntity<?> addEvent(EventRequest eventRequest){
-        Optional<Place> placeRepoById = placeRepo.findById(eventRequest.getPlace());
-        if(placeRepoById.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        Optional<Place> place = placeRepo.findById(eventRequest.getPlaceId());
+        if(place.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
         Event e = new Event();
         e.setStart(eventRequest.getStart());
         e.setEnd(eventRequest.getEnd());
@@ -30,7 +30,7 @@ public class EventService {
         e.setParticipantsAgeHighest(eventRequest.getParticipantsAgeHighest());
         e.setFullDescription(eventRequest.getFullDescription());
         e.setParticipantsAgeLowest(eventRequest.getParticipantsAgeLowest());
-        e.setPlace(placeRepoById.get());
+        e.setPlace(place.get());
         e.setStatus(eventRequest.getStatus());
         e.setRegistrationStart(eventRequest.getRegistrationStart());
         e.setRegistrationEnd(eventRequest.getRegistrationEnd());
