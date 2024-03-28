@@ -8,20 +8,19 @@ import org.itmo.eventapp.main.model.entity.TaskStatus;
 import java.time.LocalDateTime;
 
 public record TaskDto(Integer id,
-                      @Min(1)
+                      @Min(value = 1, message = "Поле eventId не может быть меньше 1!")
                       Integer eventId, // validate not null and > 0
                       UserShortDataDto assignee,
-                      @NotNull
+                      @NotNull(message = "Поле assigner не может быть null!")
                       UserShortDataDto assigner, // validate not null
-                      @NotBlank
+                      @NotBlank(message = "Поле title не может быть пустым!")
                       String title, // validate not blank
-                      @NotNull
+                      @NotNull(message = "Поле description не может быть null!")
                       String description,
-                      @NotNull
                       TaskStatus taskStatus,
                       PlaceShortDataDto place,
-                      @NotNull
+                      @NotNull(message = "Поле deadline не может быть null!")
                       LocalDateTime deadline,
-                      @NotNull
+                      @NotNull(message = "Поле notificationDeadline не может быть null!")
                       LocalDateTime notificationDeadline) {
 }
