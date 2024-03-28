@@ -2,7 +2,6 @@ package org.itmo.eventapp.main.model;
 
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
