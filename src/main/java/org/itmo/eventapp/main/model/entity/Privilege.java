@@ -14,7 +14,8 @@ public class Privilege {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private PrivilegeName name;
 
     private String description;
 

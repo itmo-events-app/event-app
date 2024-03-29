@@ -32,7 +32,7 @@ CREATE TYPE role_type AS ENUM (
     'SYSTEM',
     'EVENT'
     );
-CREATE TYPE privilege_type AS ENUM (
+CREATE TYPE privilege_name AS ENUM (
     'APPROVE_REGISTRATION_REQUEST',
     'REJECT_REGISTRATION_REQUEST',
     'MODIFY_PROFILE_DATA',
@@ -77,8 +77,11 @@ CREATE TYPE privilege_type AS ENUM (
     'IMPORT_PARTICIPANT_LIST_XLSX',
     'EXPORT_PARTICIPANT_LIST_XLSX',
     'WORK_WITH_PARTICIPANT_LIST'
-    );
-
+);
+create type privilege_type as ENUM(
+    'SYSTEM',
+    'EVENT'
+);
 create cast (character varying as event_format) with inout as implicit;
 create cast (character varying as place_format) with inout as implicit;
 create cast (character varying as task_status) with inout as implicit;
@@ -87,3 +90,4 @@ create cast (character varying as email_status) with inout as implicit;
 create cast (character varying as registration_request_status) with inout as implicit;
 create cast (character varying as role_type) with inout as implicit;
 create cast (character varying as privilege_type) with inout as implicit;
+create cast (character varying as privilege_name) with inout as implicit;
