@@ -30,7 +30,7 @@ public class RoleService {
     }
 
 
-    public List<RoleDto> getAllowed() {
+    public List<RoleDto> getOrganizational() {
         return roleRepository.findAllByType(RoleType.EVENT).stream().map(role -> mapper.map(role, RoleDto.class)).toList();
     }
 }

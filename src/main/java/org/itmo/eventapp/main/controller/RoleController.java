@@ -33,8 +33,8 @@ public class RoleController {
         return ResponseEntity.ok(roleService.getAll());
     }
 
-    @GetMapping("/allowed")
-    public ResponseEntity<List<RoleDto>> getAllowedRoles() {
-        return ResponseEntity.ok(roleService.getAllowed());
+    @GetMapping("/organizational")
+    public ResponseEntity<List<RoleDto>> getOrganizationalRoles() {
+        return ResponseEntity.ok(roleService.getOrganizational());
     }
 }
