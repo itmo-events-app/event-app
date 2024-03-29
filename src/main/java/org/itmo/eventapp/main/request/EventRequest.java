@@ -2,10 +2,10 @@ package org.itmo.eventapp.main.request;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.itmo.eventapp.main.model.Event;
-import org.itmo.eventapp.main.model.EventFormat;
-import org.itmo.eventapp.main.model.EventStatus;
-import org.itmo.eventapp.main.model.Place;
+import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.EventFormat;
+import org.itmo.eventapp.main.model.entity.EventStatus;
+import org.itmo.eventapp.main.model.entity.Place;
 
 import java.time.LocalDateTime;
 

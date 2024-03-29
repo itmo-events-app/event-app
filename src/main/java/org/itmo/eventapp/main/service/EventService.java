@@ -1,7 +1,7 @@
 package org.itmo.eventapp.main.service;
 
-import org.itmo.eventapp.main.model.Event;
-import org.itmo.eventapp.main.model.Place;
+import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.repo.EventRepo;
 import org.itmo.eventapp.main.repo.PlaceRepo;
 import org.itmo.eventapp.main.request.EventRequest;
