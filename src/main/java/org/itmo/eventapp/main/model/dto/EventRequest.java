@@ -1,4 +1,4 @@
-package org.itmo.eventapp.main.request;
+package org.itmo.eventapp.main.model.dto;
 
 import jakarta.persistence.*;
 import lombok.Data;
