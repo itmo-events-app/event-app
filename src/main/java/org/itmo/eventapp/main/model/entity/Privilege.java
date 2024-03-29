@@ -25,7 +25,7 @@ public class Privilege {
     public Privilege() {
     }
 
-    public Privilege(String name, String description, PrivilegeType type) {
+    public Privilege(PrivilegeName name, String description, PrivilegeType type) {
         this.name = name;
         this.description = description;
         this.type = type;
