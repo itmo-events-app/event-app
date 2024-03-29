@@ -1,4 +1,4 @@
-package org.itmo.eventapp.main.model;
+package org.itmo.eventapp.main.model.entity;
 
 public enum TaskStatus {
     NEW,

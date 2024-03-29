@@ -1,19 +1,19 @@
 package org.itmo.eventApp.main.controller;
 
+import io.minio.MinioClient;
+import io.minio.RemoveBucketArgs;
 import org.itmo.eventapp.main.Main;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
@@ -25,24 +25,62 @@ import java.io.IOException;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = Main.class)
-public class AbstractTestContainers {
+public abstract class AbstractTestContainers {
     @Autowired
     private DataSource dataSource;
 
     @Autowired
     protected MockMvc mockMvc;
 
+    private final static String POSTGRES_VERSION = "postgres:16.0";
+
+    /**
+     * In tests create bucket only with this name
+     * After each test bucket with this name will be deleted
+     */
+    public final static String MINIO_BUCKET = "test-bucket";
+
+    private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(POSTGRES_VERSION)
+            .withUsername("test_user")
+            .withPassword("test_password")
+            .withDatabaseName("test_db")
+            .withReuse(true);
+
+    private static final MinIOContainer minioContainer = new MinIOContainer("minio/minio")
+            .withUserName("test_minio_admin")
+            .withPassword("test_minio_admin")
+            .withReuse(true);
+
+    MinioClient minioClient = MinioClient
+            .builder()
+            .endpoint(minioContainer.getS3URL())
+            .credentials(minioContainer.getUserName(), minioContainer.getPassword())
+            .build();
+
     @BeforeAll
-    public static void start() {
+    public static void startPostgres() {
         postgreSQLContainer.start();
         System.setProperty("DB_URL", postgreSQLContainer.getJdbcUrl());
         System.setProperty("DB_USERNAME", postgreSQLContainer.getUsername());
         System.setProperty("DB_PASSWORD", postgreSQLContainer.getPassword());
     }
 
+    @BeforeAll
+    public static void startMinio() {
+        minioContainer.start();
+        System.setProperty("MINIO_URL", minioContainer.getS3URL());
+        System.setProperty("MINIO_ACCESS_KEY", minioContainer.getUserName());
+        System.setProperty("MINIO_SECRET_KEY", minioContainer.getPassword());
+    }
+
     @BeforeEach
-    public void cleanUp() {
-        executeSqlScript("/sql/cleanTables.sql");
+    public void cleanUp() throws Exception {
+        try {
+            executeSqlScript("/sql/cleanTables.sql");
+            minioClient.removeBucket(RemoveBucketArgs.builder().bucket(MINIO_BUCKET).build());
+        } catch (Exception ignored) {
+
+        }
     }
 
     /**
@@ -70,7 +108,6 @@ public class AbstractTestContainers {
         return everything;
     }
 
-
     /**
      * @param sqlFileName full path from resources directory with filename.
      *                    Example /sql/cleanTables.sql
@@ -80,23 +117,5 @@ public class AbstractTestContainers {
         resourceDatabasePopulator.addScript(new ClassPathResource(sqlFileName));
         resourceDatabasePopulator.setSeparator("@@");
         resourceDatabasePopulator.execute(dataSource);
-    }
-
-    private final static String POSTGRES_VERSION = "postgres:16.0";
-
-    private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(POSTGRES_VERSION)
-            .withUsername("test_user")
-            .withPassword("test_password")
-            .withDatabaseName("test_db")
-            .withReuse(true);
-
-    private static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
-            TestPropertyValues.of(
-                    "spring.datasource.url=" + postgreSQLContainer.getJdbcUrl(),
-                    "spring.datasource.username=" + postgreSQLContainer.getUsername(),
-                    "spring.datasource.password=" + postgreSQLContainer.getPassword()
-            ).applyTo(configurableApplicationContext.getEnvironment());
-        }
     }
 }
