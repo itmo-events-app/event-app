@@ -19,6 +19,7 @@ public class EventService {
     @Autowired
     private PlaceRepo placeRepo;
     public ResponseEntity<?> addEvent(EventRequest eventRequest){
+        //** to do: validation
         Optional<Place> place = placeRepo.findById(eventRequest.getPlaceId());
         if(place.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
         Event e = new Event();
@@ -39,6 +40,6 @@ public class EventService {
         e.setPreparingStart(eventRequest.getPreparingStart());
         e.setPreparingEnd(eventRequest.getPreparingEnd());
         eventRepo.save(e);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(e.getId());
     }
 }
