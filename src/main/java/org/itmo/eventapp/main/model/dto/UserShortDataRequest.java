@@ -1,6 +1,6 @@
 package org.itmo.eventapp.main.model.dto;
 
-public record UserShortDataDto(Integer id,
+public record UserShortDataRequest(Integer id,
                                String name,
                                String surname) {
 }

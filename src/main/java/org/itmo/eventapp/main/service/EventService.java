@@ -19,26 +19,26 @@ public class EventService {
     @Autowired
     private PlaceRepo placeRepo;
     public ResponseEntity<?> addEvent(EventRequest eventRequest){
-        //** to do: validation
-        Optional<Place> place = placeRepo.findById(eventRequest.getPlaceId());
+        // TODO: Add privilege validation
+        Optional<Place> place = placeRepo.findById(eventRequest.placeId());
         if(place.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
         Event e = new Event();
-        e.setStart(eventRequest.getStart());
-        e.setEnd(eventRequest.getEnd());
-        e.setTitle(eventRequest.getTitle());
+        e.setStart(eventRequest.start());
+        e.setEnd(eventRequest.end());
+        e.setTitle(eventRequest.title());
         e.setParent(null);
-        e.setFormat(eventRequest.getFormat());
-        e.setParticipantsAgeHighest(eventRequest.getParticipantsAgeHighest());
-        e.setFullDescription(eventRequest.getFullDescription());
-        e.setParticipantsAgeLowest(eventRequest.getParticipantsAgeLowest());
+        e.setFormat(eventRequest.format());
+        e.setParticipantsAgeHighest(eventRequest.participantsAgeHighest());
+        e.setFullDescription(eventRequest.fullDescription());
+        e.setParticipantsAgeLowest(eventRequest.participantsAgeLowest());
         e.setPlace(place.get());
-        e.setStatus(eventRequest.getStatus());
-        e.setRegistrationStart(eventRequest.getRegistrationStart());
-        e.setRegistrationEnd(eventRequest.getRegistrationEnd());
-        e.setShortDescription(eventRequest.getShortDescription());
-        e.setParticipantLimit(eventRequest.getParticipantsLimit());
-        e.setPreparingStart(eventRequest.getPreparingStart());
-        e.setPreparingEnd(eventRequest.getPreparingEnd());
+        e.setStatus(eventRequest.status());
+        e.setRegistrationStart(eventRequest.registrationStart());
+        e.setRegistrationEnd(eventRequest.registrationEnd());
+        e.setShortDescription(eventRequest.shortDescription());
+        e.setParticipantLimit(eventRequest.participantsLimit());
+        e.setPreparingStart(eventRequest.preparingStart());
+        e.setPreparingEnd(eventRequest.preparingEnd());
         eventRepo.save(e);
         return ResponseEntity.ok().body(e.getId());
     }
