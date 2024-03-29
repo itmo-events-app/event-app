@@ -4,7 +4,7 @@ create table if not exists registration_request
     email varchar(128) not null unique,
     password_hash varchar(256) not null,
     name varchar(128) not null ,
-    surname varchar(128),
+    surname varchar(128) not null,
     status registration_request_status not null,
     sent_time timestamp not null default current_timestamp
 );
@@ -117,6 +117,5 @@ create table if not exists task
     title varchar(128) not null,
     deadline timestamp not null,
     place_id int references place(id),
-    name varchar(256) not null ,
     notification_deadline timestamp not null
 );
