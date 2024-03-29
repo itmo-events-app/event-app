@@ -3,7 +3,9 @@ package org.itmo.eventapp.main.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.Type;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -27,6 +29,7 @@ public class RegistrationRequest {
     private String surname;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private RegistrationRequestStatus status;
 
     @Column(name = "sent_time")

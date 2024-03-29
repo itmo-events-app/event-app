@@ -29,6 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.flywaydb:flyway-core:9.22.3")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
 
     runtimeOnly("org.postgresql:postgresql:42.6.0")
     compileOnly("org.projectlombok:lombok")

@@ -3,7 +3,9 @@ package org.itmo.eventapp.main.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.Type;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +24,7 @@ public class Role {
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private RoleType type;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
