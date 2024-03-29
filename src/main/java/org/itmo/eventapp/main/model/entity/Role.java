@@ -25,7 +25,7 @@ public class Role {
     private RoleType type;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name="privilege",
+    @JoinTable(name="role_privilege",
             joinColumns=  @JoinColumn(name="role_id", referencedColumnName="id"),
             inverseJoinColumns= @JoinColumn(name="privilege_id", referencedColumnName="id") )
     private Set<Privilege> privileges = new HashSet<Privilege>();
