@@ -10,7 +10,7 @@ import org.itmo.eventapp.main.model.entity.Place;
 import java.time.LocalDateTime;
 
 // TODO: Add correct annotations
-public record EventRequest(Integer placeId;
+public record EventRequest(Integer placeId,
                             LocalDateTime start,
                             LocalDateTime end,
                             String title,
