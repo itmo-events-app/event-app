@@ -21,7 +21,7 @@ public class User {
     private Role role;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "notifications_info_id")
+    @JoinColumn(name = "notification_info_id")
     private UserNotificationInfo userNotificationInfo;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
