@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.bsh.commands.dir
-
 plugins {
     id("java")
     id("org.springframework.boot") version "3.2.3"
@@ -34,6 +32,9 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql:42.6.0")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+
+    // open api
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 
     // minio
     implementation("io.minio:minio:8.5.9")

@@ -12,6 +12,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show_sql: true
+
   mail:
     host: smtp.mail.ru
     port: 465
@@ -28,7 +29,17 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
+
+  flyway:
+    baselineOnMigrate: true
+
 minio:
   url: http://localhost:9000
   accessKey: minio-admin
   secretKey: minio-admin
+
+springdoc:
+  api-docs:
+    path: /event-app/v3/api-docs
+  swagger-ui:
+    path: /event-app/api

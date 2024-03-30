@@ -2,13 +2,13 @@ package org.itmo.eventapp.main.model.entity;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Table(name = "event_role")
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 public class EventRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,13 +25,4 @@ public class EventRole {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
-
-    public EventRole() {
-    }
-
-    public EventRole(User user, Role role, Event event) {
-        this.user = user;
-        this.role = role;
-        this.event = event;
-    }
 }
