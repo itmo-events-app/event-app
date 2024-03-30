@@ -4,7 +4,7 @@ truncate table participant cascade;
 truncate table event cascade;
 truncate table place cascade;
 truncate table notification cascade;
-truncate table "user" cascade;
+truncate table user_t cascade;
 truncate table user_login_info cascade;
 truncate table user_notification_info cascade;
 truncate table registration_request cascade;
