@@ -1,16 +1,9 @@
 package org.itmo.eventapp.main.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class RoleDto {
-    private Integer id;
-    private String name;
-    private String description;
+@Builder
+public record RoleDto(Integer id,
+                      String name,
+                      String description) {
 }
