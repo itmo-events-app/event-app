@@ -1,7 +1,6 @@
 package org.itmo.eventapp.main.repository;
 
 import org.itmo.eventapp.main.model.entity.Task;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
