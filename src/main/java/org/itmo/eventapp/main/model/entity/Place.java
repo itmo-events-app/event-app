@@ -3,6 +3,8 @@ package org.itmo.eventapp.main.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @Entity
 @Table(name = "place")
@@ -18,6 +20,7 @@ public class Place {
     private String address;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private PlaceFormat format;
 
     private String room;

@@ -4,7 +4,7 @@ import org.itmo.eventapp.main.model.entity.TaskStatus;
 
 import java.time.LocalDateTime;
 
-public record TaskFilterDto(Integer assigneeId,
+public record TaskFilterRequest(Integer assigneeId,
                             Integer assignerId,
                             TaskStatus taskStatus,
                             LocalDateTime deadline) {

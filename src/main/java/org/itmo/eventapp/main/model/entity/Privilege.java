@@ -3,7 +3,9 @@ package org.itmo.eventapp.main.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.Type;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @Entity
 @Table(name = "privilege")
@@ -19,6 +21,7 @@ public class Privilege {
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private PrivilegeType type;
 
     public Privilege() {

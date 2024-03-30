@@ -5,8 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.dto.TaskDto;
-import org.itmo.eventapp.main.model.dto.TaskFilterDto;
+import org.itmo.eventapp.main.model.dto.TaskRequest;
+import org.itmo.eventapp.main.model.dto.TaskFilterRequest;
 import org.itmo.eventapp.main.model.entity.TaskStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +21,10 @@ import java.util.List;
 @RequestMapping(value = "/api/tasks")
 public class TaskController {
 
+    // TODO: Add TaskService and move request processing there
+
     @PostMapping
-    public ResponseEntity<Integer> taskAdd(@Valid @RequestBody TaskDto taskDto) {
+    public ResponseEntity<Integer> taskAdd(@Valid @RequestBody TaskRequest taskRequest) {
         Integer taskId = 0; // add task
         // ASSIGNER (USER) ID SHOULD BE TAKEN FROM CONTEXT??? or dto
         // returns id of created task
@@ -31,16 +33,16 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskDto> taskGet(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+    public ResponseEntity<TaskRequest> taskGet(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                            @PathVariable Integer id) {
-        TaskDto task = null; // get task
+        TaskRequest task = null; // get task
         return ResponseEntity.ok().body(task);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> taskEdit(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                       @PathVariable Integer id,
-                                      @Valid @RequestBody TaskDto taskDto) {
+                                      @Valid @RequestBody TaskRequest taskRequest) {
         // edit task
         // schedule task deadline notification
         return ResponseEntity.ok().build();
@@ -55,23 +57,23 @@ public class TaskController {
     }
 
     @PutMapping("/{id}/assignee/{userId}")
-    public ResponseEntity<TaskDto> taskSetAssignee(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+    public ResponseEntity<TaskRequest> taskSetAssignee(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                    @PathVariable Integer id,
                                                    @Min(value = 1, message = "Параметр userId не может быть меньше 1!")
                                                    @PathVariable Integer userId) {
         // set assignee - ORG only
         // schedule task deadline notification
         // delete task deadline notification for prev assignee
-        TaskDto updatedTask = null;
+        TaskRequest updatedTask = null;
         return ResponseEntity.ok().body(updatedTask);
     }
 
     @PutMapping("/{id}/assignee")
-    public ResponseEntity<TaskDto> taskTakeOn(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+    public ResponseEntity<TaskRequest> taskTakeOn(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                               @PathVariable Integer id) {
         // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
         // schedule task deadline notification
-        TaskDto updatedTask = null;
+        TaskRequest updatedTask = null;
         return ResponseEntity.ok().body(updatedTask);
     }
 
@@ -118,13 +120,13 @@ public class TaskController {
     }
 
     @PostMapping("/event/{srcEventId}/{dstEventId}")
-    public ResponseEntity<List<TaskDto>> taskListCopy(@Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
+    public ResponseEntity<List<TaskRequest>> taskListCopy(@Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
                                                       @PathVariable Integer srcEventId,
                                                       @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
                                                       @PathVariable Integer dstEventId,
                                                       @NotEmpty(message = "Список task id не может быть пустым!")
                                                       @RequestBody List<Integer> taskIds) {
-        List<TaskDto> newTasks = new ArrayList<>();
+        List<TaskRequest> newTasks = new ArrayList<>();
         // create new tasks in event with dstEventId
         // assignee -> null; status -> new
         // schedule task deadline notification
@@ -133,25 +135,25 @@ public class TaskController {
     }
 
     @GetMapping("/event/{eventId}")
-    public ResponseEntity<List<TaskDto>> taskListShowInEvent(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
+    public ResponseEntity<List<TaskRequest>> taskListShowInEvent(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
                                                              @PathVariable Integer eventId,
-                                                             @Valid @RequestBody TaskFilterDto filter) {
-        List<TaskDto> eventTasks = new ArrayList<>();
+                                                             @Valid @RequestBody TaskFilterRequest filter) {
+        List<TaskRequest> eventTasks = new ArrayList<>();
         // apply filtering in db - ???
         return ResponseEntity.ok().body(eventTasks);
     }
 
     @GetMapping("/event/{eventId}/where-assignee")
-    public ResponseEntity<List<TaskDto>> taskListShowInEventWhereAssignee(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
+    public ResponseEntity<List<TaskRequest>> taskListShowInEventWhereAssignee(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
                                                                           @PathVariable Integer eventId) {
-        List<TaskDto> eventUserTasks = new ArrayList<>();
+        List<TaskRequest> eventUserTasks = new ArrayList<>();
         // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
         return ResponseEntity.ok().body(eventUserTasks);
     }
 
     @GetMapping("/where-assignee")
-    public ResponseEntity<List<TaskDto>> taskListShowWhereAssignee() {
-        List<TaskDto> userTasks = new ArrayList<>();
+    public ResponseEntity<List<TaskRequest>> taskListShowWhereAssignee() {
+        List<TaskRequest> userTasks = new ArrayList<>();
         // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
         return ResponseEntity.ok().body(userTasks);
     }

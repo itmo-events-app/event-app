@@ -1,6 +1,6 @@
 package org.itmo.eventapp.main.model.dto;
 
-public record PlaceShortDataDto(Integer id,
+public record PlaceShortDataRequest(Integer id,
                          String name,
                          String address) {
 }

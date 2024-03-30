@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.controller;
 
-import org.itmo.eventapp.main.request.EventRequest;
+import org.itmo.eventapp.main.model.dto.EventRequest;
+import org.itmo.eventapp.main.service.EventService;
 import org.itmo.eventapp.main.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
