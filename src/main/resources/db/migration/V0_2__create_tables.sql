@@ -40,7 +40,7 @@ create table if not exists user_login_info(
     email varchar(256) not null unique,
     email_status email_status not null,
     password_hash varchar(512) not null,
-    resettoken varchar(512),
+    reset_token varchar(512),
     last_login_date date,
     registration_id int not null references registration_request(id)
 );
