@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Реализация сервиса для отправки писем по электронной почте
@@ -34,17 +36,9 @@ public class MailSenderServiceImpl implements MailSenderService{
     @Override
     public void sendIncomingTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            message.setFrom(senderName);
-            message.setRecipients(Message.RecipientType.TO, userEmail);
-            message.setSubject("Новая задача!");
-            String messageContent = readTemplate("notification/email-templates/incoming-task-template.html")
-                    .replace("${userName}", userName)
-                    .replace("${eventName}", eventName)
-                    .replace("${taskName}", taskName)
-                    .replace("${taskLink}", taskLink);
-            message.setContent(messageContent, "text/html; charset=utf-8");
-            mailSender.send(message);
+            String subject = "Новая задача!";
+            String templatePath = "notification/email-templates/incoming-task-template.html";
+            mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
         } catch (MailException | MessagingException e) {
             //логирование
         } catch (IOException e) {
@@ -56,17 +50,9 @@ public class MailSenderServiceImpl implements MailSenderService{
     @Override
     public void sendOverdueTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            message.setFrom(senderName);
-            message.setRecipients(Message.RecipientType.TO, userEmail);
-            message.setSubject("Просроченная задача!");
-            String messageContent = readTemplate("notification/email-templates/overdue-task-template.html")
-                    .replace("${userName}", userName)
-                    .replace("${eventName}", eventName)
-                    .replace("${taskName}", taskName)
-                    .replace("${taskLink}", taskLink);
-            message.setContent(messageContent, "text/html; charset=utf-8");
-            mailSender.send(message);
+            String subject = "Просроченная задача!";
+            String templatePath = "notification/email-templates/overdue-task-template.html";
+            mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
         } catch (MailException | MessagingException e) {
             //логирование
         } catch (IOException e) {
@@ -78,22 +64,38 @@ public class MailSenderServiceImpl implements MailSenderService{
     @Override
     public void sendReminderTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            message.setFrom(senderName);
-            message.setRecipients(Message.RecipientType.TO, userEmail);
-            message.setSubject("Не забудьте выполнить задачу!");
-            String messageContent = readTemplate("notification/email-templates/reminder-task-template.html")
-                    .replace("${userName}", userName)
-                    .replace("${eventName}", eventName)
-                    .replace("${taskName}", taskName)
-                    .replace("${taskLink}", taskLink);
-            message.setContent(messageContent, "text/html; charset=utf-8");
-            mailSender.send(message);
+            String subject = "Не забудьте выполнить задачу!";
+            String templatePath = "notification/email-templates/reminder-task-template.html";
+            mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
         } catch (MailException | MessagingException e) {
             //логирование
         } catch (IOException e) {
             //логирование
         }
+    }
+
+    // Создаёт MIME письмо для отправки
+    private MimeMessage createMessageFromTemplate(String recipient, String subject, String templatePath, Map<String, String> templateFields) throws MessagingException, IOException {
+        MimeMessage message = mailSender.createMimeMessage();
+        message.setFrom(senderName);
+        message.setRecipients(Message.RecipientType.TO, recipient);
+        message.setSubject(subject);
+        String messageContent = readTemplate(templatePath);
+        for (Map.Entry<String, String> templateField: templateFields.entrySet()) {
+            messageContent = messageContent.replace(templateField.getKey(), templateField.getValue());
+        }
+        message.setContent(messageContent, "text/html; charset=utf-8");
+        return message;
+    }
+
+    // Сопоставляет пары ключ:значение для шаблонов писам, свзанных с задаами
+    private Map<String, String> getTaskNotificationTemplateFields(String userName, String eventName, String taskName, String taskLink) {
+        HashMap<String, String> templateFields = new HashMap<>();
+        templateFields.put("${userName}", userName);
+        templateFields.put("${eventName}", eventName);
+        templateFields.put("${taskName}", taskName);
+        templateFields.put("${taskLink}", taskLink);
+        return templateFields;
     }
 
     //Читает файл шаблона и преобразует в String
