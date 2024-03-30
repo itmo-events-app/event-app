@@ -76,7 +76,7 @@ public abstract class AbstractTestContainers {
     @BeforeEach
     public void cleanUp() throws Exception {
         try {
-            executeSqlScript("/sql/cleanTables.sql");
+            executeSqlScript("/sql/clean_tables.sql");
             minioClient.removeBucket(RemoveBucketArgs.builder().bucket(MINIO_BUCKET).build());
         } catch (Exception ignored) {
 
