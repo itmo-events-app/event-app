@@ -33,7 +33,6 @@ public class EmailSendingTest extends AbstractTestContainers{
 
     @Test
     void testIncomingTaskMessageSending() throws IOException, MessagingException {
-
         String expectedUserEmail = "user@test";
         String expectedUserName = "Tester";
         String expectedEventName = "TestEvent";
@@ -67,8 +66,10 @@ public class EmailSendingTest extends AbstractTestContainers{
         String expectedSubject = "Просроченная задача!";
         String expectedMessage = readMessage("email-templates/overdue-task-filled.html");
 
-        mailSenderService.sendOverdueTaskMessage(expectedUserEmail, expectedUserName,
-                expectedEventName, expectedTaskName, expectedTaskLink);
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            mailSenderService.sendOverdueTaskMessage(expectedUserEmail, expectedUserName,
+                    expectedEventName, expectedTaskName, expectedTaskLink);
+        });
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
 
@@ -94,8 +95,10 @@ public class EmailSendingTest extends AbstractTestContainers{
         String expectedSubject = "Не забудьте выполнить задачу!";
         String expectedMessage = readMessage("email-templates/reminder-task-filled.html");
 
-        mailSenderService.sendReminderTaskMessage(expectedUserEmail, expectedUserName,
-                expectedEventName, expectedTaskName, expectedTaskLink);
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            mailSenderService.sendReminderTaskMessage(expectedUserEmail, expectedUserName,
+                    expectedEventName, expectedTaskName, expectedTaskLink);
+        });
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
 
