@@ -2,8 +2,8 @@ package org.itmo.eventapp.main.service;
 
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
-import org.itmo.eventapp.main.repo.EventRepo;
-import org.itmo.eventapp.main.repo.PlaceRepo;
+import org.itmo.eventapp.main.repository.EventRepo;
+import org.itmo.eventapp.main.repository.PlaceRepo;
 import org.itmo.eventapp.main.model.dto.EventRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
