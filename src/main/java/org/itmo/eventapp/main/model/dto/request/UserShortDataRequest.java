@@ -1,4 +1,4 @@
-package org.itmo.eventapp.main.model.dto;
+package org.itmo.eventapp.main.model.dto.request;
 
 public record UserShortDataRequest(Integer id,
                                String name,
