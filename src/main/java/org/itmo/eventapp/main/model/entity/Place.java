@@ -1,15 +1,16 @@
 package org.itmo.eventapp.main.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.itmo.eventapp.main.model.entity.enums.PlaceFormat;
 
 @Entity
-@Table(name = "place")
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 public class Place {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,18 +33,4 @@ public class Place {
     private float longitude;
 
     private String renderInfo;
-
-    public Place() {
-    }
-
-    public Place(String name, String address, PlaceFormat format, String room, String description, float latitude, float longitude, String renderInfo) {
-        this.name = name;
-        this.address = address;
-        this.format = format;
-        this.room = room;
-        this.description = description;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.renderInfo = renderInfo;
-    }
 }

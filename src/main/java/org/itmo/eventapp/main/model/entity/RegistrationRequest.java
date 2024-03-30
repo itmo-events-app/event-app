@@ -1,19 +1,18 @@
 package org.itmo.eventapp.main.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.Type;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
-@Table(name = "registration_request")
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 public class RegistrationRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +20,6 @@ public class RegistrationRequest {
 
     private String email;
 
-    @Column(name = "password_hash")
     private String passwordHash;
 
     private String name;
@@ -32,18 +30,5 @@ public class RegistrationRequest {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     private RegistrationRequestStatus status;
 
-    @Column(name = "sent_time")
     private LocalDateTime sentTime;
-
-    public RegistrationRequest() {
-    }
-
-    public RegistrationRequest(String email, String passwordHash, String name, String surname, RegistrationRequestStatus status, LocalDateTime sentTime) {
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.name = name;
-        this.surname = surname;
-        this.status = status;
-        this.sentTime = sentTime;
-    }
 }
