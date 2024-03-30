@@ -3,9 +3,11 @@ package org.itmo.eventApp.main.controller;
 import org.itmo.eventapp.main.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,4 +36,13 @@ public class TaskControllerTest extends AbstractTestContainers {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("taskGet.id: Параметр id не может быть меньше 1!")));
     }
+
+//    @Test
+//    void taskAddTest() throws Exception {
+//        mockMvc.perform(post("/api/tasks")
+//                        .content(loadAsString("src/test/resources/json/taskAdd.json"))
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().is(201));
+//        // TODO        .andExpect(content().string(containsString("1")));
+//    }
 }

@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.repository.EventRepository;
@@ -47,5 +48,15 @@ public class EventService {
                 .build();
         eventRepository.save(e);
         return ResponseEntity.ok().body(e.getId());
+    }
+
+    public Event findById(int id) {
+        Optional<Event> event = eventRepository.findById(id);
+
+        if (event.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        }
+
+        return event.get();
     }
 }
