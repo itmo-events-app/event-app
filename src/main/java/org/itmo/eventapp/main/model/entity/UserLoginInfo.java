@@ -18,10 +18,6 @@ public class UserLoginInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     private String email;
 
     @Enumerated(EnumType.STRING)

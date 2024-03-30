@@ -31,11 +31,9 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<Integer> taskAdd(@Valid @RequestBody TaskRequest taskRequest) {
-        Integer taskId = 0; // add task
-        // ASSIGNER (USER) ID SHOULD BE TAKEN FROM CONTEXT??? or dto
-        // returns id of created task
+        int taskId = taskService.save(taskRequest).getId();
         // schedule task deadline notification
-        return ResponseEntity.ok().body(taskId);
+        return ResponseEntity.status(201).body(taskId);
     }
 
     @GetMapping("/{id}")
