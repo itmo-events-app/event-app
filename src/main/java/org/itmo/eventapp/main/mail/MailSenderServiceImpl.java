@@ -46,10 +46,8 @@ public class MailSenderServiceImpl implements MailSenderService{
             mailSender.send(message);
         } catch (MailException | MessagingException e) {
             //логирование
-            e.printStackTrace();
         } catch (IOException e) {
             //логирование
-            e.printStackTrace();
         }
     }
 
@@ -70,10 +68,8 @@ public class MailSenderServiceImpl implements MailSenderService{
             mailSender.send(message);
         } catch (MailException | MessagingException e) {
             //логирование
-            e.printStackTrace();
         } catch (IOException e) {
             //логирование
-            e.printStackTrace();
         }
     }
 
@@ -94,10 +90,8 @@ public class MailSenderServiceImpl implements MailSenderService{
             mailSender.send(message);
         } catch (MailException | MessagingException e) {
             //логирование
-            e.printStackTrace();
         } catch (IOException e) {
             //логирование
-            e.printStackTrace();
         }
     }
 
