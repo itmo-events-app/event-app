@@ -1,13 +1,8 @@
 package org.itmo.eventApp.main.controller;
 
-import org.itmo.eventapp.main.model.entity.Role;
-import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,6 +15,9 @@ public class TaskControllerTest extends AbstractTestContainers {
 
     @Test
     void taskGetTest() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         mockMvc.perform(get("/api/tasks/1"))
