@@ -34,4 +34,8 @@ public class RoleService {
     public List<RoleDto> getOrganizational() {
         return roleRepository.findAllByType(RoleType.EVENT);
     }
+
+    public List<RoleDto> searchByName(String name) {
+        return roleRepository.findByNameContainingIgnoreCase(name);
+    }
 }

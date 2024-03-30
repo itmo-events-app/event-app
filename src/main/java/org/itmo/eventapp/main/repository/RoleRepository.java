@@ -13,5 +13,5 @@ import java.util.List;
 public interface RoleRepository extends JpaRepository<Role, Integer> {
     List<RoleDto> findAllByType(RoleType type);
 
-//    List<RoleDto> findAll();
+    List<RoleDto> findByNameContainingIgnoreCase(String name);
 }

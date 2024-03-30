@@ -37,4 +37,9 @@ public class RoleController {
     public ResponseEntity<List<RoleDto>> getOrganizationalRoles() {
         return ResponseEntity.ok(roleService.getOrganizational());
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<RoleDto>> searchByName(@RequestParam String name) {
+        return ResponseEntity.ok(roleService.searchByName(name));
+    }
 }
