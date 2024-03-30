@@ -1,9 +1,9 @@
-package org.itmo.eventapp.main.model.dto;
+package org.itmo.eventapp.main.model.dto.response;
 
 import lombok.*;
 
 @Builder
-public record RoleDto(Integer id,
-                      String name,
-                      String description) {
+public record RoleResponse(Integer id,
+                           String name,
+                           String description) {
 }
