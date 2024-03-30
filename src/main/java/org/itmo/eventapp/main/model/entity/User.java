@@ -6,6 +6,7 @@ import lombok.*;
 import java.util.List;
 
 @Entity
+@Table(name = "user_t")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -22,6 +23,10 @@ public class User {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "notification_info_id")
     private UserNotificationInfo userNotificationInfo;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "login_info_id")
+    private UserLoginInfo userLoginInfo;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<EventRole> userEvents;

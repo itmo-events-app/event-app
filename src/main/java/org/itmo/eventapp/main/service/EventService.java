@@ -1,21 +1,17 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
-import org.itmo.eventapp.main.model.entity.enums.EventFormat;
-import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.repository.PlaceRepository;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -34,8 +30,8 @@ public class EventService {
 
         Event e = Event.builder()
                 .place(null) // TODO set place
-                .start(eventRequest.start())
-                .end(eventRequest.end())
+                .startDate(eventRequest.start())
+                .endDate(eventRequest.end())
                 .title(eventRequest.title())
                 .shortDescription(eventRequest.shortDescription())
                 .fullDescription(eventRequest.fullDescription())
@@ -52,5 +48,15 @@ public class EventService {
                 .build();
         eventRepository.save(e);
         return ResponseEntity.ok().body(e.getId());
+    }
+
+    public Event findById(int id) {
+        Optional<Event> event = eventRepository.findById(id);
+
+        if (event.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        }
+
+        return event.get();
     }
 }

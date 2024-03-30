@@ -24,10 +24,9 @@ public class Event {
     @JoinColumn(name = "place_id")
     private Place place;
 
-    private LocalDateTime start;
+    private LocalDateTime startDate;
 
-    @Column(name = "\"end\"")
-    private LocalDateTime end;
+    private LocalDateTime endDate;
 
     private String title;
 
