@@ -11,7 +11,7 @@ create table if not exists registration_request
 create table if not exists privilege
 (
     id int generated always as identity primary key not null,
-    name varchar(256) not null,
+    name privilege_name not null,
     description text not null,
     type privilege_type not null
 );
@@ -34,11 +34,22 @@ create table if not exists user_notification_info(
     enable_push_notifications boolean not null default true,
     enable_email_notifications boolean not null default true
 );
+create table if not exists user_login_info(
+    id int generated always as identity primary key not null,
+    login varchar(256) not null ,
+    email varchar(256) not null unique,
+    email_status email_status not null,
+    password_hash varchar(512) not null,
+    resettoken varchar(512),
+    last_login_date date,
+    registration_id int not null references registration_request(id)
+);
 create table if not exists "user"
 (
     id int generated always as identity primary key not null,
     role_id int not null references role(id),
     notification_info_id int not null references user_notification_info(id),
+    login_info_id int not null references user_login_info(id),
     name varchar(256) not null,
     surname varchar(256)
 );
@@ -48,17 +59,6 @@ create table if not exists notification(
     description text not null ,
     sent boolean not null default FALSE,
     read_time timestamp
-);
-create table if not exists user_login_info(
-    id int generated always as identity primary key not null,
-    user_id int not null references "user"(id),
-    login varchar(256) not null ,
-    email varchar(256) not null unique,
-    email_status email_status not null,
-    password_hash varchar(512) not null,
-    ressettoken varchar(512),
-    last_login_date date,
-    registration_id int not null references registration_request(id)
 );
 create table if not exists place
 (
