@@ -1,4 +1,4 @@
-package org.itmo.eventapp.main.model.request;
+package org.itmo.eventapp.main.model.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

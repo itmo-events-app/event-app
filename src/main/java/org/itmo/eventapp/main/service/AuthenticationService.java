@@ -3,8 +3,8 @@ package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.entity.*;
-import org.itmo.eventapp.main.model.request.LoginRequest;
-import org.itmo.eventapp.main.model.request.RegistrationUserRequest;
+import org.itmo.eventapp.main.model.dto.LoginRequest;
+import org.itmo.eventapp.main.model.dto.RegistrationUserRequest;
 import org.itmo.eventapp.main.repository.RegistrationRequestRepository;
 import org.itmo.eventapp.main.repository.RoleRepository;
 import org.itmo.eventapp.main.repository.UserLoginInfoRepository;
@@ -16,7 +16,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -59,12 +58,12 @@ public class AuthenticationService {
         registrationRequestRepository.save(registrationRequest);
     }
 
-    public void applyRegistrationRequestCallback(int requestId) {
+    public void approveRegistrationRequestCallback(int requestId) {
 
         var request = registrationRequestRepository.findById(requestId);
 
         if (request.isEmpty()) {
-            // Exception
+            // TODO Exception
             return;
         }
 
@@ -74,7 +73,7 @@ public class AuthenticationService {
         var reader = roleRepository.findByName("Читатель");
 
         if (reader.isEmpty()) {
-            // Exception
+            // TODO Exception
             return;
         }
 

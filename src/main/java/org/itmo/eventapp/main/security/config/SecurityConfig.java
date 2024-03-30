@@ -1,5 +1,6 @@
 package org.itmo.eventapp.main.security.config;
 
+import jakarta.servlet.ServletException;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.security.filter.JwtFilter;
 import org.itmo.eventapp.main.security.service.UserDetailsServiceImpl;
@@ -39,9 +40,22 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("api/login").permitAll()
-                        .requestMatchers("api/register").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/register").permitAll()
                         .anyRequest().authenticated())
+
+                .logout(
+                        logout -> logout.logoutUrl("/logout")
+                                .addLogoutHandler(((request, response, authentication) -> {
+                                    try {
+                                        request.logout();
+                                    }
+                                    catch (ServletException e) {
+                                        //TODO Exception
+                                    }
+                                }))
+                )
+
                 .httpBasic(Customizer.withDefaults())
                 .authenticationManager(authenticationManager)
 
