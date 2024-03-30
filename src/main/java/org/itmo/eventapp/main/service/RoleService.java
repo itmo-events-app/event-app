@@ -5,7 +5,6 @@ import org.itmo.eventapp.main.exception.NotFoundException;
 import org.itmo.eventapp.main.model.dto.RoleDto;
 import org.itmo.eventapp.main.model.entity.RoleType;
 import org.itmo.eventapp.main.repository.RoleRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,22 +14,24 @@ import java.util.List;
 public class RoleService {
 
     private final RoleRepository roleRepository;
-    private final ModelMapper mapper;
-
 
     public void deleteRole(Integer id) throws NotFoundException {
-        if (!roleRepository.existsById(id)) throw new NotFoundException(String.format("Role with id %d doesn't exist", id));
-        // добавить проверки
+        if (!roleRepository.existsById(id))
+            throw new NotFoundException(String.format("Role with id %d doesn't exist", id));
+        // TODO: Add checks
         roleRepository.deleteById(id);
     }
 
     public List<RoleDto> getAll() {
-
-        return roleRepository.findAll().stream().map(role -> mapper.map(role, RoleDto.class)).toList();
+        var roles = roleRepository.findAll();
+        return roles.stream().map(role -> RoleDto.builder()
+                .name(role.getName())
+                .description(role.getDescription())
+                .id(role.getId())
+                .build()).toList();
     }
 
-
     public List<RoleDto> getOrganizational() {
-        return roleRepository.findAllByType(RoleType.EVENT).stream().map(role -> mapper.map(role, RoleDto.class)).toList();
+        return roleRepository.findAllByType(RoleType.EVENT);
     }
 }
