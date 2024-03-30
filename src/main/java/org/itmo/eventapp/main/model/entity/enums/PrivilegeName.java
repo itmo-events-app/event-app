@@ -1,6 +1,6 @@
-package org.itmo.eventapp.main.model.entity;
+package org.itmo.eventapp.main.model.entity.enums;
 
-public enum PrivilegeType {
+public enum PrivilegeName {
     APPROVE_REGISTRATION_REQUEST,
     REJECT_REGISTRATION_REQUEST,
     MODIFY_PROFILE_DATA,
@@ -8,7 +8,7 @@ public enum PrivilegeType {
     VIEW_ALL_EVENTS_AND_ACTIVITIES,
     SEARCH_EVENTS_AND_ACTIVITIES,
     CREATE_EVENT,
-    VIEW_EVENT_VENUES,
+    VIEW_EVENT_PLACE,
     VIEW_ROUTE_BETWEEN_ROOMS,
     ASSIGN_ORGANIZER_ROLE,
     REVOKE_ORGANIZER_ROLE,
@@ -44,5 +44,5 @@ public enum PrivilegeType {
     DECLINE_TASK_EXECUTION,
     IMPORT_PARTICIPANT_LIST_XLSX,
     EXPORT_PARTICIPANT_LIST_XLSX,
-    WORK_WITH_PARTICIPANT_LIST,
+    WORK_WITH_PARTICIPANT_LIST
 }

@@ -12,8 +12,15 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show_sql: true
-
+  flyway:
+    baselineOnMigrate: true
 minio:
   url: http://localhost:9000
   accessKey: minio-admin
   secretKey: minio-admin
+
+springdoc:
+  api-docs:
+    path: /event-app/v3/api-docs
+  swagger-ui:
+    path: /event-app/api

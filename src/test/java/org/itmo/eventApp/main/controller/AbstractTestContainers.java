@@ -76,7 +76,7 @@ public abstract class AbstractTestContainers {
     @BeforeEach
     public void cleanUp() throws Exception {
         try {
-            executeSqlScript("/sql/cleanTables.sql");
+            executeSqlScript("/sql/clean_tables.sql");
             minioClient.removeBucket(RemoveBucketArgs.builder().bucket(MINIO_BUCKET).build());
         } catch (Exception ignored) {
 
@@ -115,7 +115,7 @@ public abstract class AbstractTestContainers {
     protected void executeSqlScript(String sqlFileName) {
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
         resourceDatabasePopulator.addScript(new ClassPathResource(sqlFileName));
-        resourceDatabasePopulator.setSeparator("@@");
+//        resourceDatabasePopulator.setSeparator("@@");
         resourceDatabasePopulator.execute(dataSource);
     }
 }

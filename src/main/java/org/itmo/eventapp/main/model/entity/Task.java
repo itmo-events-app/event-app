@@ -1,17 +1,18 @@
 package org.itmo.eventapp.main.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.Type;
+import lombok.*;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
-@Table(name = "task")
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +35,8 @@ public class Task {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private TaskStatus taskStatus;
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private TaskStatus status;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "place_id")
@@ -43,30 +44,5 @@ public class Task {
 
     private LocalDateTime deadline;
 
-    @Column(name = "notification_deadline")
     private LocalDateTime notificationDeadline;
-
-    public Task() {
-    }
-
-    public Task(
-            Event event,
-            User assignee,
-            User assigner,
-            String title,
-            String description,
-            TaskStatus taskStatus,
-            Place place,
-            LocalDateTime deadline,
-            LocalDateTime notificationDeadline) {
-        this.event = event;
-        this.assignee = assignee;
-        this.assigner = assigner;
-        this.title = title;
-        this.description = description;
-        this.taskStatus = taskStatus;
-        this.place = place;
-        this.deadline = deadline;
-        this.notificationDeadline = notificationDeadline;
-    }
 }

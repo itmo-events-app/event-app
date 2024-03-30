@@ -1,15 +1,16 @@
 package org.itmo.eventapp.main.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Table(name = "user")
-@Getter
-@Setter
+@Table(name = "user_t")
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,8 +21,12 @@ public class User {
     private Role role;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "notifications_info_id")
+    @JoinColumn(name = "notification_info_id")
     private UserNotificationInfo userNotificationInfo;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "login_info_id")
+    private UserLoginInfo userLoginInfo;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<EventRole> userEvents;
@@ -29,14 +34,4 @@ public class User {
     private String name;
 
     private String surname;
-
-    public User() {
-    }
-
-    public User(Role role, UserNotificationInfo userNotificationInfo, String name, String surname) {
-        this.role = role;
-        this.userNotificationInfo = userNotificationInfo;
-        this.name = name;
-        this.surname = surname;
-    }
 }
