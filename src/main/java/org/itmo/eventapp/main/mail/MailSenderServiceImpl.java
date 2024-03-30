@@ -4,6 +4,8 @@ import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -23,10 +25,10 @@ import java.util.Map;
 /**
  * Реализация сервиса для отправки писем по электронной почте
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class MailSenderServiceImpl implements MailSenderService{
-    //todo добавить логирование
 
     private final JavaMailSender mailSender;
     @Value("${spring.mail.username}")
@@ -34,44 +36,26 @@ public class MailSenderServiceImpl implements MailSenderService{
 
     @Async
     @Override
-    public void sendIncomingTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) {
-        try {
-            String subject = "Новая задача!";
-            String templatePath = "notification/email-templates/incoming-task-template.html";
-            mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
-        } catch (MailException | MessagingException e) {
-            //логирование
-        } catch (IOException e) {
-            //логирование
-        }
+    public void sendIncomingTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) throws MessagingException, IOException {
+        String subject = "Новая задача!";
+        String templatePath = "notification/email-templates/incoming-task-template.html";
+        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
     }
 
     @Async
     @Override
-    public void sendOverdueTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) {
-        try {
-            String subject = "Просроченная задача!";
-            String templatePath = "notification/email-templates/overdue-task-template.html";
-            mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
-        } catch (MailException | MessagingException e) {
-            //логирование
-        } catch (IOException e) {
-            //логирование
-        }
+    public void sendOverdueTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) throws MessagingException, IOException {
+        String subject = "Просроченная задача!";
+        String templatePath = "notification/email-templates/overdue-task-template.html";
+        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
     }
 
     @Async
     @Override
-    public void sendReminderTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) {
-        try {
-            String subject = "Не забудьте выполнить задачу!";
-            String templatePath = "notification/email-templates/reminder-task-template.html";
-            mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
-        } catch (MailException | MessagingException e) {
-            //логирование
-        } catch (IOException e) {
-            //логирование
-        }
+    public void sendReminderTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) throws MessagingException, IOException {
+        String subject = "Не забудьте выполнить задачу!";
+        String templatePath = "notification/email-templates/reminder-task-template.html";
+        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
     }
 
     // Создаёт MIME письмо для отправки
