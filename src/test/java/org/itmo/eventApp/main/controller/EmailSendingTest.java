@@ -66,10 +66,8 @@ public class EmailSendingTest extends AbstractTestContainers{
         String expectedSubject = "Просроченная задача!";
         String expectedMessage = readMessage("email-templates/overdue-task-filled.html");
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-            mailSenderService.sendOverdueTaskMessage(expectedUserEmail, expectedUserName,
+        mailSenderService.sendOverdueTaskMessage(expectedUserEmail, expectedUserName,
                     expectedEventName, expectedTaskName, expectedTaskLink);
-        });
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
 
@@ -79,9 +77,6 @@ public class EmailSendingTest extends AbstractTestContainers{
         assertEquals(expectedSenderEmail, receivedMessage.getFrom()[0].toString());
         assertEquals(expectedSubject, receivedMessage.getSubject());
         assertEquals(expectedMessage, receivedMessage.getContent());
-
-
-
     }
 
     @Test
@@ -95,10 +90,8 @@ public class EmailSendingTest extends AbstractTestContainers{
         String expectedSubject = "Не забудьте выполнить задачу!";
         String expectedMessage = readMessage("email-templates/reminder-task-filled.html");
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-            mailSenderService.sendReminderTaskMessage(expectedUserEmail, expectedUserName,
+        mailSenderService.sendReminderTaskMessage(expectedUserEmail, expectedUserName,
                     expectedEventName, expectedTaskName, expectedTaskLink);
-        });
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
 
