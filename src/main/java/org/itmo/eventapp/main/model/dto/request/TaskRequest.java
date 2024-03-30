@@ -3,7 +3,7 @@ package org.itmo.eventapp.main.model.dto.request;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.itmo.eventapp.main.model.entity.TaskStatus;
+import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 
 import java.time.LocalDateTime;
 

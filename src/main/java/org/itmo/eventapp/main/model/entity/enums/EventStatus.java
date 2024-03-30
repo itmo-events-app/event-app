@@ -1,4 +1,4 @@
-package org.itmo.eventapp.main.model.entity;
+package org.itmo.eventapp.main.model.entity.enums;
 
 public enum EventStatus {
     DRAFT,

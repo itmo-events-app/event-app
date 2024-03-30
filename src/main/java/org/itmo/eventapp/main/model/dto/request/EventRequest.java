@@ -1,11 +1,7 @@
 package org.itmo.eventapp.main.model.dto.request;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.EventFormat;
-import org.itmo.eventapp.main.model.entity.EventStatus;
-import org.itmo.eventapp.main.model.entity.Place;
+import org.itmo.eventapp.main.model.entity.enums.EventFormat;
+import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 
 import java.time.LocalDateTime;
 

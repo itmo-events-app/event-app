@@ -28,9 +28,9 @@ public class EventService {
         e.setTitle(eventRequest.title());
         e.setParent(null);
         e.setFormat(eventRequest.format());
-        e.setParticipantsAgeHighest(eventRequest.participantsAgeHighest());
+        e.setParticipantAgeHighest(eventRequest.participantsAgeHighest());
         e.setFullDescription(eventRequest.fullDescription());
-        e.setParticipantsAgeLowest(eventRequest.participantsAgeLowest());
+        e.setParticipantAgeLowest(eventRequest.participantsAgeLowest());
         e.setPlace(place.get());
         e.setStatus(eventRequest.status());
         e.setRegistrationStart(eventRequest.registrationStart());

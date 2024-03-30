@@ -8,7 +8,7 @@ public final class TaskMapper {
         return new TaskResponse(
                 task.getTitle(),
                 task.getDescription(),
-                task.getTaskStatus(),
+                task.getStatus(),
                 task.getDeadline(),
                 task.getNotificationDeadline()
         );

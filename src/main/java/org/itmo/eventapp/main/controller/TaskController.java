@@ -9,7 +9,7 @@ import org.itmo.eventapp.main.model.dto.request.TaskFilterRequest;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Task;
-import org.itmo.eventapp.main.model.entity.TaskStatus;
+import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.service.TaskService;
 import org.springframework.http.ResponseEntity;
