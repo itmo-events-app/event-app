@@ -77,19 +77,19 @@ public class AuthenticationService {
             return;
         }
 
-        user.setName(request.get().getName());
-        user.setSurname(request.get().getSurname());
-        user.setRole(reader.get());
-        user.setUserNotificationInfo(new UserNotificationInfo());
-
-        userRepository.save(user);
-
         loginInfo.setRegistration(request.get());
         loginInfo.setEmail(request.get().getEmail());
         loginInfo.setPasswordHash(request.get().getPasswordHash());
         loginInfo.setLastLoginDate(LocalDateTime.now());
-        loginInfo.setUser(user);
 
         userLoginInfoRepository.save(loginInfo);
+
+        user.setName(request.get().getName());
+        user.setSurname(request.get().getSurname());
+        user.setRole(reader.get());
+        user.setUserNotificationInfo(new UserNotificationInfo());
+        user.setUserLoginInfo(loginInfo);
+
+        userRepository.save(user);
     }
 }

@@ -18,10 +18,6 @@ import java.util.Date;
 @AllArgsConstructor
 @Data
 @Builder
-public class UserLoginInfo {
-@Table(name = "user_login_info")
-@Getter
-@Setter
 public class UserLoginInfo implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,19 +38,6 @@ public class UserLoginInfo implements UserDetails {
     private RegistrationRequest registration;
 
     private LocalDateTime lastLoginDate;
-
-    public UserLoginInfo() {
-    }
-
-    public UserLoginInfo(User user, String email, EmailStatus emailStatus, String passwordHash, String resetToken, RegistrationRequest registration, LocalDateTime lastLoginDate) {
-        this.user = user;
-        this.email = email;
-        this.emailStatus = emailStatus;
-        this.passwordHash = passwordHash;
-        this.resetToken = resetToken;
-        this.registration = registration;
-        this.lastLoginDate = lastLoginDate;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
