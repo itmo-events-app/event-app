@@ -3,6 +3,7 @@ package org.itmo.eventApp.main.controller;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.itmo.eventapp.main.mail.MailSenderService;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EmailSendingTest extends AbstractTestContainers{
     @Autowired
@@ -27,10 +28,12 @@ public class EmailSendingTest extends AbstractTestContainers{
 
     @RegisterExtension
     static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
-            .withConfiguration(GreenMailConfiguration.aConfig().withUser("sender@test", "passwd"));
+            .withConfiguration(GreenMailConfiguration.aConfig().withUser("sender@test", "passwd"))
+            .withPerMethodLifecycle(true);
 
     @Test
-    void testIncomingTaskMessageSending() throws IOException {
+    void testIncomingTaskMessageSending() throws IOException, MessagingException {
+
         String expectedUserEmail = "user@test";
         String expectedUserName = "Tester";
         String expectedEventName = "TestEvent";
@@ -40,21 +43,21 @@ public class EmailSendingTest extends AbstractTestContainers{
         String expectedSubject = "Новая задача!";
         String expectedMessage = readMessage("email-templates/incoming-task-filled.html");
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-            mailSenderService.sendIncomingTaskMessage(expectedUserEmail, expectedUserName,
-                    expectedEventName, expectedTaskName, expectedTaskLink);
-            MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        mailSenderService.sendIncomingTaskMessage(expectedUserEmail, expectedUserName,
+                expectedEventName, expectedTaskName, expectedTaskLink);
 
-            assertEquals(1, receivedMessage.getAllRecipients().length);
-            assertEquals(expectedUserEmail, receivedMessage.getAllRecipients()[0].toString());
-            assertEquals(expectedSenderEmail, receivedMessage.getFrom()[0].toString());
-            assertEquals(expectedSubject, receivedMessage.getSubject());
-            assertEquals(expectedMessage, receivedMessage.getContent());
-        });
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
+
+        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        assertEquals(1, receivedMessage.getAllRecipients().length);
+        assertEquals(expectedUserEmail, receivedMessage.getAllRecipients()[0].toString());
+        assertEquals(expectedSenderEmail, receivedMessage.getFrom()[0].toString());
+        assertEquals(expectedSubject, receivedMessage.getSubject());
+        assertEquals(expectedMessage, receivedMessage.getContent());
     }
 
     @Test
-    void testOverdueTaskMessageSending() throws IOException {
+    void testOverdueTaskMessageSending() throws IOException, MessagingException {
         String expectedUserEmail = "user@test";
         String expectedUserName = "Tester";
         String expectedEventName = "TestEvent";
@@ -64,21 +67,24 @@ public class EmailSendingTest extends AbstractTestContainers{
         String expectedSubject = "Просроченная задача!";
         String expectedMessage = readMessage("email-templates/overdue-task-filled.html");
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-            mailSenderService.sendOverdueTaskMessage(expectedUserEmail, expectedUserName,
-                    expectedEventName, expectedTaskName, expectedTaskLink);
-            MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        mailSenderService.sendOverdueTaskMessage(expectedUserEmail, expectedUserName,
+                expectedEventName, expectedTaskName, expectedTaskLink);
 
-            assertEquals(1, receivedMessage.getAllRecipients().length);
-            assertEquals(expectedUserEmail, receivedMessage.getAllRecipients()[0].toString());
-            assertEquals(expectedSenderEmail, receivedMessage.getFrom()[0].toString());
-            assertEquals(expectedSubject, receivedMessage.getSubject());
-            assertEquals(expectedMessage, receivedMessage.getContent());
-        });
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
+
+        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        assertEquals(1, receivedMessage.getAllRecipients().length);
+        assertEquals(expectedUserEmail, receivedMessage.getAllRecipients()[0].toString());
+        assertEquals(expectedSenderEmail, receivedMessage.getFrom()[0].toString());
+        assertEquals(expectedSubject, receivedMessage.getSubject());
+        assertEquals(expectedMessage, receivedMessage.getContent());
+
+
+
     }
 
     @Test
-    void testReminderTaskMessageSending() throws IOException {
+    void testReminderTaskMessageSending() throws IOException, MessagingException {
         String expectedUserEmail = "user@test";
         String expectedUserName = "Tester";
         String expectedEventName = "TestEvent";
@@ -88,17 +94,17 @@ public class EmailSendingTest extends AbstractTestContainers{
         String expectedSubject = "Не забудьте выполнить задачу!";
         String expectedMessage = readMessage("email-templates/reminder-task-filled.html");
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-            mailSenderService.sendReminderTaskMessage(expectedUserEmail, expectedUserName,
-                    expectedEventName, expectedTaskName, expectedTaskLink);
-            MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        mailSenderService.sendReminderTaskMessage(expectedUserEmail, expectedUserName,
+                expectedEventName, expectedTaskName, expectedTaskLink);
 
-            assertEquals(1, receivedMessage.getAllRecipients().length);
-            assertEquals(expectedUserEmail, receivedMessage.getAllRecipients()[0].toString());
-            assertEquals(expectedSenderEmail, receivedMessage.getFrom()[0].toString());
-            assertEquals(expectedSubject, receivedMessage.getSubject());
-            assertEquals(expectedMessage, receivedMessage.getContent());
-        });
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
+
+        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        assertEquals(1, receivedMessage.getAllRecipients().length);
+        assertEquals(expectedUserEmail, receivedMessage.getAllRecipients()[0].toString());
+        assertEquals(expectedSenderEmail, receivedMessage.getFrom()[0].toString());
+        assertEquals(expectedSubject, receivedMessage.getSubject());
+        assertEquals(expectedMessage, receivedMessage.getContent());
     }
 
     //Читает файл шаблона и преобразует в String
