@@ -1,12 +1,19 @@
 package org.itmo.eventapp.main.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "notification")
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +29,5 @@ public class Notification {
 
     private boolean sent;
 
-    @Column(name = "read_time")
     private LocalDateTime readTime;
 }

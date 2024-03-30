@@ -11,7 +11,7 @@ create table if not exists registration_request
 create table if not exists privilege
 (
     id int generated always as identity primary key not null,
-    name varchar(256) not null,
+    name privilege_name not null,
     description text not null,
     type privilege_type not null
 );

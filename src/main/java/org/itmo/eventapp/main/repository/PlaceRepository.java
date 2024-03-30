@@ -2,6 +2,8 @@ package org.itmo.eventapp.main.repository;
 
 import org.itmo.eventapp.main.model.entity.Place;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface PlaceRepo extends JpaRepository<Place,Integer>{
+@Repository
+public interface PlaceRepository extends JpaRepository<Place,Integer>{
 }

@@ -1,45 +1,56 @@
 package org.itmo.eventapp.main.service;
 
+import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
-import org.itmo.eventapp.main.repository.EventRepo;
-import org.itmo.eventapp.main.repository.PlaceRepo;
-import org.itmo.eventapp.main.model.dto.EventRequest;
+import org.itmo.eventapp.main.model.entity.enums.EventFormat;
+import org.itmo.eventapp.main.model.entity.enums.EventStatus;
+import org.itmo.eventapp.main.repository.EventRepository;
+import org.itmo.eventapp.main.repository.PlaceRepository;
+import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class EventService {
-    @Autowired
-    private EventRepo eventRepo;
-    @Autowired
-    private PlaceRepo placeRepo;
-    public ResponseEntity<?> addEvent(EventRequest eventRequest){
+    private EventRepository eventRepository;
+    private PlaceRepository placeRepo;
+
+    public ResponseEntity<Integer> addEvent(EventRequest eventRequest) {
         // TODO: Add privilege validation
         Optional<Place> place = placeRepo.findById(eventRequest.placeId());
-        if(place.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Place not found");
-        Event e = new Event();
-        e.setStart(eventRequest.start());
-        e.setEnd(eventRequest.end());
-        e.setTitle(eventRequest.title());
-        e.setParent(null);
-        e.setFormat(eventRequest.format());
-        e.setParticipantsAgeHighest(eventRequest.participantsAgeHighest());
-        e.setFullDescription(eventRequest.fullDescription());
-        e.setParticipantsAgeLowest(eventRequest.participantsAgeLowest());
-        e.setPlace(place.get());
-        e.setStatus(eventRequest.status());
-        e.setRegistrationStart(eventRequest.registrationStart());
-        e.setRegistrationEnd(eventRequest.registrationEnd());
-        e.setShortDescription(eventRequest.shortDescription());
-        e.setParticipantLimit(eventRequest.participantsLimit());
-        e.setPreparingStart(eventRequest.preparingStart());
-        e.setPreparingEnd(eventRequest.preparingEnd());
-        eventRepo.save(e);
+
+        if (place.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Place not found");
+        }
+
+        Event e = Event.builder()
+                .place(null) // TODO set place
+                .start(eventRequest.start())
+                .end(eventRequest.end())
+                .title(eventRequest.title())
+                .shortDescription(eventRequest.shortDescription())
+                .fullDescription(eventRequest.fullDescription())
+                .format(eventRequest.format())
+                .status(eventRequest.status())
+                .registrationStart(eventRequest.registrationStart())
+                .registrationEnd(eventRequest.registrationEnd())
+                .parent(null) // TODO set parent
+                .participantLimit(eventRequest.participantLimit())
+                .participantAgeLowest(eventRequest.participantAgeLowest())
+                .participantAgeHighest(eventRequest.participantAgeHighest())
+                .preparingStart(eventRequest.preparingStart())
+                .preparingEnd(eventRequest.preparingEnd())
+                .build();
+        eventRepository.save(e);
         return ResponseEntity.ok().body(e.getId());
     }
 }
