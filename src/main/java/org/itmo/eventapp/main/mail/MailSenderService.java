@@ -1,7 +1,5 @@
 package org.itmo.eventapp.main.mail;
 
-import org.springframework.scheduling.annotation.Async;
-
 /**
  * Сервис для отправки писем по электронной почте
  */

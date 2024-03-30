@@ -1,5 +1,6 @@
 package org.itmo.eventapp.main.mail;
 
+import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 public class MailSenderServiceImpl implements MailSenderService{
     //todo добавить логирование
 
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
     @Value("${spring.mail.username}")
     private String senderName;
 
@@ -35,7 +36,7 @@ public class MailSenderServiceImpl implements MailSenderService{
         try {
             MimeMessage message = mailSender.createMimeMessage();
             message.setFrom(senderName);
-            message.setRecipients(MimeMessage.RecipientType.TO, userEmail);
+            message.setRecipients(Message.RecipientType.TO, userEmail);
             message.setSubject("Новая задача!");
             String messageContent = readTemplate("notification/email-templates/incoming-task-template.html")
                     .replace("${userName}", userName)
@@ -57,7 +58,7 @@ public class MailSenderServiceImpl implements MailSenderService{
         try {
             MimeMessage message = mailSender.createMimeMessage();
             message.setFrom(senderName);
-            message.setRecipients(MimeMessage.RecipientType.TO, userEmail);
+            message.setRecipients(Message.RecipientType.TO, userEmail);
             message.setSubject("Просроченная задача!");
             String messageContent = readTemplate("notification/email-templates/overdue-task-template.html")
                     .replace("${userName}", userName)
@@ -79,7 +80,7 @@ public class MailSenderServiceImpl implements MailSenderService{
         try {
             MimeMessage message = mailSender.createMimeMessage();
             message.setFrom(senderName);
-            message.setRecipients(MimeMessage.RecipientType.TO, userEmail);
+            message.setRecipients(Message.RecipientType.TO, userEmail);
             message.setSubject("Не забудьте выполнить задачу!");
             String messageContent = readTemplate("notification/email-templates/reminder-task-template.html")
                     .replace("${userName}", userName)
