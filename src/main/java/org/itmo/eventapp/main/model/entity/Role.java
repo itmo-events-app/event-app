@@ -31,5 +31,5 @@ public class Role {
     @JoinTable(name = "role_privilege",
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
-    private Set<Privilege> privileges = new HashSet<>();
+    private Set<Privilege> privileges;
 }
