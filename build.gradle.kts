@@ -28,7 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.modelmapper:modelmapper:3.2.0")
+    implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
     implementation("org.flywaydb:flyway-core:9.22.3")
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
