@@ -52,14 +52,8 @@ public class EmailSendingTest extends AbstractTestContainers{
         assertEquals(expectedUserEmail, receivedMessage.getAllRecipients()[0].toString());
         assertEquals(expectedSenderEmail, receivedMessage.getFrom()[0].toString());
         assertEquals(expectedSubject, receivedMessage.getSubject());
-        System.out.println("==========================");
-        System.out.println("EXPECTED:");
-        System.out.println(expectedMessage);
-        System.out.println("==========================");
-        System.out.println("RECEIVED:");
-        System.out.println(receivedMessage.getContent());
-        System.out.println("==========================");
-        assertEquals(expectedMessage, receivedMessage.getContent());
+        // replace \r\n over \n to resolve test conflicts on Windows and Linux
+        assertEquals(expectedMessage.replace("\r\n", "\n"), receivedMessage.getContent().toString().replace("\r\n", "\n"));
     }
 
     @Test
@@ -83,14 +77,8 @@ public class EmailSendingTest extends AbstractTestContainers{
         assertEquals(expectedUserEmail, receivedMessage.getAllRecipients()[0].toString());
         assertEquals(expectedSenderEmail, receivedMessage.getFrom()[0].toString());
         assertEquals(expectedSubject, receivedMessage.getSubject());
-        System.out.println("==========================");
-        System.out.println("EXPECTED:");
-        System.out.println(expectedMessage);
-        System.out.println("==========================");
-        System.out.println("RECEIVED:");
-        System.out.println(receivedMessage.getContent());
-        System.out.println("==========================");
-        assertEquals(expectedMessage, receivedMessage.getContent());
+        // replace \r\n over \n to resolve test conflicts on Windows and Linux
+        assertEquals(expectedMessage.replace("\r\n", "\n"), receivedMessage.getContent().toString().replace("\r\n", "\n"));
     }
 
     @Test
@@ -114,14 +102,8 @@ public class EmailSendingTest extends AbstractTestContainers{
         assertEquals(expectedUserEmail, receivedMessage.getAllRecipients()[0].toString());
         assertEquals(expectedSenderEmail, receivedMessage.getFrom()[0].toString());
         assertEquals(expectedSubject, receivedMessage.getSubject());
-        System.out.println("==========================");
-        System.out.println("EXPECTED:");
-        System.out.println(expectedMessage);
-        System.out.println("==========================");
-        System.out.println("RECEIVED:");
-        System.out.println(receivedMessage.getContent());
-        System.out.println("==========================");
-        assertEquals(expectedMessage, receivedMessage.getContent());
+        // replace \r\n over \n to resolve test conflicts on Windows and Linux
+        assertEquals(expectedMessage.replace("\r\n", "\n"), receivedMessage.getContent().toString().replace("\r\n", "\n"));
     }
 
     //Читает файл шаблона и преобразует в String
