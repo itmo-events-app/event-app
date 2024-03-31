@@ -21,9 +21,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class EventService {
-    private EventRepository eventRepository;
+
+    private EventRepository eventRepo;
     private PlaceRepository placeRepo;
 
+    @Autowired
+    public EventService(EventRepository eventRepo, PlaceRepository placeRepo) {
+        this.eventRepo = eventRepo;
+        this.placeRepo = placeRepo;
+    }
     public ResponseEntity<Integer> addEvent(EventRequest eventRequest) {
         // TODO: Add privilege validation
         Optional<Place> place = placeRepo.findById(eventRequest.placeId());
@@ -31,9 +37,12 @@ public class EventService {
         if (place.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Place not found");
         }
-
+        Optional<Event> event = eventRepo.findById(eventRequest.parent());
+        if (event.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        }
         Event e = Event.builder()
-                .place(null) // TODO set place
+                .place(place.get()) // TODO set place
                 .start(eventRequest.start())
                 .end(eventRequest.end())
                 .title(eventRequest.title())
@@ -43,14 +52,14 @@ public class EventService {
                 .status(eventRequest.status())
                 .registrationStart(eventRequest.registrationStart())
                 .registrationEnd(eventRequest.registrationEnd())
-                .parent(null) // TODO set parent
+                .parent(event.get()) // TODO set parent
                 .participantLimit(eventRequest.participantLimit())
                 .participantAgeLowest(eventRequest.participantAgeLowest())
                 .participantAgeHighest(eventRequest.participantAgeHighest())
                 .preparingStart(eventRequest.preparingStart())
                 .preparingEnd(eventRequest.preparingEnd())
                 .build();
-        eventRepository.save(e);
+        eventRepo.save(e);
         return ResponseEntity.ok().body(e.getId());
     }
 }
