@@ -32,7 +32,7 @@ public class EventService {
             parent = eventRepository.findById(eventRequest.parent()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
         }
         Event e = Event.builder()
-                .place(place) // TODO set place
+                .place(place)
                 .startDate(eventRequest.start())
                 .endDate(eventRequest.end())
                 .title(eventRequest.title())
@@ -42,7 +42,7 @@ public class EventService {
                 .status(eventRequest.status())
                 .registrationStart(eventRequest.registrationStart())
                 .registrationEnd(eventRequest.registrationEnd())
-                .parent(parent) // TODO set parent
+                .parent(parent)
                 .participantLimit(eventRequest.participantLimit())
                 .participantAgeLowest(eventRequest.participantAgeLowest())
                 .participantAgeHighest(eventRequest.participantAgeHighest())

@@ -18,10 +18,8 @@ public record EventRequest(
         LocalDateTime start,
         @NotNull(message = "Поле end не может быть null!")
         LocalDateTime end,
-        @NotNull(message = "Поле title не может быть null!")
         @NotBlank(message = "Поле title не может быть пустой!")
         String title,
-        @NotNull(message = "Поле shortDescription не может быть null!")
         @NotBlank(message = "Поле shortDescription не может быть пустой!")
         String shortDescription,
         @NotNull(message = "Поле fullDescription не может быть null!")
