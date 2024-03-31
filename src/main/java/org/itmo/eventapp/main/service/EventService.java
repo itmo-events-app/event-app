@@ -7,6 +7,7 @@ import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.repository.PlaceRepository;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,19 +18,21 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class EventService {
-    private EventRepository eventRepository;
-    private PlaceRepository placeRepo;
 
-    public ResponseEntity<Integer> addEvent(EventRequest eventRequest) {
+    private final EventRepository eventRepository;
+    private final PlaceRepository placeRepository;
+
+
+    public Event addEvent(EventRequest eventRequest) {
         // TODO: Add privilege validation
-        Optional<Place> place = placeRepo.findById(eventRequest.placeId());
+        Place place = placeRepository.findById(eventRequest.placeId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Place not found"));
 
-        if (place.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Place not found");
+        Event parent = null;
+        if (eventRequest.parent() != null) {
+            parent = eventRepository.findById(eventRequest.parent()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
         }
-
         Event e = Event.builder()
-                .place(null) // TODO set place
+                .place(place)
                 .startDate(eventRequest.start())
                 .endDate(eventRequest.end())
                 .title(eventRequest.title())
@@ -39,15 +42,14 @@ public class EventService {
                 .status(eventRequest.status())
                 .registrationStart(eventRequest.registrationStart())
                 .registrationEnd(eventRequest.registrationEnd())
-                .parent(null) // TODO set parent
+                .parent(parent)
                 .participantLimit(eventRequest.participantLimit())
                 .participantAgeLowest(eventRequest.participantAgeLowest())
                 .participantAgeHighest(eventRequest.participantAgeHighest())
                 .preparingStart(eventRequest.preparingStart())
                 .preparingEnd(eventRequest.preparingEnd())
                 .build();
-        eventRepository.save(e);
-        return ResponseEntity.ok().body(e.getId());
+        return eventRepository.save(e);
     }
 
     public Event findById(int id) {
