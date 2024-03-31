@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
     id("java")
     id("org.springframework.boot") version "3.2.3"
@@ -49,6 +51,12 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = true
+        showStackTraces = true
+        exceptionFormat = TestExceptionFormat.FULL
+    }
 }
 
 tasks.jacocoTestReport {
