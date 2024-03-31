@@ -24,6 +24,9 @@ public class User {
     @JoinColumn(name = "notification_info_id")
     private UserNotificationInfo userNotificationInfo;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private UserLoginInfo userLoginInfo;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<EventRole> userEvents;
 
