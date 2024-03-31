@@ -1,5 +1,6 @@
 package org.itmo.eventapp.main.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exception.NotFoundException;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
@@ -16,10 +17,12 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
 
+    @Transactional
     public void deleteRole(Integer id) {
-        if (!roleRepository.existsById(id))
-            throw new NotFoundException(String.format("Role with id %d doesn't exist", id));
+        var role = roleRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Role with id %d doesn't exist", id)));
         // TODO: Add checks
+        role.setPrivileges(null);
         roleRepository.deleteById(id);
     }
 
