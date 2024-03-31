@@ -18,6 +18,10 @@ public class UserLoginInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private String email;
 
     @Enumerated(EnumType.STRING)

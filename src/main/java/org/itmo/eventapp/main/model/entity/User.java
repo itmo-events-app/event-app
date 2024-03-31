@@ -20,12 +20,11 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notification_info_id")
     private UserNotificationInfo userNotificationInfo;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "login_info_id")
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private UserLoginInfo userLoginInfo;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
