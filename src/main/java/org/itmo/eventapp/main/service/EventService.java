@@ -19,31 +19,20 @@ import java.util.Optional;
 @Service
 public class EventService {
 
-    private EventRepository eventRepository;
-    private PlaceRepository placeRepository;
+    private final EventRepository eventRepository;
+    private final PlaceRepository placeRepository;
 
-    @Autowired
-    public EventService(EventRepository eventRepo, PlaceRepository placeRepo) {
-        this.eventRepository = eventRepo;
-        this.placeRepository = placeRepo;
-    }
-    public ResponseEntity<Integer> addEvent(EventRequest eventRequest) {
+
+    public Event addEvent(EventRequest eventRequest) {
         // TODO: Add privilege validation
-        Optional<Place> place = placeRepository.findById(eventRequest.placeId());
+        Place place = placeRepository.findById(eventRequest.placeId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Place not found"));
 
-        if (place.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Place not found");
-        }
-        Event event = null;
+        Event parent = null;
         if (eventRequest.parent() != null) {
-            Optional<Event> eventOptional = eventRepository.findById(eventRequest.parent());
-            if (eventOptional.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
-            }
-            event = eventOptional.get();
+            parent = eventRepository.findById(eventRequest.parent()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
         }
         Event e = Event.builder()
-                .place(place.get()) // TODO set place
+                .place(place) // TODO set place
                 .startDate(eventRequest.start())
                 .endDate(eventRequest.end())
                 .title(eventRequest.title())
@@ -53,15 +42,14 @@ public class EventService {
                 .status(eventRequest.status())
                 .registrationStart(eventRequest.registrationStart())
                 .registrationEnd(eventRequest.registrationEnd())
-                .parent(event) // TODO set parent
+                .parent(parent) // TODO set parent
                 .participantLimit(eventRequest.participantLimit())
                 .participantAgeLowest(eventRequest.participantAgeLowest())
                 .participantAgeHighest(eventRequest.participantAgeHighest())
                 .preparingStart(eventRequest.preparingStart())
                 .preparingEnd(eventRequest.preparingEnd())
                 .build();
-        eventRepository.save(e);
-        return ResponseEntity.ok().body(e.getId());
+        return eventRepository.save(e);
     }
 
     public Event findById(int id) {
