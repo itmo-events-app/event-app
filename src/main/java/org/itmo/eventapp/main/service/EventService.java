@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
@@ -25,17 +26,15 @@ public class EventService {
     private final EventRepository eventRepository;
     private final PlaceRepository placeRepository;
 
-    private static final String EVENT_NOT_FOUND_MESSAGE = "Event not found";
-    private static final String EVENT_PARENT_NOT_FOUND_MESSAGE = "Event's parent not found";
-    private static final String PLACE_NOT_FOUND_MESSAGE = "Place not found";
-
     public Event addEvent(EventRequest eventRequest) {
         // TODO: Add privilege validation
-        Place place = placeRepository.findById(eventRequest.placeId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, PLACE_NOT_FOUND_MESSAGE));
+        Place place = placeRepository.findById(eventRequest.placeId()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.PLACE_NOT_FOUND_MESSAGE));
 
         Event parent = null;
         if (eventRequest.parent() != null) {
-            parent = eventRepository.findById(eventRequest.parent()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, EVENT_NOT_FOUND_MESSAGE));
+            parent = eventRepository.findById(eventRequest.parent()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_PARENT_NOT_FOUND_MESSAGE));
         }
         Event e = Event.builder()
                 .place(place)
@@ -62,7 +61,7 @@ public class EventService {
         Optional<Event> event = eventRepository.findById(id);
 
         if (event.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, EVENT_NOT_FOUND_MESSAGE);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE);
         }
 
         return event.get();
@@ -71,13 +70,13 @@ public class EventService {
     public EventResponse updateEvent(Integer id, EventRequest eventRequest) {
         Event parentEvent = null;
         if (!eventRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, EVENT_NOT_FOUND_MESSAGE);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE);
         }
         Place place = placeRepository.findById(eventRequest.placeId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, PLACE_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.PLACE_NOT_FOUND_MESSAGE));
         if (eventRequest.parent() != null) {
             parentEvent = eventRepository.findById(eventRequest.parent())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, EVENT_PARENT_NOT_FOUND_MESSAGE));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_PARENT_NOT_FOUND_MESSAGE));
         }
         Event updatedEvent = EventMapper.eventRequestToEvent(id, eventRequest, place, parentEvent);
         eventRepository.save(updatedEvent);
@@ -93,7 +92,7 @@ public class EventService {
 
     public EventResponse getEventById(Integer id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, EVENT_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
         return EventMapper.eventToEventResponse(event);
     }
 }

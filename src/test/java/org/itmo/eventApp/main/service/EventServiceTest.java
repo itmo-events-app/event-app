@@ -30,12 +30,6 @@ class EventServiceTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_event.sql");
     }
 
-    @AfterEach
-    public void cleanup() {
-        executeSqlScript("/sql/cleanup_event.sql");
-        executeSqlScript("/sql/cleanup_place.sql");
-    }
-
     @Test
     void updateEvent() {
         EventRequest eventRequest = new EventRequest(1,

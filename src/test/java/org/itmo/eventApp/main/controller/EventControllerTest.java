@@ -1,6 +1,5 @@
 package org.itmo.eventApp.main.controller;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,12 +18,6 @@ public class EventControllerTest extends AbstractTestContainers {
     public void setup() {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
-    }
-
-    @AfterEach
-    public void cleanup() {
-        executeSqlScript("/sql/cleanup_event.sql");
-        executeSqlScript("/sql/cleanup_place.sql");
     }
 
     @Test
