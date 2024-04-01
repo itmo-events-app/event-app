@@ -7,6 +7,7 @@ import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
+import org.itmo.eventapp.main.repository.PrivilegeRepository;
 import org.itmo.eventapp.main.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +18,14 @@ import java.util.List;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final PrivilegeRepository privilegeRepository;
 
+    @Transactional
     public RoleResponse createRole(RoleRequest roleRequest) {
         Role role = new Role(roleRequest);
+        roleRequest.privileges().stream()
+                .map(privilegeRepository::findPrivilegeById)
+                .forEach(role::addPrivilege);
         Role createdRole = roleRepository.save(role);
         return new RoleResponse(createdRole.getId(), createdRole.getName(), createdRole.getDescription());
     }
