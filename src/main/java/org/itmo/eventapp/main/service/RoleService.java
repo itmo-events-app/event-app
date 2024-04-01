@@ -3,6 +3,7 @@ package org.itmo.eventapp.main.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exception.NotFoundException;
+import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
@@ -16,6 +17,12 @@ import java.util.List;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+
+    public RoleResponse createRole(RoleRequest roleRequest) {
+        Role role = new Role(roleRequest);
+        Role createdRole = roleRepository.save(role);
+        return new RoleResponse(createdRole.getId(), createdRole.getName(), createdRole.getDescription());
+    }
 
     @Transactional
     public void deleteRole(Integer id) {
@@ -33,6 +40,11 @@ public class RoleService {
                 .description(role.getDescription())
                 .id(role.getId())
                 .build()).toList();
+    }
+
+    public RoleResponse findById(Integer id) {
+        var role = roleRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Role with id %d doesn't exist", id)));
+        return new RoleResponse(id, role.getName(), role.getDescription());
     }
 
     public List<RoleResponse> getOrganizational() {
