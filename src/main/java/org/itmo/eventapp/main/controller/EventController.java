@@ -39,7 +39,9 @@ public class EventController {
         return ResponseEntity.ok().body(eventService.updateEvent(id, eventRequest));
     }
 
-    @GetMapping("/")
+    // TODO: Add filtering by fields: title, dates, status, format
+
+    @GetMapping
     public ResponseEntity<List<EventResponse>> getAllEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
                                                             @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") int size) {
         return ResponseEntity.ok().body(eventService.getAllEvents(page, size));

@@ -12,6 +12,7 @@ public final class EventMapper {
     }
 
     public static EventResponse eventToEventResponse(Event event) {
+        Integer parent = (event.getParent() != null) ? event.getParent().getId() : null;
         return new EventResponse(
                 event.getId(),
                 event.getPlace().getId(),
@@ -24,7 +25,7 @@ public final class EventMapper {
                 event.getStatus(),
                 event.getRegistrationStart(),
                 event.getRegistrationEnd(),
-                (event.getParent() != null) ? event.getParent().getId() : null,
+                parent,
                 event.getParticipantLimit(),
                 event.getParticipantAgeLowest(),
                 event.getParticipantAgeHighest(),
