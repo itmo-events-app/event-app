@@ -20,6 +20,6 @@ public class EventController {
     private final EventService eventService;
     @PostMapping
     public ResponseEntity<Integer> addEvent(@RequestBody @Valid CreateEventRequest eventRequest) {
-        return ResponseEntity.ok(eventService.addEventPyOrganizer(eventRequest).getId());
+        return ResponseEntity.ok(eventService.addEventByOrganizer(eventRequest).getId());
     }
 }

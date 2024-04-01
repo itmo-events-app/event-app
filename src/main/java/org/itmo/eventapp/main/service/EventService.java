@@ -57,7 +57,7 @@ public class EventService {
         return eventRepository.save(e);
     }
 
-    public Event addEventPyOrganizer(CreateEventRequest eventRequest) {
+    public Event addEventByOrganizer(CreateEventRequest eventRequest) {
         // TODO: Add privilege validation
         Event e = Event.builder()
                 .title(eventRequest.title())
