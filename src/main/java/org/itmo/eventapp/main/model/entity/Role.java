@@ -12,9 +12,7 @@ import org.hibernate.validator.constraints.Length;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -42,7 +40,7 @@ public class Role {
     @JoinTable(name = "role_privilege",
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
-    private List<Privilege> privileges = new ArrayList<>();
+    private Set<Privilege> privileges = new HashSet<>();
 
     public void removePrivilege(Privilege privilege) {
         this.privileges.remove(privilege);

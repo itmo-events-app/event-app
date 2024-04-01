@@ -11,7 +11,7 @@ import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -44,7 +44,7 @@ public class RoleService {
         var role = roleRepository.findByName(roleRequest.name());
         if (role.isPresent() && !role.get().getId().equals(id))
             throw new NotUniqueException("Роль с таким именем уже существует");
-        editedRole.setPrivileges(new ArrayList<>());
+        editedRole.setPrivileges(new HashSet<>());
         editedRole = new Role(roleRequest);
         editedRole.setId(id);
         roleRequest.privileges().stream()
@@ -93,7 +93,13 @@ public class RoleService {
     }
 
     public List<RoleResponse> searchByName(String name) {
-        return roleRepository.findByNameContainingIgnoreCase(name);
+        return roleRepository.findByNameContainingIgnoreCase(name).stream()
+                .map(role -> new RoleResponse(role.getId(),
+                        role.getName(),
+                        role.getDescription(),
+                        role.getType(),
+                        privilegeService.convertToDto(role.getPrivileges())))
+                .toList();
     }
 
     private Role findByName(String name) {

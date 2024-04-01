@@ -7,8 +7,8 @@ import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
 import org.itmo.eventapp.main.repository.PrivilegeRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class PrivilegeService {
         return convertToDto(privilegeRepository.findAll());
     }
 
-    public List<PrivilegeResponse> convertToDto(List<Privilege> privileges) {
+    public List<PrivilegeResponse> convertToDto(Collection<Privilege> privileges) {
         return privileges.stream()
                 .map(privilege -> new PrivilegeResponse(privilege.getId(),
                         privilege.getName(),
