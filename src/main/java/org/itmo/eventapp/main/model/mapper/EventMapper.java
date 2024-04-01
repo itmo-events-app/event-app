@@ -6,7 +6,6 @@ import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class EventMapper {
     private EventMapper() {
@@ -59,6 +58,6 @@ public final class EventMapper {
     public static List<EventResponse> eventsToEventResponseList(List<Event> events) {
         return events.stream()
                 .map(EventMapper::eventToEventResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
