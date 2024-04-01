@@ -18,8 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class EventController {
     private final EventService eventService;
+    @PostMapping("/activity")
+    public ResponseEntity<Integer> addEvent(@RequestBody @Valid EventRequest eventRequest) {
+        return ResponseEntity.ok(eventService.addEvent(eventRequest).getId());
+    }
+
     @PostMapping
-    public ResponseEntity<Integer> addEvent(@RequestBody @Valid CreateEventRequest eventRequest) {
+    public ResponseEntity<Integer> addEventByOrganizer(@RequestBody @Valid CreateEventRequest eventRequest) {
         return ResponseEntity.ok(eventService.addEventByOrganizer(eventRequest).getId());
     }
 }
