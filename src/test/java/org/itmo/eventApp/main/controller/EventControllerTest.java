@@ -36,7 +36,7 @@ public class EventControllerTest extends AbstractTestContainers{
                 "\"preparingEnd\": \"2024-03-27T23:59:59\"" +
                 "}";
         mockMvc.perform(
-                        post("/api/events")
+                        post("/api/events/activity")
                                 .content(eventJson)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -66,7 +66,7 @@ public class EventControllerTest extends AbstractTestContainers{
                 "\"preparingEnd\": \"2024-03-27T23:59:59\"" +
                 "}";
         mockMvc.perform(
-                        post("/api/events")
+                        post("/api/events/activity")
                                 .content(eventJson)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -97,7 +97,7 @@ public class EventControllerTest extends AbstractTestContainers{
                 "\"preparingEnd\": \"2024-03-27T23:59:59\"" +
                 "}";
         mockMvc.perform(
-                        post("/api/events")
+                        post("/api/events/activity")
                                 .content(eventJson)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
