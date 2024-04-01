@@ -8,10 +8,11 @@ import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
-import org.itmo.eventapp.main.repository.PrivilegeRepository;
 import org.itmo.eventapp.main.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -19,17 +20,44 @@ import java.util.List;
 public class RoleService {
 
     private final RoleRepository roleRepository;
-    private final PrivilegeRepository privilegeRepository;
+    private final PrivilegeService privilegeService;
 
     @Transactional
     public RoleResponse createRole(RoleRequest roleRequest) {
-        if (roleRepository.findByName(roleRequest.name()).isPresent()) throw new NotUniqueException("Роль с таким именем уже существует");
+        if (roleRepository.findByName(roleRequest.name()).isPresent())
+            throw new NotUniqueException("Роль с таким именем уже существует");
         Role role = new Role(roleRequest);
         roleRequest.privileges().stream()
-                .map(privilegeRepository::findPrivilegeById)
+                .map(privilegeService::findById)
                 .forEach(role::addPrivilege);
         Role createdRole = roleRepository.save(role);
-        return new RoleResponse(createdRole.getId(), createdRole.getName(), createdRole.getDescription());
+        return new RoleResponse(createdRole.getId(),
+                createdRole.getName(),
+                createdRole.getDescription(),
+                createdRole.getType(),
+                privilegeService.convertToDto(createdRole.getPrivileges()));
+    }
+
+    @Transactional
+    public RoleResponse editRole(Integer id, RoleRequest roleRequest) {
+        var editedRole = roleRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
+        var role = roleRepository.findByName(roleRequest.name());
+        role.ifPresent(value -> System.out.println(value.getId()));
+        if (role.isPresent() && !role.get().getId().equals(id))
+            throw new NotUniqueException("Роль с таким именем уже существует");
+        editedRole.setPrivileges(new ArrayList<>());
+        editedRole = new Role(roleRequest);
+        editedRole.setId(id);
+        roleRequest.privileges().stream()
+                .map(privilegeService::findById)
+                .forEach(editedRole::addPrivilege);
+        roleRepository.save(editedRole);
+        return new RoleResponse(editedRole.getId(),
+                editedRole.getName(),
+                editedRole.getDescription(),
+                editedRole.getType(),
+                privilegeService.convertToDto(editedRole.getPrivileges()));
     }
 
     @Transactional
@@ -42,21 +70,28 @@ public class RoleService {
     }
 
     public List<RoleResponse> getAll() {
-        var roles = roleRepository.findAll();
-        return roles.stream().map(role -> RoleResponse.builder()
-                .name(role.getName())
-                .description(role.getDescription())
-                .id(role.getId())
-                .build()).toList();
+        return roleRepository.findAll().stream()
+                .map(role -> new RoleResponse(role.getId(),
+                        role.getName(),
+                        role.getDescription(),
+                        role.getType(),
+                        privilegeService.convertToDto(role.getPrivileges())))
+                .toList();
     }
 
     public RoleResponse findById(Integer id) {
         var role = roleRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
-        return new RoleResponse(id, role.getName(), role.getDescription());
+        return new RoleResponse(id, role.getName(), role.getDescription(), role.getType(), privilegeService.convertToDto(role.getPrivileges()));
     }
 
     public List<RoleResponse> getOrganizational() {
-        return roleRepository.findAllByType(RoleType.EVENT);
+        return roleRepository.findAllByType(RoleType.EVENT).stream()
+                .map(role -> new RoleResponse(role.getId(),
+                        role.getName(),
+                        role.getDescription(),
+                        role.getType(),
+                        privilegeService.convertToDto(role.getPrivileges())))
+                .toList();
     }
 
     public List<RoleResponse> searchByName(String name) {

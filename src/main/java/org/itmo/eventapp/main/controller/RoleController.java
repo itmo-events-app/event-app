@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
+import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
+import org.itmo.eventapp.main.service.PrivilegeService;
 import org.itmo.eventapp.main.service.RoleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.util.List;
 public class RoleController {
 
     private final RoleService roleService;
+    private final PrivilegeService privilegeService;
 
     @GetMapping("/{id}")
     public ResponseEntity<RoleResponse> getRoleById(@PathVariable Integer id) {
@@ -47,5 +50,25 @@ public class RoleController {
     public ResponseEntity<?> deleteRole(@Min(5) @PathVariable Integer id) {
         roleService.deleteRole(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<RoleResponse> editRole(@Min(5) @PathVariable Integer id, @Valid @RequestBody RoleRequest roleRequest) {
+        return ResponseEntity.ok(roleService.editRole(id, roleRequest));
+    }
+
+    @GetMapping("/system-privileges")
+    public ResponseEntity<List<PrivilegeResponse>> getSystemPrivileges() {
+        return ResponseEntity.ok(privilegeService.getSystem());
+    }
+
+    @GetMapping("/organizational-privileges")
+    public ResponseEntity<List<PrivilegeResponse>> getOrganizationalPrivileges() {
+        return ResponseEntity.ok(privilegeService.getOrganizational());
+    }
+
+    @GetMapping("/privileges")
+    public ResponseEntity<List<PrivilegeResponse>> getAllPrivileges() {
+        return ResponseEntity.ok(privilegeService.getAll());
     }
 }
