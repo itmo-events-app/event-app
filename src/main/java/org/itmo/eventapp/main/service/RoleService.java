@@ -12,7 +12,6 @@ import org.itmo.eventapp.main.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -43,7 +42,6 @@ public class RoleService {
         var editedRole = roleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
         var role = roleRepository.findByName(roleRequest.name());
-        role.ifPresent(value -> System.out.println(value.getId()));
         if (role.isPresent() && !role.get().getId().equals(id))
             throw new NotUniqueException("Роль с таким именем уже существует");
         editedRole.setPrivileges(new ArrayList<>());
