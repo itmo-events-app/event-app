@@ -69,8 +69,7 @@ public class EventService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
         }
 
-        // TODO: is it ok to hardcode org role id?
-        Optional<Role> role = roleRepository.findById(2);
+        Optional<Role> role = roleRepository.findByName("Организатор");
         if (role.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
         }
