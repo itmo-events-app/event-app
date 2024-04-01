@@ -2,6 +2,7 @@ package org.itmo.eventapp.main.exceptionhandling;
 
 import jakarta.validation.ValidationException;
 import org.itmo.eventapp.main.exception.NotFoundException;
+import org.itmo.eventapp.main.exception.NotUniqueException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -23,5 +24,10 @@ class CommonControllerAdvice {
     @ExceptionHandler(NotFoundException.class)
     ResponseEntity<String> handleNotFoundException(NotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(NotUniqueException.class)
+    ResponseEntity<String> handleNotUniqueException(NotUniqueException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }

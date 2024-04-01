@@ -3,6 +3,7 @@ package org.itmo.eventapp.main.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exception.NotFoundException;
+import org.itmo.eventapp.main.exception.NotUniqueException;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
 import org.itmo.eventapp.main.model.entity.Role;
@@ -22,6 +23,7 @@ public class RoleService {
 
     @Transactional
     public RoleResponse createRole(RoleRequest roleRequest) {
+        if (roleRepository.findByName(roleRequest.name()).isPresent()) throw new NotUniqueException("Роль с таким именем уже существует");
         Role role = new Role(roleRequest);
         roleRequest.privileges().stream()
                 .map(privilegeRepository::findPrivilegeById)
@@ -33,7 +35,7 @@ public class RoleService {
     @Transactional
     public void deleteRole(Integer id) {
         var role = roleRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Role with id %d doesn't exist", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
         // TODO: Add checks
         role.setPrivileges(null);
         roleRepository.deleteById(id);
@@ -49,7 +51,7 @@ public class RoleService {
     }
 
     public RoleResponse findById(Integer id) {
-        var role = roleRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Role with id %d doesn't exist", id)));
+        var role = roleRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
         return new RoleResponse(id, role.getName(), role.getDescription());
     }
 
@@ -62,7 +64,7 @@ public class RoleService {
     }
 
     private Role findByName(String name) {
-        return roleRepository.findByName(name);
+        return roleRepository.findByName(name).orElseThrow(() -> new NotFoundException(String.format("Роль с именем %s не существует", name)));
     }
 
     public Role getReaderRole() {
