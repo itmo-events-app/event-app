@@ -2,11 +2,14 @@ package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.Place;
+import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.repository.PlaceRepository;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
+import org.itmo.eventapp.main.repository.EventRoleRepository;
+import org.itmo.eventapp.main.repository.RoleRepository;
+import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +24,9 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final PlaceRepository placeRepository;
-
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final EventRoleRepository eventRoleRepository;
 
     public Event addEvent(EventRequest eventRequest) {
         // TODO: Add privilege validation
@@ -50,6 +55,33 @@ public class EventService {
                 .preparingEnd(eventRequest.preparingEnd())
                 .build();
         return eventRepository.save(e);
+    }
+
+    public Event addEventPyOrganizer(CreateEventRequest eventRequest) {
+        // TODO: Add privilege validation
+        Event e = Event.builder()
+                .title(eventRequest.title())
+                .build();
+        Event savedEvent = eventRepository.save(e);
+
+        Optional<User> user = userRepository.findById(eventRequest.userId());
+        if (user.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        }
+
+        // TODO: is it ok to hardcode org role id?
+        Optional<Role> role = roleRepository.findById(2);
+        if (role.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
+        }
+
+        EventRole eventRole = EventRole.builder()
+                .user(user.get())
+                .role(role.get())
+                .event(savedEvent)
+                .build();
+        eventRoleRepository.save(eventRole);
+        return savedEvent;
     }
 
     public Event findById(int id) {
