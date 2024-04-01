@@ -82,7 +82,7 @@ class EventServiceTest extends AbstractTestContainers {
     @Test
     void getAllEvents() {
         List<EventResponse> eventResponses = eventService.getAllEvents(0, 10);
-        assertEquals(eventResponses.size(), 1);
+        assertEquals(1, eventResponses.size());
     }
 
     @Test
