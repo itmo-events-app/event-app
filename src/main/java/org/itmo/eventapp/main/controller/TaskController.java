@@ -131,9 +131,8 @@ public class TaskController {
             @NotEmpty(message = "Список task id не может быть пустым!")
             @RequestBody List<Integer> taskIds
     ) {
-        // change srcEventId to dstEventId in tasks
-        // src == dst - ?
-        return ResponseEntity.ok().build();
+        List<TaskResponse> updTasks = taskService.moveTasks(dstEventId, taskIds);
+        return ResponseEntity.ok().body(updTasks);
     }
 
     //    @PostMapping("/event/{srcEventId}/{dstEventId}")
@@ -146,10 +145,7 @@ public class TaskController {
             @NotEmpty(message = "Список task id не может быть пустым!")
             @RequestBody List<Integer> taskIds
     ) {
-        List<TaskResponse> newTasks = new ArrayList<>();
-        // create new tasks in event with dstEventId
-        // assignee -> null; status -> new
-        // schedule task deadline notification
+        List<TaskResponse> newTasks = taskService.copyTasks(dstEventId, taskIds);
         // src == dst - ?
         return ResponseEntity.ok().body(newTasks);
     }

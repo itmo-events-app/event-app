@@ -1,6 +1,9 @@
 package org.itmo.eventapp.main.service;
 
+import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Event;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -137,7 +141,56 @@ public class TaskService {
     }
 
     public List<TaskResponse> moveTasks(Integer dstEventId, List<Integer> taskIds) {
-        return null;
+
+        Event event = eventService.findById(dstEventId);
+        List<Task> tasks = taskRepository.findAllById(taskIds).stream().map(
+                (task)-> {
+                    task.setEvent(event);
+                    return task;
+                }
+        ).toList();
+
+        taskRepository.saveAll(tasks);
+
+        return TaskMapper.tasksToTaskResponseList(tasks);
+    }
+
+
+    public List<TaskResponse> copyTasks(Integer dstEventId, List<Integer> taskIds) {
+
+        Event event = eventService.findById(dstEventId);
+        List<Task> tasks = taskRepository.findAllById(taskIds);
+
+        List<Task> newTasks = new ArrayList<>();
+        for (Task task: tasks) {
+
+            Task newTask = new Task();
+            newTask.setEvent(event);
+            newTask.setTitle(task.getTitle());
+            newTask.setDescription(task.getDescription());
+            newTask.setPlace(task.getPlace());
+            newTask.setAssigner(task.getAssigner());
+            newTask.setAssignee(null);
+            newTask.setDeadline(task.getDeadline());
+            newTask.setNotificationDeadline(task.getNotificationDeadline());
+
+            newTask.setCreationTime(LocalDateTime.now());
+            TaskStatus status = TaskStatus.NEW;
+            if (LocalDateTime.now().isAfter(newTask.getDeadline())) {
+                status = TaskStatus.EXPIRED;
+            }
+            newTask.setStatus(status);
+
+            newTasks.add(newTask);
+        }
+
+        taskRepository.saveAll(tasks);
+
+        for (Task newTask: newTasks) {
+            /*TODO: schedule task deadline notification for assigner */
+        }
+
+        return TaskMapper.tasksToTaskResponseList(tasks);
     }
 
 }
