@@ -13,10 +13,11 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
 
-    List<Notification> getAllByUser_Id(Integer id);
+    List<Notification> getAllByUserId(Integer id);
 
     @Modifying
     @Transactional
     @Query(value = "update notification set seen = true, read_time = now() where user_id = :id and seen = false;", nativeQuery = true)
-    void updateAllSeenByUser_Id(Integer id);
+    void updateAllSeenByUserId(Integer id);
+
 }
