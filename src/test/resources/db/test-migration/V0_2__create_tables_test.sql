@@ -53,11 +53,12 @@ create table if not exists user_login_info(
     registration_id int not null references registration_request(id)
 );
 create table if not exists notification(
+    id int generated always as identity primary key not null,
     user_id int not null references user_t(id),
     title varchar(256) not null,
     description text not null ,
-    sent boolean not null default FALSE,
-    read_time timestamp
+    seen boolean not null default FALSE,
+    read_time timestamp default null
 );
 create table if not exists place
 (
