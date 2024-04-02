@@ -55,6 +55,6 @@ public class Role {
     public Role(RoleRequest roleRequest) {
         name = roleRequest.name();
         description = roleRequest.description();
-        type = roleRequest.isEvent() ? RoleType.EVENT : RoleType.SYSTEM;
+        type = Boolean.TRUE.equals(roleRequest.isEvent()) ? RoleType.EVENT : RoleType.SYSTEM;
     }
 }
