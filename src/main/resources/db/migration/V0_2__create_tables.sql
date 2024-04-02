@@ -34,24 +34,23 @@ create table if not exists user_notification_info(
     enable_push_notifications boolean not null default true,
     enable_email_notifications boolean not null default true
 );
+create table if not exists user_t
+(
+    id int generated always as identity primary key not null,
+    role_id int not null references role(id),
+    notification_info_id int not null references user_notification_info(id),
+    name varchar(256) not null,
+    surname varchar(256)
+);
 create table if not exists user_login_info(
     id int generated always as identity primary key not null,
-    login varchar(256) not null ,
+    user_id int not null references user_t(id),
     email varchar(256) not null unique,
     email_status email_status not null,
     password_hash varchar(512) not null,
     reset_token varchar(512),
     last_login_date date,
     registration_id int not null references registration_request(id)
-);
-create table if not exists user_t
-(
-    id int generated always as identity primary key not null,
-    role_id int not null references role(id),
-    notification_info_id int not null references user_notification_info(id),
-    login_info_id int not null references user_login_info(id),
-    name varchar(256) not null,
-    surname varchar(256)
 );
 create table if not exists notification(
     user_id int not null references user_t(id),
