@@ -39,14 +39,17 @@ public class RoleService {
 
     @Transactional
     public RoleResponse editRole(Integer id, RoleRequest roleRequest) {
-        var editedRole = roleRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
         var role = roleRepository.findByName(roleRequest.name());
         if (role.isPresent() && !role.get().getId().equals(id))
             throw new NotUniqueException("Роль с таким именем уже существует");
+
+        var editedRole = roleRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
+
+        editedRole.setName(roleRequest.name());
+        editedRole.setDescription(roleRequest.description());
+        editedRole.setType(roleRequest.isEvent() ? RoleType.EVENT : RoleType.SYSTEM);
         editedRole.setPrivileges(new HashSet<>());
-        editedRole = new Role(roleRequest);
-        editedRole.setId(id);
         roleRequest.privileges().stream()
                 .map(privilegeService::findById)
                 .forEach(editedRole::addPrivilege);
