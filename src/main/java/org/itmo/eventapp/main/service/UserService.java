@@ -15,12 +15,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     User findById(int id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
-
-        return user.get();
+        return userRepository.findById(id)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User event not found"));
     }
 
 }

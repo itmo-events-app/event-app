@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class EventController {
     private final EventService eventService;
+
+    // TODO: Add privilege validation
+
     @PostMapping("/addActivity")
     public ResponseEntity<Integer> addEvent(@RequestBody @Valid EventRequest eventRequest) {
         return ResponseEntity

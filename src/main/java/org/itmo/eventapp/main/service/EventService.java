@@ -33,8 +33,7 @@ public class EventService {
         // TODO: Add privilege validation
         Place place = placeService.findById(eventRequest.placeId());
 
-        Event parent = eventRepository.findById(eventRequest.parent())
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent event not found"));
+        Event parent = findById(eventRequest.parent());
         Event e = Event.builder()
                 .place(place)
                 .startDate(eventRequest.start())
@@ -57,7 +56,6 @@ public class EventService {
     }
 
     public Event addEventByOrganizer(CreateEventRequest eventRequest) {
-        // TODO: Add privilege validation
         Event e = Event.builder()
                 .title(eventRequest.title())
                 .build();
@@ -65,6 +63,7 @@ public class EventService {
 
         User user = userService.findById(eventRequest.userId());
 
+        // TODO: Do not get organizer from DB each time.
         Role role = roleService.findByName("Организатор");
 
         EventRole eventRole = EventRole.builder()
@@ -77,12 +76,7 @@ public class EventService {
     }
 
     public Event findById(int id) {
-        Optional<Event> event = eventRepository.findById(id);
-
-        if (event.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
-        }
-
-        return event.get();
+        return eventRepository.findById(id)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Event event not found"));
     }
 }

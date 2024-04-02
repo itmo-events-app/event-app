@@ -15,11 +15,7 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
 
     Place findById(int id) {
-        Optional<Place> place = placeRepository.findById(id);
-        if (place.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Place not found");
-        }
-
-        return place.get();
+        return placeRepository.findById(id)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Place event not found"));
     }
 }

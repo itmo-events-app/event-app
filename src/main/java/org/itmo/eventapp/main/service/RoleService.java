@@ -16,21 +16,13 @@ public class RoleService {
     private final RoleRepository roleRepository;
 
     Role findById(int id) {
-        Optional<Role> role = roleRepository.findById(id);
-        if (role.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
-        }
-
-        return role.get();
+        return roleRepository.findById(id)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Role event not found"));
     }
 
     Role findByName(String name) {
-        Optional<Role> role = roleRepository.findByName(name);
-        if (role.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
-        }
-
-        return role.get();
+        return roleRepository.findByName(name)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Role event not found"));
     }
 
 }
