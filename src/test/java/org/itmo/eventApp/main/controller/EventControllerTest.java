@@ -12,12 +12,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class EventControllerTest extends AbstractTestContainers {
-    // TODO: Add Test for event controller here
 
     @BeforeEach
     public void setup() {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+    }
+
+    @Test
+    void getAllOrFilteredEventsTest() throws Exception {
+        mockMvc.perform(get("/api/events")
+                        .param("title", "party")
+                        .param("format", "OFFLINE")
+                        .param("status", "PUBLISHED"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].title").value("party"))
+                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
+                .andExpect(jsonPath("$[0].status").value("PUBLISHED"));
     }
 
     @Test

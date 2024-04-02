@@ -6,7 +6,10 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
+import org.itmo.eventapp.main.model.entity.enums.EventFormat;
+import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.service.EventService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -39,12 +43,15 @@ public class EventController {
         return ResponseEntity.ok().body(eventService.updateEvent(id, eventRequest));
     }
 
-    // TODO: Add filtering by fields: title, dates, status, format
-
     @GetMapping
-    public ResponseEntity<List<EventResponse>> getAllEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
-                                                            @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") int size) {
-        return ResponseEntity.ok().body(eventService.getAllEvents(page, size));
+    public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                      @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") int size,
+                                                                      @RequestParam(required = false) String title,
+                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                                                      @RequestParam(required = false) EventStatus status,
+                                                                      @RequestParam(required = false) EventFormat format) {
+        return ResponseEntity.ok().body(eventService.getAllOrFilteredEvents(page, size, title, startDate, endDate, status, format));
     }
 
     @GetMapping("/{id}")

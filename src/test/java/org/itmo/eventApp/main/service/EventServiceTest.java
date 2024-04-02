@@ -6,7 +6,6 @@ import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.service.EventService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +73,21 @@ class EventServiceTest extends AbstractTestContainers {
     }
 
     @Test
-    void getAllEvents() {
-        List<EventResponse> eventResponses = eventService.getAllEvents(0, 10);
-        assertEquals(1, eventResponses.size());
+    void getAllOrFilteredEvents() {
+        List<EventResponse> eventResponses = eventService.getAllOrFilteredEvents(0, 10, "party",
+                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
+                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
+                EventStatus.PUBLISHED, EventFormat.OFFLINE);
+
+        EventResponse eventResponse = eventResponses.get(0);
+        assertAll(
+                () -> assertEquals(1, eventResponses.size()),
+                () -> assertEquals("party", eventResponse.title()),
+                () -> assertEquals(LocalDateTime.parse("2024-03-30T21:32:23.536819"), eventResponse.start()),
+                () -> assertEquals(LocalDateTime.parse("2024-03-30T21:32:23.536819"), eventResponse.end()),
+                () -> assertEquals(EventFormat.OFFLINE, eventResponse.format()),
+                () -> assertEquals(EventStatus.PUBLISHED, eventResponse.status())
+        );
     }
 
     @Test
