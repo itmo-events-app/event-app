@@ -26,9 +26,13 @@ public class EventRoleService {
         var role = roleService.findRoleById(roleId);
         if (!role.getType().equals(RoleType.EVENT)) throw new IncorrectRoleTypeException("Неверный тип роли");
         var event = eventService.findById(eventId);
-        // TODO: add check for Organizer
         var eventRole = eventRoleRepository.findByUserAndEvent(user, event);
         if (eventRole.isPresent()) {
+            if (eventRole.get().getRole().getId().equals(roleService.getOrganizerRole().getId())) {
+                var organizersInEvent = eventRoleRepository.findAllByRoleAndEvent(role, event);
+                if (organizersInEvent.size() == 1)
+                    throw new NotAllowedException("Мероприятия должно содержать не менее одного пользователя с ролью Организатор");
+            }
             eventRole.get().setRole(role);
             eventRoleRepository.save(eventRole.get());
         } else {
@@ -51,8 +55,8 @@ public class EventRoleService {
             if (eventRole.size() == 1)
                 throw new NotAllowedException("Мероприятия должно содержать не менее одного пользователя с ролью Организатор");
         }
-        var iDontKnow = eventRoleRepository.findByUserAndRoleAndEvent(user, role, event);
-        iDontKnow.ifPresentOrElse(eventRoleRepository::delete,
+        var userRoleInEvent = eventRoleRepository.findByUserAndRoleAndEvent(user, role, event);
+        userRoleInEvent.ifPresentOrElse(eventRoleRepository::delete,
                 () -> {
                     throw new NotFoundException(String.format("У пользователя с id %d нет роли %s в мероприятии с id %d", // TODO: correct the message
                             userId,
