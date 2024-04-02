@@ -58,7 +58,7 @@ public class EventRoleService {
         var userRoleInEvent = eventRoleRepository.findByUserAndRoleAndEvent(user, role, event);
         userRoleInEvent.ifPresentOrElse(eventRoleRepository::delete,
                 () -> {
-                    throw new NotFoundException(String.format("У пользователя с id %d нет роли %s в мероприятии с id %d", // TODO: correct the message
+                    throw new NotFoundException(String.format("У пользователя с id %d нет роли %s в мероприятии с id %d",
                             userId,
                             role.getName(),
                             eventId));
