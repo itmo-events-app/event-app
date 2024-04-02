@@ -29,7 +29,7 @@ public class EventRoleService {
         var eventRole = eventRoleRepository.findByUserAndEvent(user, event);
         if (eventRole.isPresent()) {
             if (eventRole.get().getRole().getId().equals(roleService.getOrganizerRole().getId())) {
-                var organizersInEvent = eventRoleRepository.findAllByRoleAndEvent(role, event);
+                var organizersInEvent = eventRoleRepository.findAllByRoleAndEvent(roleService.getOrganizerRole(), event);
                 if (organizersInEvent.size() == 1)
                     throw new NotAllowedException("Мероприятия должно содержать не менее одного пользователя с ролью Организатор");
             }
