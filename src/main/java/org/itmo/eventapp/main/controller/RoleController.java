@@ -100,7 +100,7 @@ public class RoleController {
 
     @Operation(summary = "Назначение пользователю роли Организатор")
     @PostMapping("/organizer/{userId}/{eventId}")
-    public ResponseEntity<?> assignOrganizerRole(@Positive @PathVariable Integer userId,
+    public ResponseEntity<Integer> assignOrganizerRole(@Positive @PathVariable Integer userId,
                                                  @Positive @PathVariable Integer eventId) {
         eventRoleService.assignOrganizationalRole(userId, roleService.getOrganizerRole().getId(), eventId);
         return ResponseEntity.ok().build();
@@ -125,7 +125,7 @@ public class RoleController {
 
     @Operation(summary = "Лишение пользователя роли Организатор")
     @DeleteMapping("/organizer/{userId}/{eventId}")
-    public ResponseEntity<?> revokeOrganizerRole(@Positive @PathVariable Integer userId,
+    public ResponseEntity<Integer> revokeOrganizerRole(@Positive @PathVariable Integer userId,
                                                  @Positive @PathVariable Integer eventId) {
         eventRoleService.revokeOrganizationalRole(userId, roleService.getOrganizerRole().getId(), eventId);
         return ResponseEntity.ok().build();
