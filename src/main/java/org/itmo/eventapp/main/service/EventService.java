@@ -23,19 +23,18 @@ import java.util.Optional;
 public class EventService {
 
     private final EventRepository eventRepository;
-    private final PlaceRepository placeRepository;
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final EventRoleRepository eventRoleRepository;
+
+    private final PlaceService placeService;
+    private final UserService userService;
+    private final RoleService roleService;
+    private final EventRoleService eventRoleService;
 
     public Event addEvent(EventRequest eventRequest) {
         // TODO: Add privilege validation
-        Place place = placeRepository.findById(eventRequest.placeId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Place not found"));
+        Place place = placeService.findById(eventRequest.placeId());
 
-        Event parent = null;
-        if (eventRequest.parent() != null) {
-            parent = eventRepository.findById(eventRequest.parent()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
-        }
+        Event parent = eventRepository.findById(eventRequest.parent())
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent event not found"));
         Event e = Event.builder()
                 .place(place)
                 .startDate(eventRequest.start())
@@ -64,22 +63,16 @@ public class EventService {
                 .build();
         Event savedEvent = eventRepository.save(e);
 
-        Optional<User> user = userRepository.findById(eventRequest.userId());
-        if (user.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
-        }
+        User user = userService.findById(eventRequest.userId());
 
-        Optional<Role> role = roleRepository.findByName("Организатор");
-        if (role.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found");
-        }
+        Role role = roleService.findByName("Организатор");
 
         EventRole eventRole = EventRole.builder()
-                .user(user.get())
-                .role(role.get())
+                .user(user)
+                .role(role)
                 .event(savedEvent)
                 .build();
-        eventRoleRepository.save(eventRole);
+        eventRoleService.save(eventRole);
         return savedEvent;
     }
 
