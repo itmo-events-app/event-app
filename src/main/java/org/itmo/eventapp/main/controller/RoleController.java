@@ -58,7 +58,7 @@ public class RoleController {
 
     @Operation(summary = "Удаление роли")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRole(@Min(5) @PathVariable Integer id) {
+    public ResponseEntity<Integer> deleteRole(@Min(5) @PathVariable Integer id) {
         roleService.deleteRole(id);
         return ResponseEntity.ok().build();
     }
@@ -91,7 +91,7 @@ public class RoleController {
 
     @Operation(summary = "Назначение пользователю организационной роли")
     @PostMapping("/organizational/{userId}/{eventId}")
-    public ResponseEntity<?> assignOrganizationalRole(@Positive @PathVariable Integer userId,
+    public ResponseEntity<Integer> assignOrganizationalRole(@Positive @PathVariable Integer userId,
                                                       @Positive @PathVariable Integer eventId,
                                                       @Min(3) @RequestBody Integer roleId) {
         eventRoleService.assignOrganizationalRole(userId, roleId, eventId);
@@ -108,7 +108,7 @@ public class RoleController {
 
     @Operation(summary = "Назначение пользователю роли Помощник")
     @PostMapping("assistant/{userId}/{eventId}")
-    public ResponseEntity<?> assignAssistantRole(@Positive @PathVariable Integer userId,
+    public ResponseEntity<Integer> assignAssistantRole(@Positive @PathVariable Integer userId,
                                                  @Positive @PathVariable Integer eventId) {
         eventRoleService.assignOrganizationalRole(userId, roleService.getAssistantRole().getId(), eventId);
         return ResponseEntity.ok().build();
@@ -116,7 +116,7 @@ public class RoleController {
 
     @Operation(summary = "Лишение пользователя организационной роли")
     @DeleteMapping("/organizational/{userId}/{eventId}")
-    public ResponseEntity<?> revokeOrganizationalRole(@Positive @PathVariable Integer userId,
+    public ResponseEntity<Integer> revokeOrganizationalRole(@Positive @PathVariable Integer userId,
                                                       @Positive @PathVariable Integer eventId,
                                                       @Min(3) @RequestBody Integer roleId) {
         eventRoleService.revokeOrganizationalRole(userId, roleId, eventId);
@@ -133,7 +133,7 @@ public class RoleController {
 
     @Operation(summary = "Лишение пользователя роли Помощник")
     @DeleteMapping("/assistant/{userId}/{eventId}")
-    public ResponseEntity<?> revokeAssistantRole(@Positive @PathVariable Integer userId,
+    public ResponseEntity<Integer> revokeAssistantRole(@Positive @PathVariable Integer userId,
                                                  @Positive @PathVariable Integer eventId) {
         eventRoleService.revokeOrganizationalRole(userId, roleService.getAssistantRole().getId(), eventId);
         return ResponseEntity.ok().build();
@@ -141,7 +141,7 @@ public class RoleController {
 
     @Operation(summary = "Назначение пользователю системной роли")
     @PostMapping("/system/{userId}")
-    public ResponseEntity<?> assignSystemRole(@Positive @PathVariable Integer userId,
+    public ResponseEntity<Integer> assignSystemRole(@Positive @PathVariable Integer userId,
                                               @Positive @RequestBody Integer roleId) {
         roleService.assignSystemRole(userId, roleId);
         return ResponseEntity.ok().build();
@@ -149,7 +149,7 @@ public class RoleController {
 
     @Operation(summary = "Лишение пользователя системной роли")
     @PutMapping("/system/{userId}")
-    public ResponseEntity<?> revokeSystemRole(@Positive @PathVariable Integer userId) {
+    public ResponseEntity<Integer> revokeSystemRole(@Positive @PathVariable Integer userId) {
         roleService.revokeSystemRole(userId);
         return ResponseEntity.ok().build();
     }
