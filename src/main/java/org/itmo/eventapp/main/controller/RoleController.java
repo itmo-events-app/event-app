@@ -160,7 +160,7 @@ public class RoleController {
     }
 
     @Operation(summary = "Лишение пользователя системной роли")
-    @PutMapping("/system/{userId}")
+    @PutMapping("/system-revoke/{userId}")
     public ResponseEntity<Void> revokeSystemRole(
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId) {
         roleService.revokeSystemRole(userId);

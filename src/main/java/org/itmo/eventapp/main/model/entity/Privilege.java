@@ -32,6 +32,7 @@ public class Privilege {
     private PrivilegeType type;
 
     @ManyToMany(mappedBy = "privileges", fetch = FetchType.LAZY)
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     @Override

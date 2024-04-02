@@ -2,13 +2,13 @@ package org.itmo.eventapp.main.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-import org.hibernate.validator.constraints.Length;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 
@@ -26,7 +26,7 @@ public class Role {
     private Integer id;
 
     @NotBlank(message = "Название роли обязательно")
-    @Length(message = "Название роли должно содержать от 1 до 256 символов", min = 1, max = 256)
+    @Size(message = "Название роли должно содержать от 1 до 256 символов", min = 1, max = 256)
     private String name;
 
     @NotBlank(message = "Описание роли обязательно")
@@ -37,6 +37,7 @@ public class Role {
     private RoleType type;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     @JoinTable(name = "role_privilege",
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
@@ -56,5 +57,6 @@ public class Role {
         name = roleRequest.name();
         description = roleRequest.description();
         type = Boolean.TRUE.equals(roleRequest.isEvent()) ? RoleType.EVENT : RoleType.SYSTEM;
+        privileges= new HashSet<>();
     }
 }
