@@ -2,6 +2,8 @@ package org.itmo.eventapp.main.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.exception.IncorrectRoleTypeException;
+import org.itmo.eventapp.main.exception.NotAllowedException;
 import org.itmo.eventapp.main.exception.NotFoundException;
 import org.itmo.eventapp.main.exception.NotUniqueException;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
@@ -20,7 +22,8 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final PrivilegeService privilegeService;
-
+    private final UserService userService;
+//    private final EventRoleService eventRoleService;
     @Transactional
     public RoleResponse createRole(RoleRequest roleRequest) {
         if (roleRepository.findByName(roleRequest.name()).isPresent())
@@ -63,9 +66,14 @@ public class RoleService {
 
     @Transactional
     public void deleteRole(Integer id) {
-        var role = roleRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
-        // TODO: Add checks
+        var role = findRoleById(id);
+        if (role.getType().equals(RoleType.SYSTEM)) {
+            if (!userService.findAllByRole(role).isEmpty())
+                throw new NotAllowedException("Невозможно удалить роль, так как существуют пользователи, которым она назначена");
+        } // else {
+//            if (!eventRoleService.findAllByRole(role).isEmpty())
+//                throw new NotAllowedException("Невозможно удалить роль, так как существуют пользователи, которым она назначена");
+//        }
         role.setPrivileges(null);
         roleRepository.deleteById(id);
     }
@@ -81,8 +89,17 @@ public class RoleService {
     }
 
     public RoleResponse findById(Integer id) {
-        var role = roleRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
-        return new RoleResponse(id, role.getName(), role.getDescription(), role.getType(), privilegeService.convertToDto(role.getPrivileges()));
+        var role = findRoleById(id);
+        return new RoleResponse(id,
+                role.getName(),
+                role.getDescription(),
+                role.getType(),
+                privilegeService.convertToDto(role.getPrivileges()));
+    }
+
+    public Role findRoleById(Integer id) {
+        return roleRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
     }
 
     public List<RoleResponse> getOrganizational() {
@@ -105,8 +122,23 @@ public class RoleService {
                 .toList();
     }
 
+    public void assignSystemRole(Integer userId, Integer roleId) {
+        var user = userService.findById(userId);
+        var role = findRoleById(roleId);
+        if (role.getType().equals(RoleType.EVENT)) throw new IncorrectRoleTypeException("Неверный тип роли");
+        user.setRole(role);
+        userService.save(user);
+    }
+
+    public void revokeSystemRole(Integer userId) {
+        var user = userService.findById(userId);
+        user.setRole(getReaderRole());
+        userService.save(user);
+    }
+
     private Role findByName(String name) {
-        return roleRepository.findByName(name).orElseThrow(() -> new NotFoundException(String.format("Роль с именем %s не существует", name)));
+        return roleRepository.findByName(name)
+                .orElseThrow(() -> new NotFoundException(String.format("Роль с именем %s не существует", name)));
     }
 
     public Role getReaderRole() {
@@ -124,4 +156,6 @@ public class RoleService {
     public Role getOrganizerRole() {
         return findByName("Организатор");
     }
+
+
 }

@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.exception.NotFoundException;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
@@ -16,15 +17,12 @@ public class PrivilegeService {
     private final PrivilegeRepository privilegeRepository;
 
     public Privilege findById(Integer id) {
-        return privilegeRepository.findPrivilegeById(id);
+        return privilegeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Привилегия с id %d не существует", id)));
     }
 
-    public List<PrivilegeResponse> getOrganizational() {
-        return privilegeRepository.findAllByType(PrivilegeType.EVENT);
-    }
-
-    public List<PrivilegeResponse> getSystem() {
-        return privilegeRepository.findAllByType(PrivilegeType.SYSTEM);
+    public List<PrivilegeResponse> getPrivilegeByType(PrivilegeType type) {
+        return privilegeRepository.findAllByType(type);
     }
 
     public List<PrivilegeResponse> getAll() {

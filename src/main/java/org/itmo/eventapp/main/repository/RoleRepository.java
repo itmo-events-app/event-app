@@ -1,6 +1,5 @@
 package org.itmo.eventapp.main.repository;
 
-import org.itmo.eventapp.main.model.dto.response.RoleResponse;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +15,5 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
     List<Role> findByNameContainingIgnoreCase(String name);
 
     Optional<Role> findByName(String name);
+
 }

@@ -1,6 +1,8 @@
 package org.itmo.eventapp.main.exceptionhandling;
 
 import jakarta.validation.ValidationException;
+import org.itmo.eventapp.main.exception.IncorrectRoleTypeException;
+import org.itmo.eventapp.main.exception.NotAllowedException;
 import org.itmo.eventapp.main.exception.NotFoundException;
 import org.itmo.eventapp.main.exception.NotUniqueException;
 import org.springframework.http.HttpStatus;
@@ -29,5 +31,15 @@ class CommonControllerAdvice {
     @ExceptionHandler(NotUniqueException.class)
     ResponseEntity<String> handleNotUniqueException(NotUniqueException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IncorrectRoleTypeException.class)
+    ResponseEntity<String> handleNotUniqueException(IncorrectRoleTypeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(NotAllowedException.class)
+    ResponseEntity<String> handleNotUniqueException(NotAllowedException ex) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(ex.getMessage());
     }
 }

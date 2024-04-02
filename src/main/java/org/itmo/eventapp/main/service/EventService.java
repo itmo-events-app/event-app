@@ -1,7 +1,6 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.repository.EventRepository;
@@ -17,8 +16,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class EventService {
-    private EventRepository eventRepository;
-    private PlaceRepository placeRepo;
+    private final EventRepository eventRepository;
+    private final PlaceRepository placeRepo;
 
     public ResponseEntity<Integer> addEvent(EventRequest eventRequest) {
         // TODO: Add privilege validation

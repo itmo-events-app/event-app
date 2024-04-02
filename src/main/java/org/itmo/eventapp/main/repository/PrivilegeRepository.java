@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface PrivilegeRepository extends JpaRepository<Privilege, Integer> {
-    Privilege findPrivilegeById(Integer id);
 
     List<PrivilegeResponse> findAllByType(PrivilegeType type);
 
