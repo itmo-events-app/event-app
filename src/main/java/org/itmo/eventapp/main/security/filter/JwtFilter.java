@@ -5,9 +5,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.security.service.UserDetailsServiceImpl;
 import org.itmo.eventapp.main.security.util.JwtTokenUtil;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,13 +18,15 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtFilter extends GenericFilterBean {
+public class JwtFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private final UserDetailsServiceImpl userDetailsServiceImpl;
@@ -38,14 +43,14 @@ public class JwtFilter extends GenericFilterBean {
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-            throws IOException, ServletException {
-
+    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
+                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
         try {
-            String token = getTokenFromRequest((HttpServletRequest) servletRequest);
+            String token = getTokenFromRequest((request));
 
             if (token == null) {
-                filterChain.doFilter(servletRequest, servletResponse);
+                filterChain.doFilter(request, response);
+                return;
             }
 
             String login = jwtTokenUtil.extractUserEmail(token);
@@ -57,14 +62,14 @@ public class JwtFilter extends GenericFilterBean {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, null);
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource()
-                            .buildDetails((HttpServletRequest) servletRequest));
+                            .buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
-            filterChain.doFilter(servletRequest, servletResponse);
+            filterChain.doFilter(request, response);
         }
         catch (AccessDeniedException ex) {
-
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Доступ запрещен");
         }
     }
 }

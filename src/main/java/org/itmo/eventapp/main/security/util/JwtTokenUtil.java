@@ -2,8 +2,10 @@ package org.itmo.eventapp.main.security.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Key;
 import java.time.Instant;
@@ -18,8 +20,13 @@ public class JwtTokenUtil {
     private static final int MINUTES = 60;
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build()
-                .parseClaimsJws(token).getBody();
+        try {
+            return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build()
+                    .parseClaimsJws(token).getBody();
+        }
+        catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка валидации токена");
+        }
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

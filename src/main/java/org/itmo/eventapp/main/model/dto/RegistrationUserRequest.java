@@ -12,9 +12,6 @@ public record RegistrationUserRequest(
     @NotBlank(message = "Поле обязательно для заполнения")
     String surname,
 
-    @NotBlank(message = "Поле обязательно для заполнения")
-    String login,
-
     @Email(message = "Неверный формат email")
     @NotBlank(message = "Поле обязательно для заполнения")
     String email,

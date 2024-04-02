@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 
 public record LoginRequest(
     @NotBlank(message = "Поле обязательно для заполнения")
+    // TODO make custom
     @Email()
     String login,
 

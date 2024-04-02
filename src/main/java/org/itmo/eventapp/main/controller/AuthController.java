@@ -7,30 +7,31 @@ import org.itmo.eventapp.main.model.dto.RegistrationUserRequest;
 import org.itmo.eventapp.main.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
 @RequiredArgsConstructor
+@RestController
 public class AuthController {
 
     private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest) {
+    ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest) {
         String token = authenticationService.login(loginRequest);
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@Valid @RequestBody RegistrationUserRequest registrationUserRequest) {
+    ResponseEntity<Void> register(@Valid @RequestBody RegistrationUserRequest registrationUserRequest) {
         authenticationService.createRegisterRequest(registrationUserRequest);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PostMapping("/approveRegister")
-    public ResponseEntity<Void> approveRegister(@RequestBody int requestId) {
+    @PostMapping(value = "/approveRegister/{requestId}")
+    ResponseEntity<Void> approveRegister(@PathVariable("requestId") Integer requestId) {
         authenticationService.approveRegistrationRequestCallback(requestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
