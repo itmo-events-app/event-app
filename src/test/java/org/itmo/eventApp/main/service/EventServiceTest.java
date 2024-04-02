@@ -122,8 +122,8 @@ class EventServiceTest extends AbstractTestContainers {
 
         assertEquals(1, eventResponses.size());
         eventResponses.forEach(eventResponse -> assertAll(
-                () -> assertEquals(eventResponse.title(), "m"),
-                () -> assertEquals(eventResponse.start(), LocalDateTime.parse("2024-04-02T05:07:00.000000")))
+                () -> assertEquals("m", eventResponse.title()),
+                () -> assertEquals(LocalDateTime.parse("2024-04-02T05:07:00.000000"), eventResponse.start()))
         );
     }
 
