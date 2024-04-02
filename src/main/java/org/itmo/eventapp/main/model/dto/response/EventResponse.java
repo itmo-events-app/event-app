@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 public record EventResponse(
         Integer id,
         Integer placeId,
-        LocalDateTime start,
-        LocalDateTime end,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
         String title,
         String shortDescription,
         String fullDescription,
