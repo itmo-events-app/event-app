@@ -32,7 +32,6 @@ public record EventRequest(
         LocalDateTime registrationStart,
         @NotNull(message = "Поле registrationEnd не может быть null!")
         LocalDateTime registrationEnd,
-        @NotNull(message = "Поле parent не может быть null!")
         Integer parent,
         @NotNull(message = "Поле participantLimit не может быть null!")
         @Min(value = 1, message = "Поле participantLimit не может быть меньше 1!")
