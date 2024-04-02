@@ -2,17 +2,16 @@ package org.itmo.eventapp.main.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.exception.IncorrectRoleTypeException;
-import org.itmo.eventapp.main.exception.NotAllowedException;
-import org.itmo.eventapp.main.exception.NotFoundException;
-import org.itmo.eventapp.main.exception.NotUniqueException;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.repository.RoleRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -23,11 +22,12 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final PrivilegeService privilegeService;
     private final UserService userService;
-//    private final EventRoleService eventRoleService;
+    private final List<String> basicRoles = Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
+
     @Transactional
     public RoleResponse createRole(RoleRequest roleRequest) {
         if (roleRepository.findByName(roleRequest.name()).isPresent())
-            throw new NotUniqueException("Роль с таким именем уже существует");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Роль с таким именем уже существует");
         Role role = new Role(roleRequest);
         roleRequest.privileges().stream()
                 .map(privilegeService::findById)
@@ -42,12 +42,13 @@ public class RoleService {
 
     @Transactional
     public RoleResponse editRole(Integer id, RoleRequest roleRequest) {
-        var role = roleRepository.findByName(roleRequest.name());
-        if (role.isPresent() && !role.get().getId().equals(id))
-            throw new NotUniqueException("Роль с таким именем уже существует");
+        if (basicRoles.contains(roleRequest.name()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно изменить эту роль");
+        var role = roleRepository.findByName(roleRequest.name()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Роли с id %d не существует", id)));
+        if (!role.getId().equals(id)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Роль с таким именем уже существует");
 
         var editedRole = roleRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Роли с id %d не существует", id)));
 
         editedRole.setName(roleRequest.name());
         editedRole.setDescription(roleRequest.description());
@@ -67,9 +68,11 @@ public class RoleService {
     @Transactional
     public void deleteRole(Integer id) {
         var role = findRoleById(id);
+        if (basicRoles.contains(role.getName()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно удалить эту роль");
         if (role.getType().equals(RoleType.SYSTEM)) {
             if (!userService.findAllByRole(role).isEmpty())
-                throw new NotAllowedException("Невозможно удалить роль, так как существуют пользователи, которым она назначена");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно удалить роль, так как существуют пользователи, которым она назначена");
         } // else {
 //            if (!eventRoleService.findAllByRole(role).isEmpty())
 //                throw new NotAllowedException("Невозможно удалить роль, так как существуют пользователи, которым она назначена");
@@ -99,7 +102,7 @@ public class RoleService {
 
     public Role findRoleById(Integer id) {
         return roleRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Роль с id %d не существует", id)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Роли с id %d не существует", id)));
     }
 
     public List<RoleResponse> getOrganizational() {
@@ -125,7 +128,8 @@ public class RoleService {
     public void assignSystemRole(Integer userId, Integer roleId) {
         var user = userService.findById(userId);
         var role = findRoleById(roleId);
-        if (role.getType().equals(RoleType.EVENT)) throw new IncorrectRoleTypeException("Неверный тип роли");
+        if (role.getType().equals(RoleType.EVENT))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Неверный тип роли: ожидалась системная роль");
         user.setRole(role);
         userService.save(user);
     }
@@ -138,7 +142,7 @@ public class RoleService {
 
     private Role findByName(String name) {
         return roleRepository.findByName(name)
-                .orElseThrow(() -> new NotFoundException(String.format("Роль с именем %s не существует", name)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Роли с именем %s не существует", name)));
     }
 
     public Role getReaderRole() {
