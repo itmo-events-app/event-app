@@ -31,9 +31,8 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<Integer> taskAdd(@Valid @RequestBody TaskRequest taskRequest) {
-        int taskId = taskService.save(taskRequest).getId();
-        // schedule task deadline notification
-        return ResponseEntity.status(201).body(taskId);
+        TaskResponse task = taskService.save(taskRequest);
+        return ResponseEntity.status(201).body(task.id());
     }
 
     @GetMapping("/{id}")
@@ -46,11 +45,10 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> taskEdit(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
-                                      @PathVariable Integer id,
-                                      @Valid @RequestBody TaskRequest taskRequest) {
-        // edit task
-        // schedule task deadline notification
+    public ResponseEntity<TaskResponse> taskEdit(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                                 @PathVariable Integer id,
+                                                 @Valid @RequestBody TaskRequest taskRequest) {
+        TaskResponse edited = taskService.edit(id, taskRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -58,75 +56,76 @@ public class TaskController {
     public ResponseEntity<?> taskDelete(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                         @PathVariable Integer id) {
         // delete task
+        taskService.delete(id);
         // delete task deadline notification
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/assignee/{userId}")
-    public ResponseEntity<TaskRequest> taskSetAssignee(
+    public ResponseEntity<TaskResponse> taskSetAssignee(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id,
             @Min(value = 1, message = "Параметр userId не может быть меньше 1!")
             @PathVariable Integer userId
     ) {
-        // set assignee - ORG only
-        // schedule task deadline notification
-        // delete task deadline notification for prev assignee
-        TaskRequest updatedTask = null;
+        TaskResponse updatedTask = taskService.setAssignee(id, userId);
         return ResponseEntity.ok().body(updatedTask);
     }
 
     @PutMapping("/{id}/assignee")
-    public ResponseEntity<TaskRequest> taskTakeOn(
+    public ResponseEntity<TaskResponse> taskTakeOn(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id
     ) {
-        // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
-        // schedule task deadline notification
-        TaskRequest updatedTask = null;
+        Integer userId = 0; // TODO: get from principal
+        TaskResponse updatedTask = taskService.setAssignee(id, userId);
         return ResponseEntity.ok().body(updatedTask);
     }
 
+    // p35 && also delete yourself as privilege 41
     @DeleteMapping("/{id}/assignee")
-    public ResponseEntity<?> taskDeleteAssignee(
+    public ResponseEntity<TaskResponse> taskDeleteAssignee(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id
     ) {
-        // delete task deadline notification
-        return ResponseEntity.ok().build();
+        TaskResponse updatedTask = taskService.setAssignee(id, -1);
+        return ResponseEntity.ok().body(updatedTask);
     }
 
-    //privilege 32
+    //privilege 32 && privilege 39
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> taskSetStatus(
+    public ResponseEntity<TaskResponse> taskSetStatus(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id,
             @NotNull(message = "Параметр newStatus не может быть null!")
             @RequestBody TaskStatus newStatus
     ) {
-        // set status - ORG only
-        // delete task deadline notification - if done ???
-        return ResponseEntity.ok().build();
+        if (newStatus == TaskStatus.EXPIRED) {
+            throw new IllegalArgumentException("Недопустимый для ручного выставления статус!");
+        }
+        TaskResponse updatedTask = taskService.setStatus(id, newStatus);
+        return ResponseEntity.ok().body(updatedTask);
     }
 
     //privilege 39
-    @PutMapping("/{id}/status/assignee")
-    public ResponseEntity<?> taskMarkDone(
-            @Min(value = 1, message = "Параметр id не может быть меньше 1!")
-            @PathVariable Integer id,
-            @NotNull(message = "Параметр newStatus не может быть null!")
-            @RequestBody TaskStatus newStatus
-    ) {
-        // set status "done"
-        // delete task deadline notification - if done ???
-        return ResponseEntity.ok().build();
-    }
+//    @PutMapping("/{id}/status/assignee")
+//    public ResponseEntity<?> taskSetStatusAsAssignee(
+//            @Min(value = 1, message = "Параметр id не может быть меньше 1!")
+//            @PathVariable Integer id,
+//            @NotNull(message = "Параметр newStatus не может быть null!")
+//            @RequestBody TaskStatus newStatus
+//    ) {
+//        // set status "done"
+//        // delete task deadline notification - if done ???
+//        return ResponseEntity.ok().build();
+//    }
 
 
-    @PutMapping("/event/{srcEventId}/{dstEventId}")
-    public ResponseEntity<?> taskListMove(
-            @Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
-            @PathVariable Integer srcEventId,
+    //    @PutMapping("/event/{srcEventId}/{dstEventId}")
+    @PutMapping("/event/{dstEventId}")
+    public ResponseEntity<List<TaskResponse>> taskListMove(
+//            @Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
+//            @PathVariable Integer srcEventId,
             @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
             @PathVariable Integer dstEventId,
             @NotEmpty(message = "Список task id не может быть пустым!")
@@ -137,16 +136,17 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/event/{srcEventId}/{dstEventId}")
-    public ResponseEntity<List<TaskRequest>> taskListCopy(
-            @Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
-            @PathVariable Integer srcEventId,
+    //    @PostMapping("/event/{srcEventId}/{dstEventId}")
+    @PostMapping("/event/{dstEventId}")
+    public ResponseEntity<List<TaskResponse>> taskListCopy(
+//            @Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
+//            @PathVariable Integer srcEventId,
             @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
             @PathVariable Integer dstEventId,
             @NotEmpty(message = "Список task id не может быть пустым!")
             @RequestBody List<Integer> taskIds
     ) {
-        List<TaskRequest> newTasks = new ArrayList<>();
+        List<TaskResponse> newTasks = new ArrayList<>();
         // create new tasks in event with dstEventId
         // assignee -> null; status -> new
         // schedule task deadline notification

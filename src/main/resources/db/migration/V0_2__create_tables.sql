@@ -114,6 +114,7 @@ create table if not exists task
     description text not null,
     status task_status not null,
     title varchar(128) not null,
+    creation_time timestamp not null,
     deadline timestamp not null,
     place_id int references place(id),
     notification_deadline timestamp not null
