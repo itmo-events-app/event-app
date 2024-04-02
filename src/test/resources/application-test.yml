@@ -16,6 +16,12 @@ spring:
     enabled: true
     locations:
       - 'classpath:db/test-migration'
+  mail:
+    username: sender@test
+    password: passwd
+    host: 127.0.0.1
+    port: 3025
+    protocol: smtp
 
 minio:
   url: ${MINIO_URL}
