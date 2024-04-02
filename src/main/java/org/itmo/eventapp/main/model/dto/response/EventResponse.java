@@ -23,6 +23,5 @@ public record EventResponse(
         int participantAgeHighest,
         LocalDateTime preparingStart,
         LocalDateTime preparingEnd
-
 ) {
 }

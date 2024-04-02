@@ -1,23 +1,31 @@
 package org.itmo.eventApp.main.controller;
 
+import io.minio.RemoveBucketArgs;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class EventControllerTest extends AbstractTestContainers {
-    // TODO: Add Test for event controller here
-
     @BeforeEach
     public void setup() {
+        executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+    }
+
+    @AfterEach
+    public void cleanUp() {
+        executeSqlScript("/sql/clean_tables.sql");
     }
 
     @Test
@@ -28,6 +36,62 @@ public class EventControllerTest extends AbstractTestContainers {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void addProperEventByOrganizer() throws Exception {
+        String eventJson = """
+                {
+                    "userId": 1,
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(201));
+    }
+
+    @Test
+    void addEventByOrganizerUserNotFound() throws Exception {
+        String eventJson = """
+                {
+                    "userId": 42,
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(404))
+                .andExpect(content().string(containsString("User not found")));
+    }
+
+    @Test
+    void addEventByOrganizerNotNull() throws Exception {
+        String eventJson = """
+                {
+                    "userId": 1,
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(400));
+
+        eventJson = """
+                {
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(400));
     }
 
     @Test

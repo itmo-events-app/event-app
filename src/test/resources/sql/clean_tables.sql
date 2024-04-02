@@ -15,7 +15,6 @@ select setval('event_role_id_seq', 1, false);
 select setval('participant_id_seq', 1, false);
 select setval('event_id_seq', 1, false);
 select setval('place_id_seq', 1, false);
-select setval('notification_id_seq', 1, false);
 select setval('user_login_info_id_seq', 1, false);
 select setval('user_t_id_seq', 1, false);
 select setval('user_notification_info_id_seq', 1, false);
