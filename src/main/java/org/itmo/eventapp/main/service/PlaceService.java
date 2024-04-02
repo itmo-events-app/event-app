@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.repository.PlaceRepository;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,6 @@ public class PlaceService {
 
     Place findById(int id) {
         return placeRepository.findById(id)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Place event not found"));
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.PLACE_NOT_FOUND_MESSAGE));
     }
 }

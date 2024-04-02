@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.repository.RoleRepository;
@@ -17,12 +18,12 @@ public class RoleService {
 
     Role findById(int id) {
         return roleRepository.findById(id)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Role event not found"));
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.ROLE_NOT_FOUND_MESSAGE));
     }
 
     Role findByName(String name) {
         return roleRepository.findByName(name)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Role event not found"));
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.ROLE_NOT_FOUND_MESSAGE));
     }
 
 }
