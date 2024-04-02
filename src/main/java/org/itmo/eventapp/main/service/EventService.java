@@ -1,22 +1,13 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.repository.EventRepository;
-import org.itmo.eventapp.main.repository.PlaceRepository;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
-import org.itmo.eventapp.main.repository.EventRoleRepository;
-import org.itmo.eventapp.main.repository.RoleRepository;
-import org.itmo.eventapp.main.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -36,8 +27,8 @@ public class EventService {
         Event parent = findById(eventRequest.parent());
         Event e = Event.builder()
                 .place(place)
-                .startDate(eventRequest.start())
-                .endDate(eventRequest.end())
+                .startDate(eventRequest.startDate())
+                .endDate(eventRequest.endDate())
                 .title(eventRequest.title())
                 .shortDescription(eventRequest.shortDescription())
                 .fullDescription(eventRequest.fullDescription())
