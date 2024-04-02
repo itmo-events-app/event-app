@@ -36,8 +36,8 @@ public class EventControllerTest extends AbstractTestContainers {
                 {
                   "id": 1,
                   "placeId": 1,
-                  "start": "2024-03-30T21:32:23.536819",
-                  "end": "2024-03-30T21:32:23.536819",
+                  "startDate": "2024-03-30T21:32:23.536819",
+                  "endDate": "2024-03-30T21:32:23.536819",
                   "title": "party",
                   "shortDescription": "cool party",
                   "fullDescription": "very cool party",
@@ -64,8 +64,8 @@ public class EventControllerTest extends AbstractTestContainers {
         String eventRequestJson = """
                 {
                   "placeId": 1,
-                  "start": "2024-04-02T14:00:00",
-                  "end": "2024-04-02T16:00:00",
+                  "startDate": "2024-04-02T14:00:00",
+                  "endDate": "2024-04-02T16:00:00",
                   "title": "New updated test title",
                   "shortDescription": "Short Description",
                   "fullDescription": "Full Description",
@@ -85,8 +85,8 @@ public class EventControllerTest extends AbstractTestContainers {
                 {
                   "id": 1,
                   "placeId": 1,
-                  "start": "2024-04-02T14:00:00",
-                  "end": "2024-04-02T16:00:00",
+                  "startDate": "2024-04-02T14:00:00",
+                  "endDate": "2024-04-02T16:00:00",
                   "title": "New updated test title",
                   "shortDescription": "Short Description",
                   "fullDescription": "Full Description",
