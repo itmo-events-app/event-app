@@ -77,18 +77,18 @@ create table if not exists event
     place_id integer references place(id),
     start_date timestamp,
     end_date timestamp,
-    title varchar(256) not null ,
+    title varchar(256) not null,
     short_description text,
     full_description text,
     format event_format,
-    status varchar(64) ,
-    registration_start timestamp ,
-    registration_end timestamp ,
+    status varchar(64),
+    registration_start timestamp,
+    registration_end timestamp,
     parent_id integer references event(id),
     participant_limit int,
     participant_age_lowest int,
     participant_age_highest int,
-    preparing_start timestamp ,
+    preparing_start timestamp,
     preparing_end timestamp
 );
 create table if not exists participant(
