@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,5 +58,12 @@ public class EventController {
     @GetMapping("/{id}")
     public ResponseEntity<EventResponse> getEventById(@Min(1) @PathVariable("id") Integer id) {
         return ResponseEntity.ok().body(eventService.getEventById(id));
+    }
+
+    // TODO: Add annotation @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEventById(@Min(1) @PathVariable("id") Integer id) {
+        eventService.deleteEventById(id);
+        return ResponseEntity.noContent().build();
     }
 }

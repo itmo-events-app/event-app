@@ -105,15 +105,14 @@ public class EventService {
         if (title != null) {
             predicates.add(cb.equal(root.get("title"), title));
         }
+        if (startDate != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("startDate"), startDate));
+        }
+        if (endDate != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("endDate"), endDate));
+        }
         if (startDate != null && endDate != null) {
             predicates.add(cb.between(root.get("startDate"), startDate, endDate));
-        } else {
-            if (startDate != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("startDate"), startDate));
-            }
-            if (endDate != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("endDate"), endDate));
-            }
         }
         if (status != null) {
             predicates.add(cb.equal(root.get("status"), status));
@@ -135,5 +134,9 @@ public class EventService {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
         return EventMapper.eventToEventResponse(event);
+    }
+
+    public void deleteEventById(Integer id) {
+        eventRepository.deleteById(id);
     }
 }
