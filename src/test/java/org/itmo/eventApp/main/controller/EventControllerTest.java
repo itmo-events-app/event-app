@@ -122,4 +122,11 @@ public class EventControllerTest extends AbstractTestContainers {
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedEventJson));
     }
+
+
+    @Test
+    void deleteEventByIdTest() throws Exception {
+        mockMvc.perform(delete("/api/events/1"))
+                .andExpect(status().isNoContent());
+    }
 }

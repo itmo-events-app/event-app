@@ -91,6 +91,43 @@ class EventServiceTest extends AbstractTestContainers {
     }
 
     @Test
+    void getFilteredEventsForNullValues() {
+        executeSqlScript("/sql/custom_data_for_event_filter.sql");
+        List<EventResponse> eventResponses = eventService.getAllOrFilteredEvents(0, 10, null,
+                null, null, null, null);
+
+        assertEquals(6, eventResponses.size());
+    }
+
+    @Test
+    void getPartialFilteringEventsByEnums() {
+        executeSqlScript("/sql/custom_data_for_event_filter.sql");
+
+        List<EventResponse> eventResponses = eventService.getAllOrFilteredEvents(0, 10, null,
+                null, null, EventStatus.PUBLISHED, EventFormat.ONLINE);
+
+        assertEquals(2, eventResponses.size());
+        eventResponses.forEach(eventResponse -> assertAll(
+                () -> assertEquals(EventStatus.PUBLISHED, eventResponse.status()),
+                () -> assertEquals(EventFormat.ONLINE, eventResponse.format()))
+        );
+    }
+
+    @Test
+    void getPartialFilteringEventsByDateAndTitle() {
+        executeSqlScript("/sql/custom_data_for_event_filter.sql");
+
+        List<EventResponse> eventResponses = eventService.getAllOrFilteredEvents(0, 10, "m",
+                LocalDateTime.parse("2024-04-02T05:07:00.000000"), null, null, null);
+
+        assertEquals(1, eventResponses.size());
+        eventResponses.forEach(eventResponse -> assertAll(
+                () -> assertEquals(eventResponse.title(), "m"),
+                () -> assertEquals(eventResponse.start(), LocalDateTime.parse("2024-04-02T05:07:00.000000")))
+        );
+    }
+
+    @Test
     void getEventById() {
         EventResponse expectedEvent = new EventResponse(1, 1,
                 LocalDateTime.parse("2024-03-30T21:32:23.536819"),
