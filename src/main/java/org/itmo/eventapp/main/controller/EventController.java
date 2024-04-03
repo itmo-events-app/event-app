@@ -27,6 +27,7 @@ public class EventController {
         return ResponseEntity.ok(eventService.addEvent(eventRequest).getId());
     }
 
+    // TODO: Return images in response
     @PutMapping("/{id}")
     public ResponseEntity<EventResponse> updateEvent(@Min(1) @PathVariable("id") Integer id,
                                                      @Valid EventRequest eventRequest) {
@@ -34,7 +35,6 @@ public class EventController {
     }
 
     // TODO: Add filtering by fields: title, dates, status, format
-
     @GetMapping
     public ResponseEntity<List<EventResponse>> getAllEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
                                                             @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") int size) {
