@@ -415,7 +415,7 @@ public class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_task.sql");
 
         Task task = taskRepository.findById(1).orElseThrow();
-        Assertions.assertEquals(task.getEvent().getId(), 1);
+        Assertions.assertEquals(1, task.getEvent().getId());
 
         mockMvc.perform(post("/api/tasks/event/2")
                         .content("[1]")
