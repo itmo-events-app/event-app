@@ -9,6 +9,8 @@ import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
+import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
+import org.itmo.eventapp.main.model.mapper.RoleMapper;
 import org.itmo.eventapp.main.service.EventRoleService;
 import org.itmo.eventapp.main.service.PrivilegeService;
 import org.itmo.eventapp.main.service.RoleService;
@@ -33,31 +35,31 @@ public class RoleController {
     @GetMapping("/{id}")
     public ResponseEntity<RoleResponse> getRoleById(@Positive(message = "Параметр roleId не может быть меньше 1!")
                                                     @PathVariable Integer id) {
-        return ResponseEntity.ok().body(roleService.findById(id));
+        return ResponseEntity.ok().body(RoleMapper.roleToRoleResponse(roleService.findById(id)));
     }
 
     @Operation(summary = "Получение списка всех ролей")
     @GetMapping("/")
     public ResponseEntity<List<RoleResponse>> getAllRoles() {
-        return ResponseEntity.ok(roleService.getAll());
+        return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.getAll()));
     }
 
     @Operation(summary = "Получение организационных ролей")
     @GetMapping("/organizational")
     public ResponseEntity<List<RoleResponse>> getOrganizationalRoles() {
-        return ResponseEntity.ok(roleService.getOrganizational());
+        return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.getOrganizational()));
     }
 
-    @Operation(summary = "Поиск ролей по названию")
+    @Operation(summary = "Поиск ролей по совпадению в названии")
     @GetMapping("/search")
     public ResponseEntity<List<RoleResponse>> searchByName(@RequestParam String name) {
-        return ResponseEntity.ok(roleService.searchByName(name));
+        return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.searchByName(name)));
     }
 
     @Operation(summary = "Создание роли")
     @PostMapping("/")
     public ResponseEntity<RoleResponse> createRole(@Valid @RequestBody RoleRequest roleRequest) {
-        return ResponseEntity.ok(roleService.createRole(roleRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(RoleMapper.roleToRoleResponse(roleService.createRole(roleRequest)));
     }
 
     @Operation(summary = "Удаление роли")
@@ -73,25 +75,25 @@ public class RoleController {
     public ResponseEntity<RoleResponse> editRole(@Positive(message = "Параметр roleId не может быть меньше 1!")
                                                  @PathVariable Integer id,
                                                  @Valid @RequestBody RoleRequest roleRequest) {
-        return ResponseEntity.ok(roleService.editRole(id, roleRequest));
+        return ResponseEntity.ok(RoleMapper.roleToRoleResponse(roleService.editRole(id, roleRequest)));
     }
 
     @Operation(summary = "Получение списка всех привилегий")
     @GetMapping("/privileges")
     public ResponseEntity<List<PrivilegeResponse>> getAllPrivileges() {
-        return ResponseEntity.ok(privilegeService.getAll());
+        return ResponseEntity.ok(PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeService.getAll()));
     }
 
     @Operation(summary = "Получение списка системных привилегий")
     @GetMapping("/system-privileges")
     public ResponseEntity<List<PrivilegeResponse>> getSystemPrivileges() {
-        return ResponseEntity.ok(privilegeService.getPrivilegeByType(PrivilegeType.SYSTEM));
+        return ResponseEntity.ok(PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeService.getPrivilegeByType(PrivilegeType.SYSTEM)));
     }
 
     @Operation(summary = "Получение списка организационных привилегий")
     @GetMapping("/organizational-privileges")
     public ResponseEntity<List<PrivilegeResponse>> getOrganizationalPrivileges() {
-        return ResponseEntity.ok(privilegeService.getPrivilegeByType(PrivilegeType.EVENT));
+        return ResponseEntity.ok(PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeService.getPrivilegeByType(PrivilegeType.EVENT)));
     }
 
     @Operation(summary = "Назначение пользователю организационной роли")

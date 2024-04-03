@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 
 import java.util.HashSet;
@@ -53,10 +52,4 @@ public class Role {
         privilege.getRoles().add(this);
     }
 
-    public Role(RoleRequest roleRequest) {
-        name = roleRequest.name();
-        description = roleRequest.description();
-        type = Boolean.TRUE.equals(roleRequest.isEvent()) ? RoleType.EVENT : RoleType.SYSTEM;
-        privileges= new HashSet<>();
-    }
 }

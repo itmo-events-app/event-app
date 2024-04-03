@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface PrivilegeRepository extends JpaRepository<Privilege, Integer> {
 
-    List<PrivilegeResponse> findAllByType(PrivilegeType type);
+    List<Privilege> findAllByType(PrivilegeType type);
 
 }
