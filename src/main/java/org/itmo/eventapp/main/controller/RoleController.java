@@ -101,7 +101,7 @@ public class RoleController {
     public ResponseEntity<Void> assignOrganizationalRole(
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
             @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer eventId,
-            @Min(3) @RequestBody Integer roleId) {
+            @RequestBody Integer roleId) {
         eventRoleService.assignOrganizationalRole(userId, roleId, eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -129,7 +129,7 @@ public class RoleController {
     public ResponseEntity<Void> revokeOrganizationalRole(
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
             @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer eventId,
-            @Min(3) @RequestBody Integer roleId) {
+            @RequestBody Integer roleId) {
         eventRoleService.revokeOrganizationalRole(userId, roleId, eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -19,10 +20,14 @@ public class EventRoleService {
     private final UserService userService;
     private final RoleService roleService;
     private final EventService eventService;
+    private final List<String> notAssignableRoles = Arrays.asList("Администратор", "Читатель", "Организатор");
 
     public void assignOrganizationalRole(Integer userId, Integer roleId, Integer eventId) {
-        var user = userService.findById(userId);
         var role = roleService.findRoleById(roleId);
+        if (notAssignableRoles.contains(role.getName()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нельзя назначить эту роль");
+
+        var user = userService.findById(userId);
         if (!role.getType().equals(RoleType.EVENT))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Неверный тип роли: ожидалась организационная роль");
         var event = eventService.findById(eventId);
@@ -46,8 +51,11 @@ public class EventRoleService {
 
     @Transactional
     public void revokeOrganizationalRole(Integer userId, Integer roleId, Integer eventId) {
-        var user = userService.findById(userId);
         var role = roleService.findRoleById(roleId);
+        if (notAssignableRoles.contains(role.getName()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нельзя лишить этой роль");
+
+        var user = userService.findById(userId);
         if (!role.getType().equals(RoleType.EVENT))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Неверный тип роли: ожидалась организационная роль");
         var event = eventService.findById(eventId);
