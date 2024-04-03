@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class EventServiceTest {
+class EventServiceTest {
 
     @InjectMocks
     private EventService eventService;
@@ -63,7 +63,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testUpdateEvent() {
+    void testUpdateEvent() {
         Integer eventId = 1;
         EventRequest eventRequest = new EventRequest(
                 1,
@@ -97,7 +97,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testGetAllOrFilteredEvents() {
+    void testGetAllOrFilteredEvents() {
         String title = "new test event party";
         LocalDateTime startDate = LocalDateTime.now().minusDays(1);
         LocalDateTime endDate = LocalDateTime.now().plusDays(1);
@@ -125,7 +125,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testGetEventById() {
+    void testGetEventById() {
         Integer eventId = 1;
         Event expectedEvent = new Event();
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(expectedEvent));
@@ -134,14 +134,14 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testGetEventByIdNotFound() {
+    void testGetEventByIdNotFound() {
         Integer eventId = 1;
         when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
         assertThrows(ResponseStatusException.class, () -> eventService.getEventById(eventId));
     }
 
     @Test
-    public void testDeleteEventById() {
+    void testDeleteEventById() {
         Integer eventId = 1;
         eventService.deleteEventById(eventId);
         assertThrows(ResponseStatusException.class, () -> eventService.getEventById(eventId));
