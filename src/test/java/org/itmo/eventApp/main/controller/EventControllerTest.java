@@ -112,6 +112,7 @@ public class EventControllerTest extends AbstractTestContainers {
         boolean isImageExists = isImageExist("3.jpeg");
         assertThat(isBucketExists).isTrue();
         assertThat(isImageExists).isTrue();
+        assertThat(eventRepository.findById(3).isPresent()).isTrue();
     }
 
     @Test
