@@ -156,7 +156,7 @@ public class TaskService {
                 }
         ).toList();
 
-        taskRepository.saveAll(tasks);
+        tasks = taskRepository.saveAll(tasks);
 
         return TaskMapper.tasksToTaskResponseList(tasks);
     }
@@ -190,13 +190,13 @@ public class TaskService {
             newTasks.add(newTask);
         }
 
-        taskRepository.saveAll(tasks);
+        newTasks = taskRepository.saveAll(newTasks);
 
         for (Task newTask: newTasks) {
             /*TODO: schedule task deadline notification for assigner */
         }
 
-        return TaskMapper.tasksToTaskResponseList(tasks);
+        return TaskMapper.tasksToTaskResponseList(newTasks);
     }
 
 }
