@@ -1,5 +1,13 @@
 package org.itmo.eventApp.main.controller;
 
+import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.repository.EventRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+
+import java.util.Optional;
 import io.minio.RemoveBucketArgs;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,14 +21,21 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 public class EventControllerTest extends AbstractTestContainers {
-    @BeforeEach
-    public void setup() {
-        executeSqlScript("/sql/insert_user.sql");
+    private final EventRepository eventRepository;
+
+    @Autowired
+    public EventControllerTest(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
+
+    private void setUpEventData() {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+    }
+
+    private void setUpUserData() {
+        executeSqlScript("/sql/insert_user.sql");
     }
 
     @AfterEach
@@ -29,7 +44,24 @@ public class EventControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    void getAllOrFilteredEventsTest() throws Exception {
+        setUpEventData();
+        mockMvc.perform(get("/api/events")
+                        .param("title", "party")
+                        .param("format", "OFFLINE")
+                        .param("status", "PUBLISHED"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].title").value("party"))
+                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
+                .andExpect(jsonPath("$[0].status").value("PUBLISHED"));
+    }
+
+    @Test
     void getAllEventsTest() throws Exception {
+        setUpEventData();
         mockMvc.perform(get("/api/events")
                         .param("page", "0")
                         .param("size", "15"))
@@ -40,6 +72,7 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void addProperEventByOrganizer() throws Exception {
+        setUpUserData();
         String eventJson = """
                 {
                     "userId": 1,
@@ -96,6 +129,7 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void getEventByIdTest() throws Exception {
+        setUpEventData();
         String expectedEventJson = """
                 {
                   "id": 1,
@@ -125,6 +159,7 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void updateEventTest() throws Exception {
+        setUpEventData();
         String eventRequestJson = """
                 {
                   "placeId": 1,
@@ -171,5 +206,16 @@ public class EventControllerTest extends AbstractTestContainers {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedEventJson));
+    }
+
+
+    @Test
+    void deleteEventByIdTest() throws Exception {
+        setUpEventData();
+        mockMvc.perform(delete("/api/events/1"))
+                .andExpect(status().isNoContent());
+
+        Optional<Event> deletedEvent = eventRepository.findById(1);
+        Assertions.assertFalse(deletedEvent.isPresent());
     }
 }
