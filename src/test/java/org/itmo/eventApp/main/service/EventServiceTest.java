@@ -3,6 +3,7 @@ package org.itmo.eventApp.main.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
@@ -56,6 +57,8 @@ class EventServiceTest {
     private Root<Event> root;
 
     @Mock
+    private MinioService minioService;
+    @Mock
     private TypedQuery<Event> typedQuery;
 
     @BeforeEach
@@ -93,7 +96,7 @@ class EventServiceTest {
         when(eventRepository.existsById(eventId)).thenReturn(true);
         when(eventRepository.save(any())).thenReturn(new Event());
         when(placeService.findById(anyInt())).thenReturn(new Place());
-
+        doNothing().when(minioService).deleteImageByEvent(anyString(), any());
         Event updatedEvent = eventService.updateEvent(eventId, eventRequest);
 
         assertAll(

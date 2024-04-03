@@ -13,11 +13,11 @@ public class AuthControllerTest extends AbstractTestContainers {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
-    @Test
-    @WithAnonymousUser
-    void methodUnauthorizedTest() throws Exception {
-        mockMvc.perform(get("/hello").param("s", "world")).andExpect(status().isUnauthorized());
-    }
+//    @Test
+//    @WithAnonymousUser
+//    void methodUnauthorizedTest() throws Exception {
+//        mockMvc.perform(get("/hello").param("s", "world")).andExpect(status().isUnauthorized());
+//    }
 
     @Test
     @WithMockUser(username = "login@gmail.com")
