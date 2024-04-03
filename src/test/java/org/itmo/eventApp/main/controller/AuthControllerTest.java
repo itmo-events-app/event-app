@@ -15,13 +15,13 @@ public class AuthControllerTest extends AbstractTestContainers {
 
     @Test
     @WithAnonymousUser
-    public void methodUnauthorizedTest() throws Exception {
+    void methodUnauthorizedTest() throws Exception {
         mockMvc.perform(get("/hello").param("s", "world")).andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(username = "login@gmail.com")
-    public void methodAuthorizedTest() throws Exception {
+    void methodAuthorizedTest() throws Exception {
         mockMvc.perform(get("/hello").param("s", "world"))
                 .andExpect(status().isOk());
     }

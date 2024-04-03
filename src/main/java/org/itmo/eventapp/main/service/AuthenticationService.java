@@ -3,13 +3,12 @@ package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.entity.*;
-import org.itmo.eventapp.main.model.dto.LoginRequest;
-import org.itmo.eventapp.main.model.dto.RegistrationUserRequest;
+import org.itmo.eventapp.main.model.dto.request.LoginRequest;
+import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.entity.enums.EmailStatus;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
 import org.itmo.eventapp.main.repository.*;
 import org.itmo.eventapp.main.security.util.JwtTokenUtil;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

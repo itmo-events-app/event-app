@@ -1,13 +1,10 @@
 package org.itmo.eventapp.main.security.config;
 
-import jakarta.servlet.ServletException;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.security.filter.JwtFilter;
 import org.itmo.eventapp.main.security.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,11 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.server.authentication.logout.DelegatingServerLogoutHandler;
-import org.springframework.security.web.server.authentication.logout.SecurityContextServerLogoutHandler;
-import org.springframework.security.web.server.authentication.logout.WebSessionServerLogoutHandler;
-import org.springframework.web.server.ResponseStatusException;
 
 @Configuration
 @EnableWebSecurity
@@ -47,9 +39,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/register").permitAll()
-                        .anyRequest().authenticated())
+                        //.requestMatchers("/login").permitAll()
+                        //.requestMatchers("/register").permitAll()
+                        //.anyRequest().authenticated()
+                        .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .authenticationManager(authenticationManager)
 

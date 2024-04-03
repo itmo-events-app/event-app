@@ -2,8 +2,8 @@ package org.itmo.eventapp.main.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.dto.LoginRequest;
-import org.itmo.eventapp.main.model.dto.RegistrationUserRequest;
+import org.itmo.eventapp.main.model.dto.request.LoginRequest;
+import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

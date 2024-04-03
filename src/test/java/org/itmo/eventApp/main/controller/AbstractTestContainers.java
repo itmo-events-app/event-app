@@ -22,7 +22,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = Main.class)
 public abstract class AbstractTestContainers {
