@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
@@ -11,6 +12,7 @@ import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.service.EventService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,9 +36,20 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
-    @PostMapping
+    // TODO: Add privilege validation
+
+    @PostMapping("/activity")
     public ResponseEntity<Integer> addEvent(@RequestBody @Valid EventRequest eventRequest) {
-        return ResponseEntity.ok(eventService.addEvent(eventRequest).getId());
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(eventService.addEvent(eventRequest).getId());
+    }
+
+    @PostMapping
+    public ResponseEntity<Integer> addEventByOrganizer(@RequestBody @Valid CreateEventRequest eventRequest) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(eventService.addEventByOrganizer(eventRequest).getId());
     }
 
     @PutMapping("/{id}")

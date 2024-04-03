@@ -8,12 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import java.util.Optional;
+import io.minio.RemoveBucketArgs;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class EventControllerTest extends AbstractTestContainers {
-
     private final EventRepository eventRepository;
 
     @Autowired
@@ -24,6 +32,11 @@ public class EventControllerTest extends AbstractTestContainers {
     private void setUpEventData() {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+    }
+
+    @AfterEach
+    public void cleanUp() {
+        executeSqlScript("/sql/clean_tables.sql");
     }
 
     @Test
@@ -54,14 +67,70 @@ public class EventControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    void addProperEventByOrganizer() throws Exception {
+        String eventJson = """
+                {
+                    "userId": 1,
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(201));
+    }
+
+    @Test
+    void addEventByOrganizerUserNotFound() throws Exception {
+        String eventJson = """
+                {
+                    "userId": 42,
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(404))
+                .andExpect(content().string(containsString("User not found")));
+    }
+
+    @Test
+    void addEventByOrganizerNotNull() throws Exception {
+        String eventJson = """
+                {
+                    "userId": 1,
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(400));
+
+        eventJson = """
+                {
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(400));
+    }
+
+    @Test
     void getEventByIdTest() throws Exception {
         setUpEventData();
         String expectedEventJson = """
                 {
                   "id": 1,
                   "placeId": 1,
-                  "start": "2024-03-30T21:32:23.536819",
-                  "end": "2024-03-30T21:32:23.536819",
+                  "startDate": "2024-03-30T21:32:23.536819",
+                  "endDate": "2024-03-30T21:32:23.536819",
                   "title": "party",
                   "shortDescription": "cool party",
                   "fullDescription": "very cool party",
@@ -89,8 +158,8 @@ public class EventControllerTest extends AbstractTestContainers {
         String eventRequestJson = """
                 {
                   "placeId": 1,
-                  "start": "2024-04-02T14:00:00",
-                  "end": "2024-04-02T16:00:00",
+                  "startDate": "2024-04-02T14:00:00",
+                  "endDate": "2024-04-02T16:00:00",
                   "title": "New updated test title",
                   "shortDescription": "Short Description",
                   "fullDescription": "Full Description",
@@ -110,8 +179,8 @@ public class EventControllerTest extends AbstractTestContainers {
                 {
                   "id": 1,
                   "placeId": 1,
-                  "start": "2024-04-02T14:00:00",
-                  "end": "2024-04-02T16:00:00",
+                  "startDate": "2024-04-02T14:00:00",
+                  "endDate": "2024-04-02T16:00:00",
                   "title": "New updated test title",
                   "shortDescription": "Short Description",
                   "fullDescription": "Full Description",

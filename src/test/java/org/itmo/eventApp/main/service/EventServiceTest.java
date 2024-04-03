@@ -133,12 +133,14 @@ class EventServiceTest {
         assertEquals(expectedEvent, actualEvent);
     }
 
+
     @Test
     void testGetEventByIdNotFound() {
         Integer eventId = 1;
         when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
         assertThrows(ResponseStatusException.class, () -> eventService.getEventById(eventId));
     }
+
 
     @Test
     void testDeleteEventById() {

@@ -53,15 +53,16 @@ create table if not exists user_login_info(
     registration_id int not null references registration_request(id)
 );
 create table if not exists notification(
+    id int generated always as identity primary key not null,
     user_id int not null references user_t(id),
     title varchar(256) not null,
     description text not null ,
-    sent boolean not null default FALSE,
-    read_time timestamp
+    seen boolean not null default FALSE,
+    read_time timestamp default null
 );
 create table if not exists place
 (
-    id int generated always as identity primary key not null ,
+    id int generated always as identity primary key not null,
     address varchar(512) not null,
     name varchar(256) not null,
     format place_format not null,
@@ -74,22 +75,22 @@ create table if not exists place
 create table if not exists event
 (
     id int generated always as identity primary key not null,
-    place_id integer not null references place(id),
-    start_date timestamp not null,
-    end_date timestamp not null,
-    title varchar(256) not null ,
-    short_description text not null,
-    full_description text not null,
-    format event_format not null,
-    status varchar(64) not null ,
-    registration_start timestamp not null ,
-    registration_end timestamp not null ,
+    place_id integer references place(id),
+    start_date timestamp,
+    end_date timestamp,
+    title varchar(256) not null,
+    short_description text,
+    full_description text,
+    format event_format,
+    status varchar(64),
+    registration_start timestamp,
+    registration_end timestamp,
     parent_id integer references event(id),
     participant_limit int,
     participant_age_lowest int,
     participant_age_highest int,
-    preparing_start timestamp not null ,
-    preparing_end timestamp not null
+    preparing_start timestamp,
+    preparing_end timestamp
 );
 create table if not exists participant(
     id int generated always as identity primary key not null,
