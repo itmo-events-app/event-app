@@ -32,7 +32,7 @@ public class EventController {
 
     // TODO: Add privilege validation
 
-    @PostMapping("/addActivity")
+    @PostMapping("/activity")
     public ResponseEntity<Integer> addEvent(@RequestBody @Valid EventRequest eventRequest) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
