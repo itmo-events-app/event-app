@@ -1,9 +1,11 @@
 package org.itmo.eventApp.main.controller;
 
+
 import io.minio.BucketExistsArgs;
 import io.minio.StatObjectArgs;
 import io.minio.errors.ErrorResponseException;
-import org.junit.jupiter.api.BeforeEach;
+import org.itmo.eventapp.main.model.entity.Event;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
@@ -13,11 +15,18 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.itmo.eventapp.main.repository.EventRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.AfterEach;
+
+import java.util.Optional;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class EventControllerTest extends AbstractTestContainers {
+
     // TODO: Add Test for event controller here
     private boolean isImageExist(String object) {
         try {
@@ -31,20 +40,52 @@ public class EventControllerTest extends AbstractTestContainers {
             throw new RuntimeException(e.getMessage());
         }
     }
-    @BeforeEach
-    public void setup() {
+    private final EventRepository eventRepository;
+
+    @Autowired
+    public EventControllerTest(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
+
+    private void setUpEventData() {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_event.sql");
     }
 
+    private void setUpUserData() {
+        executeSqlScript("/sql/insert_user.sql");
+    }
+
+    @AfterEach
+    public void cleanUp() {
+        executeSqlScript("/sql/clean_tables.sql");
+    }
+
+    @Test
+    void getAllOrFilteredEventsTest() throws Exception {
+        setUpEventData();
+        mockMvc.perform(get("/api/events")
+                        .param("title", "party")
+                        .param("format", "OFFLINE")
+                        .param("status", "PUBLISHED"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].title").value("party"))
+                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
+                .andExpect(jsonPath("$[0].status").value("PUBLISHED"));
+    }
+
     @Test
     void addProperEvent() throws Exception {
+        setUpEventData();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "1");
-        params.add("start", "2024-03-28T09:00:00");
-        params.add("end", "2024-03-28T18:00:00");
+        params.add("startDate", "2024-03-28T09:00:00");
+        params.add("endDate", "2024-03-28T18:00:00");
         params.add("title", "itmo-event");
         params.add("shortDescription", "This is a short description.");
         params.add("fullDescription", "This is a full description of the event.");
@@ -65,7 +106,7 @@ public class EventControllerTest extends AbstractTestContainers {
                         .file(image)
                         .params(params)
                         .contentType("multipart/form-data"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().string("3"));
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
         boolean isImageExists = isImageExist("3.jpeg");
@@ -75,10 +116,11 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void addPlaceNotFoundInvalidEvent() throws Exception {
+        setUpEventData();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "10000000");
-        params.add("start", "2024-03-28T09:00:00");
-        params.add("end", "2024-03-28T18:00:00");
+        params.add("startDate", "2024-03-28T09:00:00");
+        params.add("endDate", "2024-03-28T18:00:00");
         params.add("title", "itmo-event");
         params.add("shortDescription", "This is a short description.");
         params.add("fullDescription", "This is a full description of the event.");
@@ -105,10 +147,11 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void addEmptyTitleInvalidEvent() throws Exception {
+        setUpEventData();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "1");
-        params.add("start", "2024-03-28T09:00:00");
-        params.add("end", "2024-03-28T18:00:00");
+        params.add("startDate", "2024-03-28T09:00:00");
+        params.add("endDate", "2024-03-28T18:00:00");
         params.add("title", "");
         params.add("shortDescription", "This is a short description.");
         params.add("fullDescription", "This is a full description of the event.");
@@ -133,6 +176,7 @@ public class EventControllerTest extends AbstractTestContainers {
     }
     @Test
     void getAllEventsTest() throws Exception {
+        setUpEventData();
         mockMvc.perform(get("/api/events")
                         .param("page", "0")
                         .param("size", "15"))
@@ -142,13 +186,71 @@ public class EventControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    void addProperEventByOrganizer() throws Exception {
+        setUpUserData();
+        String eventJson = """
+                {
+                    "userId": 1,
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(201));
+    }
+
+    @Test
+    void addEventByOrganizerUserNotFound() throws Exception {
+        String eventJson = """
+                {
+                    "userId": 42,
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(404))
+                .andExpect(content().string(containsString("User not found")));
+    }
+
+    @Test
+    void addEventByOrganizerNotNull() throws Exception {
+        String eventJson = """
+                {
+                    "userId": 1,
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(400));
+
+        eventJson = """
+                {
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is(400));
+    }
+
+    @Test
     void getEventByIdTest() throws Exception {
+        setUpEventData();
         String expectedEventJson = """
                 {
                   "id": 1,
                   "placeId": 1,
-                  "start": "2024-03-30T21:32:23.536819",
-                  "end": "2024-03-30T21:32:23.536819",
+                  "startDate": "2024-03-30T21:32:23.536819",
+                  "endDate": "2024-03-30T21:32:23.536819",
                   "title": "party",
                   "shortDescription": "cool party",
                   "fullDescription": "very cool party",
@@ -171,11 +273,12 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void updateEventTest() throws Exception {
+        setUpEventData();
         // add one event for updating later
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "1");
-        params.add("start", "2024-03-28T09:00:00");
-        params.add("end", "2024-03-28T18:00:00");
+        params.add("startDate", "2024-03-28T09:00:00");
+        params.add("endDate", "2024-03-28T18:00:00");
         params.add("title", "itmo-event");
         params.add("shortDescription", "This is a short description.");
         params.add("fullDescription", "This is a full description of the event.");
@@ -196,7 +299,7 @@ public class EventControllerTest extends AbstractTestContainers {
                         .file(image)
                         .params(params)
                         .contentType("multipart/form-data"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().string("3"));
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
         boolean isObjectExists = isImageExist("3.jpeg");
@@ -207,8 +310,8 @@ public class EventControllerTest extends AbstractTestContainers {
                 {
                   "id": 3,
                   "placeId": 2,
-                  "start": "2024-04-02T14:00:00",
-                  "end": "2024-04-02T16:00:00",
+                  "startDate": "2024-04-02T14:00:00",
+                  "endDate": "2024-04-02T16:00:00",
                   "title": "New updated test title",
                   "shortDescription": "Short Description",
                   "fullDescription": "Full Description",
@@ -225,8 +328,8 @@ public class EventControllerTest extends AbstractTestContainers {
                 }""";
         MultiValueMap<String, String> updatedParams = new LinkedMultiValueMap<>();
         updatedParams.add("placeId", "2");
-        updatedParams.add("start", "2024-04-02T14:00:00");
-        updatedParams.add("end", "2024-04-02T16:00:00");
+        updatedParams.add("startDate", "2024-04-02T14:00:00");
+        updatedParams.add("endDate", "2024-04-02T16:00:00");
         updatedParams.add("title", "New updated test title");
         updatedParams.add("shortDescription", "Short Description");
         updatedParams.add("fullDescription", "Full Description");
@@ -253,5 +356,16 @@ public class EventControllerTest extends AbstractTestContainers {
         boolean isOldImageExists = isImageExist("3.jpeg");
         assertThat(isNewImageExists).isTrue();
         assertThat(isOldImageExists).isFalse();
+    }
+
+
+    @Test
+    void deleteEventByIdTest() throws Exception {
+        setUpEventData();
+        mockMvc.perform(delete("/api/events/1"))
+                .andExpect(status().isNoContent());
+
+        Optional<Event> deletedEvent = eventRepository.findById(1);
+        Assertions.assertFalse(deletedEvent.isPresent());
     }
 }

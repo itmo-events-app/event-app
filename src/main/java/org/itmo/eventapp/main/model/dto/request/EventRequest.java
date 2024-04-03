@@ -15,10 +15,10 @@ public record EventRequest(
         @Min(value = 1, message = "Поле eventId не может быть меньше 1!")
         @NotNull(message = "Поле placeId не может быть null!")
         Integer placeId,
-        @NotNull(message = "Поле start не может быть null!")
-        LocalDateTime start,
-        @NotNull(message = "Поле end не может быть null!")
-        LocalDateTime end,
+        @NotNull(message = "Поле startDate не может быть null!")
+        LocalDateTime startDate,
+        @NotNull(message = "Поле endDate не может быть null!")
+        LocalDateTime endDate,
         @NotBlank(message = "Поле title не может быть пустой!")
         String title,
         @NotBlank(message = "Поле shortDescription не может быть пустой!")

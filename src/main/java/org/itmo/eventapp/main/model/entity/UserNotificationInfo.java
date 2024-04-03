@@ -16,7 +16,7 @@ public class UserNotificationInfo {
     @Column(columnDefinition = "varchar[]", name = "devices")
     private String[] devices;
 
-    private String enablePushNotifications;
+    private boolean enablePushNotifications;
 
-    private String enableEmailNotifications;
+    private boolean enableEmailNotifications;
 }
