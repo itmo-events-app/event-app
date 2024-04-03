@@ -1,5 +1,6 @@
-package org.itmo.eventApp.main.controller;
+package org.itmo.eventApp.main.service;
 
+import org.itmo.eventApp.main.controller.AbstractTestContainers;
 import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.repository.NotificationRepository;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NotificationServiceTest extends AbstractTestContainers{
+public class NotificationServiceTest extends AbstractTestContainers {
 
     @Autowired
     private NotificationService notificationService;

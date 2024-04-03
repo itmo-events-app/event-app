@@ -22,6 +22,11 @@ spring:
     host: 127.0.0.1
     port: 3025
     protocol: smtp
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password: password
 
 minio:
   url: ${MINIO_URL}
