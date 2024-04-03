@@ -1,4 +1,4 @@
 #!/bin/bash
 cd ..
-gradle build -x test
+./gradlew build -x test
 docker compose -f docker-compose-docker.yml up
