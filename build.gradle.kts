@@ -64,9 +64,9 @@ tasks.test {
     finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
     testLogging {
         events("passed", "skipped", "failed")
-        showStandardStreams = true
-        showStackTraces = true
-        exceptionFormat = TestExceptionFormat.FULL
+        // showStandardStreams = true
+        // showStackTraces = true
+        // exceptionFormat = TestExceptionFormat.FULL
     }
 }
 
