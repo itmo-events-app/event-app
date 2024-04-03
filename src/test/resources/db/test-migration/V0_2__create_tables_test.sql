@@ -57,8 +57,8 @@ create table if not exists notification(
     user_id int not null references user_t(id),
     title varchar(256) not null,
     description text not null ,
-    sent boolean not null default FALSE,
-    read_time timestamp
+    seen boolean not null default FALSE,
+    read_time timestamp default null
 );
 create table if not exists place
 (
