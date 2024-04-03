@@ -28,6 +28,7 @@ public class TaskControllerTest extends AbstractTestContainers {
 
     @Test
     void taskGetTest() throws Exception {
+        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
