@@ -47,7 +47,7 @@ class EventServiceTest extends AbstractTestContainers {
                 18,
                 100,
                 LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"));
+                LocalDateTime.parse("2024-03-30T21:32:23.536819"),null);
 
         EventResponse expectedEvent = new EventResponse(1, 1,
                 LocalDateTime.parse("2024-03-30T21:32:23.536819"),
