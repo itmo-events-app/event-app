@@ -2,6 +2,7 @@ package org.itmo.eventapp.main.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
@@ -76,13 +77,9 @@ public class RoleService {
         return roleRepository.findAll();
     }
 
-    public Role findById(Integer id) {
-        return findRoleById(id);
-    }
-
     public Role findRoleById(Integer id) {
         return roleRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Роли с id %d не существует", id)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.ROLE_NOT_FOUND_MESSAGE));
     }
 
     public List<Role> getOrganizational() {
@@ -108,9 +105,9 @@ public class RoleService {
         userService.save(user);
     }
 
-    private Role findByName(String name) {
+    public Role findByName(String name) {
         return roleRepository.findByName(name)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Роли с именем %s не существует", name)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.ROLE_NOT_FOUND_MESSAGE));
     }
 
     public Role getReaderRole() {

@@ -35,7 +35,7 @@ public class RoleController {
     @GetMapping("/{id}")
     public ResponseEntity<RoleResponse> getRoleById(@Positive(message = "Параметр roleId не может быть меньше 1!")
                                                     @PathVariable Integer id) {
-        return ResponseEntity.ok().body(RoleMapper.roleToRoleResponse(roleService.findById(id)));
+        return ResponseEntity.ok().body(RoleMapper.roleToRoleResponse(roleService.findRoleById(id)));
     }
 
     @Operation(summary = "Получение списка всех ролей")

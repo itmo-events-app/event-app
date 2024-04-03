@@ -69,4 +69,8 @@ public class EventRoleService {
     public List<EventRole> findAllByRole(Role role) {
         return eventRoleRepository.findAllByRole(role);
     }
+
+    EventRole save(EventRole eventRole) {
+        return eventRoleRepository.save(eventRole);
+    }
 }
