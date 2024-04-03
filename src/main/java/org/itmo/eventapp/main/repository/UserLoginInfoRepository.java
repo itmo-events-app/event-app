@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface UserLoginInfoRepository extends JpaRepository<UserLoginInfo, Integer> {
 
     Optional<UserLoginInfo> getUserLoginInfoByEmail(String email);
+    boolean existsByEmail(String email);
 }
