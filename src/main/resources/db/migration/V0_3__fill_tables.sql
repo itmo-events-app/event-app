@@ -1,5 +1,5 @@
 INSERT INTO role (name, description, type)
-VALUES ('Администратор ', 'Имеет полный доступ к системе', 'SYSTEM'),
+VALUES ('Администратор', 'Имеет полный доступ к системе', 'SYSTEM'),
        ('Читатель', 'Базовая пользовательская система', 'SYSTEM'),
        ('Организатор', 'Организатор мероприятия', 'EVENT'),
        ('Помощник', 'Помощь в мероприятиях', 'EVENT');
@@ -11,14 +11,14 @@ VALUES
     ('REJECT_REGISTRATION_REQUEST', 'SYSTEM','Отклонение заявки на регистрацию в системе'),
     ('MODIFY_PROFILE_DATA', 'SYSTEM','Изменение данных в личном кабинете'),
     ('VIEW_OTHER_USERS_PROFILE', 'SYSTEM','Просмотр личного кабинета других пользователей'),
-    ('VIEW_ALL_EVENTS_AND_ACTIVITIES', 'SYSTEM','Просмотр списка всех мероприятий и активностей'),
+    ('VIEW_ALL_EVENTS_AND_ACTIVITIES', 'SYSTEM','Просмотр списка всех'),
     ('SEARCH_EVENTS_AND_ACTIVITIES', 'SYSTEM','Поиск мероприятий и активностей'),
     ('CREATE_EVENT', 'EVENT','Создание мероприятия'),
     ('VIEW_EVENT_PLACE', 'SYSTEM','Просмотр списка площадок проведения мероприятия'),
     ('VIEW_ROUTE_BETWEEN_ROOMS', 'SYSTEM','Просмотр маршрута между помещениями'),
     ('ASSIGN_ORGANIZER_ROLE', 'EVENT','Назначение пользователю роли Организатор'),
     ('REVOKE_ORGANIZER_ROLE', 'SYSTEM','Лишение пользователя роли Организатор'),
-    ('CREATE_EVENT_VENUE', 'EVENT','создание площадки проведения мероприятия'),
+    ('CREATE_EVENT_VENUE', 'EVENT','Создание площадки проведения мероприятия'),
     ('DELETE_EVENT_VENUE', 'EVENT','Удаление площадки проведения мероприятия'),
     ('EDIT_EVENT_VENUE', 'EVENT','Редактирование площадки проведения мероприятия'),
     ('CREATE_ROLE', 'SYSTEM','Создание роли'),
