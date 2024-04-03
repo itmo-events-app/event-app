@@ -11,7 +11,7 @@ import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.repository.PlaceRepository;
-import org.itmo.eventapp.main.service.EventService;
+import org.itmo.eventapp.main.service.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
@@ -33,6 +33,9 @@ class EventServiceTest {
 
     @InjectMocks
     private EventService eventService;
+
+    @Mock
+    private PlaceService placeService;
 
     @Mock
     private EventRepository eventRepository;
@@ -87,6 +90,7 @@ class EventServiceTest {
         when(placeRepository.findById(any())).thenReturn(Optional.of(place));
         when(eventRepository.existsById(eventId)).thenReturn(true);
         when(eventRepository.save(any())).thenReturn(new Event());
+        when(placeService.findById(anyInt())).thenReturn(new Place());
 
         Event updatedEvent = eventService.updateEvent(eventId, eventRequest);
 

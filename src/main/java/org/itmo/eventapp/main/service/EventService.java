@@ -45,8 +45,7 @@ public class EventService {
     }
 
     public Event addEvent(EventRequest eventRequest) {
-        Place place = placeRepository.findById(eventRequest.placeId()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.PLACE_NOT_FOUND_MESSAGE));
+        Place place = placeService.findById(eventRequest.placeId());
 
         Event parent = findById(eventRequest.parent());
         Event e = Event.builder()
