@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -47,14 +48,52 @@ public class TaskControllerTest extends AbstractTestContainers {
                 .andExpect(content().string(containsString("taskGet.id: Параметр id не может быть меньше 1!")));
     }
 
-//    @Test
-//    void taskAddTest() throws Exception {
-//        mockMvc.perform(post("/api/tasks")
-//                        .content(loadAsString("src/test/resources/json/taskAdd.json"))
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().is(201));
-//        // TODO        .andExpect(content().string(containsString("1")));
-//    }
+    @Test
+    void taskAddTest() throws Exception {
+
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+//        executeSqlScript("/sql/insert_task.sql");
+
+        String newTitle = "CREATED";
+        String newDescription = "created";
+        TaskStatus newStatus = TaskStatus.NEW;
+        LocalDateTime newDeadline = LocalDateTime.of(2024, 4, 20, 21, 0, 0);
+        LocalDateTime newNotificationDeadline = LocalDateTime.of(2024, 4, 20, 21, 0, 0);
+
+        String taskJson = """
+                {
+                  "eventId": 1,
+                  "assignee": {
+                    "id": 1,
+                    "name": "test",
+                    "surname": "user"
+                  },
+                  "title": "CREATED",
+                  "description": "created",
+                  "taskStatus": "NEW",
+                  "place": null,
+                  "deadline": "2024-04-20T21:00:00",
+                  "notificationDeadline": "2024-04-20T21:00:00"
+                }""";
+
+        mockMvc.perform(post("/api/tasks")
+                        .content(taskJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(201))
+                .andExpect(content().string(containsString("1")));
+
+        Task task = taskRepository.findById(1).orElseThrow();
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(task.getTitle(), newTitle),
+                () -> Assertions.assertEquals(task.getDescription(), newDescription),
+                () -> Assertions.assertEquals(task.getStatus(), newStatus),
+                () -> Assertions.assertNull(task.getPlace()),
+                () -> Assertions.assertEquals(task.getDeadline(), newDeadline),
+                () -> Assertions.assertEquals(task.getNotificationDeadline(), newNotificationDeadline)
+        );
+    }
 
     @Test
     void taskEditTest() throws Exception {
@@ -63,34 +102,64 @@ public class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_task.sql");
 
-        UserShortDataRequest assignee = new UserShortDataRequest(
-                1,
-                "test",
-                "user"
-        );
-
+//        UserShortDataRequest assignee = new UserShortDataRequest(
+//                1,
+//                "test",
+//                "user"
+//        );
+//
         String newTitle = "UPDATED";
         String newDescription = "upd";
         TaskStatus newStatus = TaskStatus.IN_PROGRESS;
-        LocalDateTime newDeadline = LocalDateTime.of(2025, 2, 13, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2025, 2, 9, 21, 0, 0);
+        LocalDateTime newDeadline = LocalDateTime.of(2024, 4, 20, 21, 0, 0);
+        LocalDateTime newNotificationDeadline = LocalDateTime.of(2024, 4, 20, 21, 0, 0);
+//
+//        TaskRequest taskRequest = new TaskRequest(
+//                1,
+//                assignee,
+//                newTitle,
+//                newDescription,
+//                newStatus,
+//                null,
+//                newDeadline,
+//                newNotificationDeadline
+//        );
 
-        TaskRequest taskRequest = new TaskRequest(
-                1,
-                assignee,
-                newTitle,
-                newDescription,
-                newStatus,
-                null,
-                newDeadline,
-                newNotificationDeadline
-        );
+//        Integer eventId,
+//        @NotNull(message = "Поле assignee не может быть null!")
+//        UserShortDataRequest assignee,
+//        @NotBlank(message = "Поле title не может быть пустым!")
+//        String title,
+//        @NotNull(message = "Поле description не может быть null!")
+//        String description,
+//        TaskStatus taskStatus,
+//        PlaceShortDataRequest place,
+//        @NotNull(message = "Поле deadline не может быть null!")
+//        LocalDateTime deadline,
+//        @NotNull(message = "Поле notificationDeadline не может быть null!")
+//        LocalDateTime notificationDeadline
 
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonContent = mapper.writeValueAsString(taskRequest);
+        String taskJson = """
+                {
+                  "eventId": 1,
+                  "assignee": {
+                    "id": 1,
+                    "name": "test",
+                    "surname": "user"
+                  },
+                  "title": "UPDATED",
+                  "description": "upd",
+                  "taskStatus": "IN_PROGRESS",
+                  "place": null,
+                  "deadline": "2024-04-20T21:00:00",
+                  "notificationDeadline": "2024-04-20T21:00:00"
+                }""";
+
+//        ObjectMapper mapper = new ObjectMapper();
+//        String jsonContent = mapper.writeValueAsString(taskRequest);
 
         mockMvc.perform(put("/api/tasks/1")
-                        .content(jsonContent)
+                        .content(taskJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
