@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Event;
@@ -72,7 +73,7 @@ public class TaskService {
 
     public TaskResponse edit(Integer id, TaskRequest taskRequest) {
 
-        Task task = taskRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+        Task task = taskRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
 
         Event event = eventService.findById(taskRequest.eventId());
         User assigner = task.getAssigner();
@@ -114,7 +115,7 @@ public class TaskService {
 
     public TaskResponse setAssignee(Integer taskId, Integer assigneeId) {
 
-        Task task = taskRepository.findById(taskId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+        Task task = taskRepository.findById(taskId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
 
         User prevAssignee = task.getAssignee();
 
@@ -140,7 +141,7 @@ public class TaskService {
 
 
     public TaskResponse setStatus(Integer taskId, TaskStatus taskStatus) {
-        Task task = taskRepository.findById(taskId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+        Task task = taskRepository.findById(taskId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
         task.setStatus(taskStatus);
         task = taskRepository.save(task);
         return TaskMapper.taskToTaskResponse(task);

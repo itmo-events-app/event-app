@@ -101,13 +101,13 @@ public class TaskControllerTest extends AbstractTestContainers {
 
         Task task = taskRepository.findById(1).orElseThrow();
         Assertions.assertAll(
-                () -> Assertions.assertEquals(task.getTitle(), newTitle),
-                () -> Assertions.assertEquals(task.getDescription(), newDescription),
-                () -> Assertions.assertEquals(task.getStatus(), newStatus),
+                () -> Assertions.assertEquals(newTitle, task.getTitle()),
+                () -> Assertions.assertEquals(newDescription, task.getDescription()),
+                () -> Assertions.assertEquals(newStatus, task.getStatus()),
                 () -> Assertions.assertNull(task.getPlace()),
-                () -> Assertions.assertEquals(task.getDeadline(), newDeadline),
-                () -> Assertions.assertEquals(task.getNotificationDeadline(), newNotificationDeadline),
-                ()-> Assertions.assertEquals(task.getAssignee().getId(), assigneeId)
+                () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
+                () -> Assertions.assertEquals(newNotificationDeadline, task.getNotificationDeadline()),
+                ()-> Assertions.assertEquals(assigneeId, task.getAssignee().getId())
         );
     }
 
@@ -148,9 +148,9 @@ public class TaskControllerTest extends AbstractTestContainers {
 
         Task task = taskRepository.findById(1).orElseThrow();
         Assertions.assertAll(
-                () -> Assertions.assertEquals(task.getDeadline(), newDeadline),
-                () -> Assertions.assertEquals(task.getNotificationDeadline(), newNotificationDeadline),
-                ()-> Assertions.assertEquals(task.getStatus(), TaskStatus.EXPIRED)
+                () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
+                () -> Assertions.assertEquals(newNotificationDeadline, task.getNotificationDeadline()),
+                ()-> Assertions.assertEquals(TaskStatus.EXPIRED, task.getStatus())
         );
     }
 
@@ -199,15 +199,15 @@ public class TaskControllerTest extends AbstractTestContainers {
 
         Task edited = taskRepository.findById(1).orElseThrow();
         Assertions.assertAll(
-                () -> Assertions.assertEquals(edited.getTitle(), newTitle),
-                () -> Assertions.assertEquals(edited.getDescription(), newDescription),
-                () -> Assertions.assertEquals(edited.getStatus(), newStatus),
-                () -> Assertions.assertEquals(edited.getDeadline(), newDeadline),
-                () -> Assertions.assertEquals(edited.getNotificationDeadline(), newNotificationDeadline),
-                ()-> Assertions.assertEquals(edited.getAssignee().getId(), assigneeId),
+                () -> Assertions.assertEquals(newTitle, edited.getTitle()),
+                () -> Assertions.assertEquals(newDescription, edited.getDescription()),
+                () -> Assertions.assertEquals(newStatus, edited.getStatus()),
+                () -> Assertions.assertEquals(newDeadline, edited.getDeadline()),
+                () -> Assertions.assertEquals(newNotificationDeadline, edited.getNotificationDeadline()),
+                ()-> Assertions.assertEquals(assigneeId, edited.getAssignee().getId()),
                 ()-> {
                     Assertions.assertNotNull(edited.getPlace());
-                    Assertions.assertEquals(edited.getPlace().getId(), placeId);
+                    Assertions.assertEquals(placeId, edited.getPlace().getId());
                 }
 
         );
@@ -269,7 +269,7 @@ public class TaskControllerTest extends AbstractTestContainers {
 
         Task edited = taskRepository.findById(1).orElseThrow();
 
-        Assertions.assertEquals(edited.getAssignee().getId(), 2);
+        Assertions.assertEquals(2, edited.getAssignee().getId());
 
     }
 
@@ -352,7 +352,7 @@ public class TaskControllerTest extends AbstractTestContainers {
 
         Task task = taskRepository.findById(1).orElseThrow();
 
-        Assertions.assertEquals(task.getStatus(), TaskStatus.IN_PROGRESS);
+        Assertions.assertEquals(TaskStatus.IN_PROGRESS, task.getStatus());
 
     }
 
@@ -368,7 +368,7 @@ public class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_task.sql");
 
         Task task = taskRepository.findById(1).orElseThrow();
-        Assertions.assertEquals(task.getEvent().getId(), 1);
+        Assertions.assertEquals(1, task.getEvent().getId());
 
         String expectedTaskJson = """
                 [{
@@ -399,7 +399,7 @@ public class TaskControllerTest extends AbstractTestContainers {
                 .andExpect(content().json(expectedTaskJson));
 
         task = taskRepository.findById(1).orElseThrow();
-        Assertions.assertEquals(task.getEvent().getId(), 2);
+        Assertions.assertEquals(2, task.getEvent().getId());
 
     }
 
@@ -423,9 +423,9 @@ public class TaskControllerTest extends AbstractTestContainers {
                 .andExpect(status().isOk());
 
         task = taskRepository.findById(2).orElseThrow();
-        Assertions.assertEquals(task.getEvent().getId(), 2);
+        Assertions.assertEquals(2, task.getEvent().getId());
         task = taskRepository.findById(1).orElseThrow();
-        Assertions.assertEquals(task.getEvent().getId(), 1);
+        Assertions.assertEquals(1, task.getEvent().getId());
 
     }
 }

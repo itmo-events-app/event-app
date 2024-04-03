@@ -5,6 +5,10 @@ import org.itmo.eventapp.main.model.entity.Place;
 
 public class PlaceMapper {
 
+    private PlaceMapper(){
+
+    }
+
     public static PlaceShortDataResponse placeToPlaceShortResponse(Place place) {
         if (place == null) {
             return null;

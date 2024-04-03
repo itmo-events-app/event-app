@@ -5,6 +5,10 @@ import org.itmo.eventapp.main.model.entity.User;
 
 public class UserMapper {
 
+    private UserMapper() {
+
+    }
+    
     public static UserShortDataResponse userToUserShortResponse(User user) {
         if (user == null) {
             return null;
