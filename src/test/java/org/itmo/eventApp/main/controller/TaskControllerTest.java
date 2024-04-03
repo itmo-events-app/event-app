@@ -1,10 +1,5 @@
 package org.itmo.eventApp.main.controller;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import org.itmo.eventapp.main.model.dto.request.PlaceShortDataRequest;
-import org.itmo.eventapp.main.model.dto.request.TaskRequest;
-import org.itmo.eventapp.main.model.dto.request.UserShortDataRequest;
 import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.repository.TaskRepository;
@@ -12,10 +7,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,8 +31,8 @@ public class TaskControllerTest extends AbstractTestContainers {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString(
                         "{\"title\":\"VERY DIFFICULT TASK\",\"description\":\"write sql script for tests\"," +
-                                "\"taskStatus\":\"NEW\",\"deadline\":\"2024-03-30T21:32:23.536819\"," +
-                                "\"notificationDeadline\":\"2024-03-30T21:32:23.536819\"}")));
+                                "\"taskStatus\":\"NEW\",\"deadline\":\"2025-03-30T21:32:23.536819\"," +
+                                "\"notificationDeadline\":\"2025-03-30T21:32:23.536819\"}")));
     }
 
     @Test
@@ -52,16 +45,18 @@ public class TaskControllerTest extends AbstractTestContainers {
     @Test
     void taskAddTest() throws Exception {
 
+        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
-//        executeSqlScript("/sql/insert_task.sql");
 
         String newTitle = "CREATED";
         String newDescription = "created";
         TaskStatus newStatus = TaskStatus.NEW;
-        LocalDateTime newDeadline = LocalDateTime.of(2024, 4, 20, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2024, 4, 20, 21, 0, 0);
+        LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+        LocalDateTime newNotificationDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+        Integer assigneeId = 1;
+        /*TODO: assigner id check after adding security*/
 
         String taskJson = """
                 {
@@ -75,8 +70,8 @@ public class TaskControllerTest extends AbstractTestContainers {
                   "description": "created",
                   "taskStatus": "NEW",
                   "place": null,
-                  "deadline": "2024-04-20T21:00:00",
-                  "notificationDeadline": "2024-04-20T21:00:00"
+                  "deadline": "2025-04-20T21:00:00",
+                  "notificationDeadline": "2025-04-20T21:00:00"
                 }""";
 
         mockMvc.perform(post("/api/tasks")
@@ -92,72 +87,48 @@ public class TaskControllerTest extends AbstractTestContainers {
                 () -> Assertions.assertEquals(task.getStatus(), newStatus),
                 () -> Assertions.assertNull(task.getPlace()),
                 () -> Assertions.assertEquals(task.getDeadline(), newDeadline),
-                () -> Assertions.assertEquals(task.getNotificationDeadline(), newNotificationDeadline)
+                () -> Assertions.assertEquals(task.getNotificationDeadline(), newNotificationDeadline),
+                ()-> Assertions.assertEquals(task.getAssignee().getId(), assigneeId)
         );
     }
 
     @Test
     void taskEditTest() throws Exception {
+        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_task.sql");
 
-//        UserShortDataRequest assignee = new UserShortDataRequest(
-//                1,
-//                "test",
-//                "user"
-//        );
-//
         String newTitle = "UPDATED";
         String newDescription = "upd";
         TaskStatus newStatus = TaskStatus.IN_PROGRESS;
-        LocalDateTime newDeadline = LocalDateTime.of(2024, 4, 20, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2024, 4, 20, 21, 0, 0);
-//
-//        TaskRequest taskRequest = new TaskRequest(
-//                1,
-//                assignee,
-//                newTitle,
-//                newDescription,
-//                newStatus,
-//                null,
-//                newDeadline,
-//                newNotificationDeadline
-//        );
-
-//        Integer eventId,
-//        @NotNull(message = "Поле assignee не может быть null!")
-//        UserShortDataRequest assignee,
-//        @NotBlank(message = "Поле title не может быть пустым!")
-//        String title,
-//        @NotNull(message = "Поле description не может быть null!")
-//        String description,
-//        TaskStatus taskStatus,
-//        PlaceShortDataRequest place,
-//        @NotNull(message = "Поле deadline не может быть null!")
-//        LocalDateTime deadline,
-//        @NotNull(message = "Поле notificationDeadline не может быть null!")
-//        LocalDateTime notificationDeadline
+        LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+        LocalDateTime newNotificationDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+        Integer assigneeId = 2;
+        Integer placeId = 1;
 
         String taskJson = """
                 {
                   "eventId": 1,
                   "assignee": {
-                    "id": 1,
-                    "name": "test",
-                    "surname": "user"
+                    "id": 2,
+                    "name": "test2",
+                    "surname": "user2"
                   },
                   "title": "UPDATED",
                   "description": "upd",
                   "taskStatus": "IN_PROGRESS",
-                  "place": null,
-                  "deadline": "2024-04-20T21:00:00",
-                  "notificationDeadline": "2024-04-20T21:00:00"
-                }""";
-
-//        ObjectMapper mapper = new ObjectMapper();
-//        String jsonContent = mapper.writeValueAsString(taskRequest);
+                  "place": {
+                    "id": 1,
+                    "name": "itmo place",
+                    "address": "itmo university"
+                  },
+                  "deadline": "2025-04-20T21:00:00",
+                  "notificationDeadline": "2025-04-20T21:00:00"
+                }
+                """;
 
         mockMvc.perform(put("/api/tasks/1")
                         .content(taskJson)
@@ -169,9 +140,159 @@ public class TaskControllerTest extends AbstractTestContainers {
                 () -> Assertions.assertEquals(edited.getTitle(), newTitle),
                 () -> Assertions.assertEquals(edited.getDescription(), newDescription),
                 () -> Assertions.assertEquals(edited.getStatus(), newStatus),
-                () -> Assertions.assertNull(edited.getPlace()),
                 () -> Assertions.assertEquals(edited.getDeadline(), newDeadline),
-                () -> Assertions.assertEquals(edited.getNotificationDeadline(), newNotificationDeadline)
+                () -> Assertions.assertEquals(edited.getNotificationDeadline(), newNotificationDeadline),
+                ()-> Assertions.assertEquals(edited.getAssignee().getId(), assigneeId),
+                ()-> {
+                    Assertions.assertNotNull(edited.getPlace());
+                    Assertions.assertEquals(edited.getPlace().getId(), placeId);
+                }
+
         );
+    }
+
+    /*TODO: validation test*/
+
+    @Test
+    void taskDeleteTest() throws Exception {
+        executeSqlScript("/sql/clean_tables.sql");
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_task.sql");
+
+        Assertions.assertTrue(taskRepository.findById(1).isPresent());
+
+        mockMvc.perform(delete("/api/tasks/1"))
+                .andExpect(status().isOk());
+
+        Assertions.assertFalse(taskRepository.findById(1).isPresent());
+    }
+
+    @Test
+    void taskSetAssigneeTest() throws Exception {
+        executeSqlScript("/sql/clean_tables.sql");
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_task.sql");
+
+        String expectedTaskJson = """
+                {
+                  "id": 1,
+                  "assignee": {
+                    "id": 2,
+                    "name": "test2",
+                    "surname": "user2"
+                  },
+                  "title": "VERY DIFFICULT TASK",
+                  "description": "write sql script for tests",
+                  "taskStatus": "NEW",
+                  "place": {
+                    "id": 1,
+                    "name": "itmo place",
+                    "address": "itmo university"
+                  },
+                  "creation_time": "2025-03-10T21:32:23.536819",
+                  "deadline": "2025-03-30T21:32:23.536819",
+                  "notificationDeadline": "2025-03-30T21:32:23.536819"
+                }
+                """;
+
+        mockMvc.perform(put("/api/tasks/1/assignee/2"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedTaskJson));
+
+        Task edited = taskRepository.findById(1).orElseThrow();
+
+        Assertions.assertEquals(edited.getAssignee().getId(), 2);
+
+    }
+
+
+    @Test
+    void taskDeleteAssigneeTest() throws Exception {
+        executeSqlScript("/sql/clean_tables.sql");
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_task.sql");
+
+        String expectedTaskJson = """
+                {
+                  "id": 1,
+                  "assignee": {
+                    "id": 2,
+                    "name": "test2",
+                    "surname": "user2"
+                  },
+                  "title": "VERY DIFFICULT TASK",
+                  "description": "write sql script for tests",
+                  "taskStatus": "NEW",
+                  "place": {
+                    "id": 1,
+                    "name": "itmo place",
+                    "address": "itmo university"
+                  },
+                  "creation_time": "2025-03-10T21:32:23.536819",
+                  "deadline": "2025-03-30T21:32:23.536819",
+                  "notificationDeadline": "2025-03-30T21:32:23.536819"
+                }
+                """;
+
+        mockMvc.perform(delete("/api/tasks/1/assignee"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedTaskJson));
+
+        Task task = taskRepository.findById(1).orElseThrow();
+
+        Assertions.assertNull(task.getAssignee());
+
+    }
+
+
+    @Test
+    void taskSetStatusTest() throws Exception {
+        executeSqlScript("/sql/clean_tables.sql");
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_task.sql");
+
+
+        String expectedTaskJson = """
+                {
+                  "id": 1,
+                  "assignee": {
+                    "id": 2,
+                    "name": "test2",
+                    "surname": "user2"
+                  },
+                  "title": "VERY DIFFICULT TASK",
+                  "description": "write sql script for tests",
+                  "taskStatus": "IN_PROGRESS",
+                  "place": {
+                    "id": 1,
+                    "name": "itmo place",
+                    "address": "itmo university"
+                  },
+                  "creation_time": "2025-03-10T21:32:23.536819",
+                  "deadline": "2025-03-30T21:32:23.536819",
+                  "notificationDeadline": "2025-03-30T21:32:23.536819"
+                }
+                """;
+
+        mockMvc.perform(delete("/api/tasks/1/assignee").content("IN_PROGRESS"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedTaskJson));
+
+        Task task = taskRepository.findById(1).orElseThrow();
+
+        Assertions.assertEquals(task.getStatus(), TaskStatus.IN_PROGRESS);
+
     }
 }

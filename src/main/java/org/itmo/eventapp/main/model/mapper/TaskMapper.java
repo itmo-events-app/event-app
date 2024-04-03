@@ -1,5 +1,7 @@
 package org.itmo.eventapp.main.model.mapper;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Event;
@@ -10,7 +12,8 @@ import org.itmo.eventapp.main.model.entity.User;
 import java.util.List;
 
 public final class TaskMapper {
-    private TaskMapper() {
+
+    private TaskMapper(){
     }
 
     public static TaskResponse taskToTaskResponse(Task task) {
@@ -19,6 +22,8 @@ public final class TaskMapper {
                 task.getTitle(),
                 task.getDescription(),
                 task.getStatus(),
+                UserMapper.userToUserShortResponse(task.getAssignee()),
+                PlaceMapper.placeToPlaceShortResponse(task.getPlace()),
                 task.getCreationTime(),
                 task.getDeadline(),
                 task.getNotificationDeadline()

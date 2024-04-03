@@ -49,7 +49,7 @@ public class TaskController {
                                                  @PathVariable Integer id,
                                                  @Valid @RequestBody TaskRequest taskRequest) {
         TaskResponse edited = taskService.edit(id, taskRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(edited);
     }
 
     @DeleteMapping("/{id}")
@@ -77,7 +77,7 @@ public class TaskController {
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id
     ) {
-        Integer userId = 0; // TODO: get from principal
+        Integer userId = 1; // TODO: get from principal
         TaskResponse updatedTask = taskService.setAssignee(id, userId);
         return ResponseEntity.ok().body(updatedTask);
     }
@@ -106,20 +106,6 @@ public class TaskController {
         TaskResponse updatedTask = taskService.setStatus(id, newStatus);
         return ResponseEntity.ok().body(updatedTask);
     }
-
-    //privilege 39
-//    @PutMapping("/{id}/status/assignee")
-//    public ResponseEntity<?> taskSetStatusAsAssignee(
-//            @Min(value = 1, message = "Параметр id не может быть меньше 1!")
-//            @PathVariable Integer id,
-//            @NotNull(message = "Параметр newStatus не может быть null!")
-//            @RequestBody TaskStatus newStatus
-//    ) {
-//        // set status "done"
-//        // delete task deadline notification - if done ???
-//        return ResponseEntity.ok().build();
-//    }
-
 
     //    @PutMapping("/event/{srcEventId}/{dstEventId}")
     @PutMapping("/event/{dstEventId}")

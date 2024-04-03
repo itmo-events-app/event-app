@@ -20,13 +20,14 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class TaskService {
     private final EventService eventService;
+    private final UserService userService;
+    private final PlaceService placeService;
     private final TaskRepository taskRepository;
 
     public Optional<Task> findById(int id) {
@@ -40,10 +41,17 @@ public class TaskService {
 
         /*TODO: GET FROM PRINCIPAL*/
         User assigner = new User();
+        assigner.setId(1);
+        /*TODO: GET FROM PRINCIPAL*/
 
-        /* TODO: ADD USER & PLACE SERVICE CALL*/
-        User assignee = new User(); // may be null; else find by id from request
-        Place place = new Place(); // may be null; else find by id from request
+        User assignee = null;
+        if (taskRequest.assignee()!= null) {
+            assignee = userService.findById(taskRequest.assignee().id());
+        }
+        Place place = null;
+        if (taskRequest.place()!= null) {
+            place = placeService.findById(taskRequest.place().id());
+        }
 
         Task newTask = TaskMapper.taskRequestToTask(taskRequest, event, assignee, assigner, place);
 
@@ -71,14 +79,13 @@ public class TaskService {
 
         User prevAssignee = task.getAssignee();
 
-        /* TODO: ADD USER & PLACE SERVICE CALL*/
         User assignee = null;
-        if (taskRequest.assignee() != null) {
-            assignee = new User(); // may be null; else find by id from request
+        if (taskRequest.assignee()!= null) {
+            assignee = userService.findById(taskRequest.assignee().id());
         }
         Place place = null;
-        if (taskRequest.place() != null) {
-            place = new Place(); // may be null; else find by id from request
+        if (taskRequest.place()!= null) {
+            place = placeService.findById(taskRequest.place().id());
         }
 
         Task newTaskData = TaskMapper.taskRequestToTask(taskRequest, event, assignee, assigner, place);
@@ -92,10 +99,9 @@ public class TaskService {
 
         /*TODO: schedule task deadline notification for new assignee */
         if (prevAssignee != null) {
-            /*TODO: delete task deadline notification for prev assignee */
+            /*TODO: unset task deadline notification for prev assignee */
         }
 
-        // NEW ENTITY; MAY BE PROBLEM !!!
         return TaskMapper.taskToTaskResponse(newTaskData);
     }
 
@@ -114,8 +120,8 @@ public class TaskService {
 
         /* TODO: ADD USER SERVICE CALL*/
         User assignee = null;
-        if (assigneeId != -1) {
-            assignee = new User(); // find by id from request
+        if (assigneeId != -1) { // -1 stands for delete option
+            assignee = userService.findById(assigneeId); // find by id from request
         }
         task.setAssignee(assignee);
 
@@ -125,7 +131,7 @@ public class TaskService {
             /*TODO: schedule task deadline notification for new assignee */
         }
         if (prevAssignee != null) {
-            /*TODO: delete task deadline notification for prev assignee */
+            /*TODO: unset task deadline notification for prev assignee */
         }
 
         return TaskMapper.taskToTaskResponse(task);
