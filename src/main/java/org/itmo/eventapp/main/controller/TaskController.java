@@ -72,6 +72,7 @@ public class TaskController {
         return ResponseEntity.ok().body(updatedTask);
     }
 
+    /*TODO: TEST*/
     @PutMapping("/{id}/assignee")
     public ResponseEntity<TaskResponse> taskTakeOn(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
@@ -107,6 +108,8 @@ public class TaskController {
         return ResponseEntity.ok().body(updatedTask);
     }
 
+    /*TODO: TEST*/
+
     //    @PutMapping("/event/{srcEventId}/{dstEventId}")
     @PutMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListMove(
@@ -120,6 +123,8 @@ public class TaskController {
         List<TaskResponse> updTasks = taskService.moveTasks(dstEventId, taskIds);
         return ResponseEntity.ok().body(updTasks);
     }
+
+    /*TODO: TEST*/
 
     //    @PostMapping("/event/{srcEventId}/{dstEventId}")
     @PostMapping("/event/{dstEventId}")
