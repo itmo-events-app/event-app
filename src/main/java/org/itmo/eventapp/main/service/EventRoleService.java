@@ -16,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Arrays;
 import java.util.List;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class EventRoleService {
@@ -88,6 +90,10 @@ public class EventRoleService {
     //TODO временный фикс, надо переделать
     private Event eventFindById(int id) {
         return eventRepository.findById(id)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
+    }
+
+    List<EventRole> findAllByEventId(Integer eventId) {
+        return  eventRoleRepository.findAllByEventId(eventId);
     }
 }
