@@ -1,26 +1,34 @@
 package org.itmo.eventApp.main.controller;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.repository.EventRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 public class EventControllerTest extends AbstractTestContainers {
 
-    @BeforeEach
-    public void setup() {
+    private final EventRepository eventRepository;
+
+    @Autowired
+    public EventControllerTest(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
+
+    private void setUpEventData() {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
     }
 
     @Test
     void getAllOrFilteredEventsTest() throws Exception {
+        setUpEventData();
         mockMvc.perform(get("/api/events")
                         .param("title", "party")
                         .param("format", "OFFLINE")
@@ -36,6 +44,7 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void getAllEventsTest() throws Exception {
+        setUpEventData();
         mockMvc.perform(get("/api/events")
                         .param("page", "0")
                         .param("size", "15"))
@@ -46,6 +55,7 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void getEventByIdTest() throws Exception {
+        setUpEventData();
         String expectedEventJson = """
                 {
                   "id": 1,
@@ -75,6 +85,7 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void updateEventTest() throws Exception {
+        setUpEventData();
         String eventRequestJson = """
                 {
                   "placeId": 1,
@@ -126,7 +137,11 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void deleteEventByIdTest() throws Exception {
+        setUpEventData();
         mockMvc.perform(delete("/api/events/1"))
                 .andExpect(status().isNoContent());
+
+        Optional<Event> deletedEvent = eventRepository.findById(1);
+        Assertions.assertFalse(deletedEvent.isPresent());
     }
 }

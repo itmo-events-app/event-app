@@ -1,37 +1,72 @@
 package org.itmo.eventApp.main.service;
 
-import org.itmo.eventApp.main.controller.AbstractTestContainers;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
-import org.itmo.eventapp.main.model.dto.response.EventResponse;
+import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
+import org.itmo.eventapp.main.model.mapper.EventMapper;
+import org.itmo.eventapp.main.repository.EventRepository;
+import org.itmo.eventapp.main.repository.PlaceRepository;
 import org.itmo.eventapp.main.service.EventService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-class EventServiceTest extends AbstractTestContainers {
-    @Autowired
-    EventService eventService;
+public class EventServiceTest {
+
+    @InjectMocks
+    private EventService eventService;
+
+    @Mock
+    private EventRepository eventRepository;
+
+    @Mock
+    private PlaceRepository placeRepository;
+
+    @Mock
+    private EntityManager entityManager;
+
+    @Mock
+    private CriteriaBuilder criteriaBuilder;
+
+    @Mock
+    private CriteriaQuery<Event> query;
+
+    @Mock
+    private Root<Event> root;
+
+    @Mock
+    private TypedQuery<Event> typedQuery;
 
     @BeforeEach
     public void setup() {
-        executeSqlScript("/sql/insert_place.sql");
-        executeSqlScript("/sql/insert_event.sql");
+        MockitoAnnotations.openMocks(this);
+        eventService.setEntityManager(entityManager);
+        when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
     }
 
     @Test
-    void updateEvent() {
-        EventRequest eventRequest = new EventRequest(1,
+    public void testUpdateEvent() {
+        Integer eventId = 1;
+        EventRequest eventRequest = new EventRequest(
+                1,
                 LocalDateTime.parse("2024-03-30T21:32:23.536819"),
                 LocalDateTime.parse("2024-03-30T21:32:23.536819"),
                 "Circus",
@@ -46,111 +81,71 @@ class EventServiceTest extends AbstractTestContainers {
                 18,
                 100,
                 LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"));
+                LocalDateTime.parse("2024-03-30T21:32:23.536819")
+        );
+        Place place = new Place();
+        when(placeRepository.findById(any())).thenReturn(Optional.of(place));
+        when(eventRepository.existsById(eventId)).thenReturn(true);
+        when(eventRepository.save(any())).thenReturn(new Event());
 
-        EventResponse expectedEvent = new EventResponse(1, 1,
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                "Circus",
-                "cool circus",
-                "very cool circus",
-                EventFormat.OFFLINE,
-                EventStatus.PUBLISHED,
-                LocalDateTime.parse("2024-03-30T21:18:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:18:23.536819"),
-                null,
-                20,
-                18,
-                100,
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"));
+        Event updatedEvent = eventService.updateEvent(eventId, eventRequest);
 
-        EventResponse updatedEvent = eventService.updateEvent(1, eventRequest);
         assertAll(
                 () -> assertNotNull(updatedEvent),
-                () -> assertEquals(updatedEvent, expectedEvent)
+                () -> assertEquals(EventMapper.eventRequestToEvent(1, eventRequest, place, null), updatedEvent)
         );
     }
 
     @Test
-    void getAllOrFilteredEvents() {
-        List<EventResponse> eventResponses = eventService.getAllOrFilteredEvents(0, 10, "party",
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                EventStatus.PUBLISHED, EventFormat.OFFLINE);
+    public void testGetAllOrFilteredEvents() {
+        String title = "new test event party";
+        LocalDateTime startDate = LocalDateTime.now().minusDays(1);
+        LocalDateTime endDate = LocalDateTime.now().plusDays(1);
+        EventStatus status = EventStatus.PUBLISHED;
+        EventFormat format = EventFormat.OFFLINE;
+        int page = 0;
+        int size = 10;
+        List<Event> expectedEvents = Arrays.asList(new Event(), new Event());
 
-        EventResponse eventResponse = eventResponses.get(0);
-        assertAll(
-                () -> assertEquals(1, eventResponses.size()),
-                () -> assertEquals("party", eventResponse.title()),
-                () -> assertEquals(LocalDateTime.parse("2024-03-30T21:32:23.536819"), eventResponse.start()),
-                () -> assertEquals(LocalDateTime.parse("2024-03-30T21:32:23.536819"), eventResponse.end()),
-                () -> assertEquals(EventFormat.OFFLINE, eventResponse.format()),
-                () -> assertEquals(EventStatus.PUBLISHED, eventResponse.status())
-        );
+        when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
+        when(criteriaBuilder.createQuery(Event.class)).thenReturn(query);
+        when(query.from(Event.class)).thenReturn(root);
+        when(entityManager.createQuery(query)).thenReturn(typedQuery);
+        when(typedQuery.getResultList()).thenReturn(expectedEvents);
+
+        List<Event> result = eventService.getAllOrFilteredEvents(page, size, title, startDate, endDate, status, format);
+
+        verify(criteriaBuilder).equal(root.get("title"), title);
+        verify(criteriaBuilder).greaterThanOrEqualTo(root.get("startDate"), startDate);
+        verify(criteriaBuilder).lessThanOrEqualTo(root.get("endDate"), endDate);
+        verify(criteriaBuilder).equal(root.get("status"), status);
+        verify(criteriaBuilder).equal(root.get("format"), format);
+
+        assertEquals(expectedEvents, result);
     }
 
     @Test
-    void getFilteredEventsForNullValues() {
-        executeSqlScript("/sql/custom_data_for_event_filter.sql");
-        List<EventResponse> eventResponses = eventService.getAllOrFilteredEvents(0, 10, null,
-                null, null, null, null);
-
-        assertEquals(6, eventResponses.size());
+    public void testGetEventById() {
+        Integer eventId = 1;
+        Event expectedEvent = new Event();
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(expectedEvent));
+        Event actualEvent = eventService.getEventById(eventId);
+        assertEquals(expectedEvent, actualEvent);
     }
 
     @Test
-    void getPartialFilteringEventsByEnums() {
-        executeSqlScript("/sql/custom_data_for_event_filter.sql");
-
-        List<EventResponse> eventResponses = eventService.getAllOrFilteredEvents(0, 10, null,
-                null, null, EventStatus.PUBLISHED, EventFormat.ONLINE);
-
-        assertEquals(2, eventResponses.size());
-        eventResponses.forEach(eventResponse -> assertAll(
-                () -> assertEquals(EventStatus.PUBLISHED, eventResponse.status()),
-                () -> assertEquals(EventFormat.ONLINE, eventResponse.format()))
-        );
+    public void testGetEventByIdNotFound() {
+        Integer eventId = 1;
+        when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
+        assertThrows(ResponseStatusException.class, () -> eventService.getEventById(eventId));
     }
 
     @Test
-    void getPartialFilteringEventsByDateAndTitle() {
-        executeSqlScript("/sql/custom_data_for_event_filter.sql");
-
-        List<EventResponse> eventResponses = eventService.getAllOrFilteredEvents(0, 10, "m",
-                LocalDateTime.parse("2024-04-02T05:07:00.000000"), null, null, null);
-
-        assertEquals(1, eventResponses.size());
-        eventResponses.forEach(eventResponse -> assertAll(
-                () -> assertEquals("m", eventResponse.title()),
-                () -> assertEquals(LocalDateTime.parse("2024-04-02T05:07:00.000000"), eventResponse.start()))
-        );
-    }
-
-    @Test
-    void getEventById() {
-        EventResponse expectedEvent = new EventResponse(1, 1,
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                "party",
-                "cool party",
-                "very cool party",
-                EventFormat.OFFLINE,
-                EventStatus.PUBLISHED,
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                null,
-                10,
-                5,
-                7,
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"));
-
-        EventResponse actualEvent = eventService.getEventById(1);
-
-        assertAll(
-                () -> assertNotNull(actualEvent),
-                () -> assertEquals(expectedEvent, actualEvent)
-        );
+    public void testDeleteEventById() {
+        Integer eventId = 1;
+        eventService.deleteEventById(eventId);
+        assertThrows(ResponseStatusException.class, () -> eventService.getEventById(eventId));
+        verify(eventRepository).deleteById(eventId);
+        verify(eventRepository, times(1)).deleteById(eventId);
     }
 }

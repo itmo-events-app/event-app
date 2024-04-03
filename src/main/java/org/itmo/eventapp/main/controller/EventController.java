@@ -8,6 +8,7 @@ import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
+import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.service.EventService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class EventController {
     @PutMapping("/{id}")
     public ResponseEntity<EventResponse> updateEvent(@Min(1) @PathVariable("id") Integer id,
                                                      @RequestBody @Valid EventRequest eventRequest) {
-        return ResponseEntity.ok().body(eventService.updateEvent(id, eventRequest));
+        return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
     }
 
     @GetMapping
@@ -52,12 +53,13 @@ public class EventController {
                                                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
                                                                       @RequestParam(required = false) EventStatus status,
                                                                       @RequestParam(required = false) EventFormat format) {
-        return ResponseEntity.ok().body(eventService.getAllOrFilteredEvents(page, size, title, startDate, endDate, status, format));
+        return ResponseEntity.ok().body(EventMapper.eventsToEventResponseList(
+                eventService.getAllOrFilteredEvents(page, size, title, startDate, endDate, status, format)));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EventResponse> getEventById(@Min(1) @PathVariable("id") Integer id) {
-        return ResponseEntity.ok().body(eventService.getEventById(id));
+        return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.getEventById(id)));
     }
 
     // TODO: Add annotation @PreAuthorize("hasRole('ADMIN')")

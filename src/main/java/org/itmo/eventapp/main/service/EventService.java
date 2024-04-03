@@ -9,7 +9,6 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
-import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
@@ -37,8 +36,11 @@ public class EventService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
     public Event addEvent(EventRequest eventRequest) {
-        // TODO: Add privilege validation
         Place place = placeRepository.findById(eventRequest.placeId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.PLACE_NOT_FOUND_MESSAGE));
 
@@ -78,7 +80,7 @@ public class EventService {
         return event.get();
     }
 
-    public EventResponse updateEvent(Integer id, EventRequest eventRequest) {
+    public Event updateEvent(Integer id, EventRequest eventRequest) {
         Event parentEvent = null;
         if (!eventRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE);
@@ -91,10 +93,10 @@ public class EventService {
         }
         Event updatedEvent = EventMapper.eventRequestToEvent(id, eventRequest, place, parentEvent);
         eventRepository.save(updatedEvent);
-        return EventMapper.eventToEventResponse(updatedEvent);
+        return updatedEvent;
     }
 
-    public List<EventResponse> getAllOrFilteredEvents(int page, int size, String title,
+    public List<Event> getAllOrFilteredEvents(int page, int size, String title,
                                                       LocalDateTime startDate, LocalDateTime endDate,
                                                       EventStatus status, EventFormat format) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -127,13 +129,12 @@ public class EventService {
         typedQuery.setFirstResult(page * size);
         typedQuery.setMaxResults(size);
 
-        return EventMapper.eventsToEventResponseList(typedQuery.getResultList());
+        return typedQuery.getResultList();
     }
 
-    public EventResponse getEventById(Integer id) {
-        Event event = eventRepository.findById(id)
+    public Event getEventById(Integer id) {
+        return eventRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
-        return EventMapper.eventToEventResponse(event);
     }
 
     public void deleteEventById(Integer id) {
