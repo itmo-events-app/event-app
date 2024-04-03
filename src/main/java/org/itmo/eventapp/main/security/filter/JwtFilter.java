@@ -68,8 +68,8 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         }
-        catch (AccessDeniedException ex) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Доступ запрещен");
+        catch (ResponseStatusException ex) {
+            throw new ResponseStatusException(ex.getStatusCode(), ex.getMessage());
         }
     }
 }
