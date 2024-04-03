@@ -53,6 +53,7 @@ create table if not exists user_login_info(
     registration_id int not null references registration_request(id)
 );
 create table if not exists notification(
+    id int generated always as identity primary key not null,
     user_id int not null references user_t(id),
     title varchar(256) not null,
     description text not null ,
@@ -61,7 +62,7 @@ create table if not exists notification(
 );
 create table if not exists place
 (
-    id int generated always as identity primary key not null ,
+    id int generated always as identity primary key not null,
     address varchar(512) not null,
     name varchar(256) not null,
     format place_format not null,
