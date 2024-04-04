@@ -376,4 +376,37 @@ public class EventControllerTest extends AbstractTestContainers {
         Optional<Event> deletedEvent = eventRepository.findById(1);
         Assertions.assertFalse(deletedEvent.isPresent());
     }
+
+    @Test
+    void getUsersHavingRolesByEventSimple() throws Exception {
+        setUpEventData();
+        mockMvc.perform(
+                        get("/api/events/1/organizers"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void getUsersHavingRolesByEvent() throws Exception {
+        setUpUserData();
+        String eventJson = """
+                {
+                    "userId": 1,
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                );
+
+        String expectedJson = """
+                        [{"id":1,"name":"test","surname":"user","roleName":"Организатор"}]
+                        """;
+        mockMvc.perform(
+                        get("/api/events/1/organizers"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(content().json(expectedJson));
+    }
 }

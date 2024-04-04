@@ -12,12 +12,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
+import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
+import org.itmo.eventapp.main.model.mapper.EventRoleMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 
 @RequiredArgsConstructor
 @Service
@@ -192,4 +195,7 @@ public class EventService {
         return firstParent || firstChild || bothChildren;
     }
 
+    public List<EventRole> getUsersHavingRoles(Integer id) {
+        return eventRoleService.findAllByEventId(id);
+    }
 }
