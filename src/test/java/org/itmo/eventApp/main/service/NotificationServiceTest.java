@@ -1,5 +1,6 @@
-package org.itmo.eventApp.main.controller;
+package org.itmo.eventApp.main.service;
 
+import org.itmo.eventApp.main.controller.AbstractTestContainers;
 import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.repository.NotificationRepository;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NotificationServiceTest extends AbstractTestContainers{
+public class NotificationServiceTest extends AbstractTestContainers {
 
     @Autowired
     private NotificationService notificationService;
@@ -19,75 +20,79 @@ public class NotificationServiceTest extends AbstractTestContainers{
     @Autowired
     private NotificationRepository notificationRepository;
 
-    @Test
-    void updateSeenWithCorrectDataTest(){
+    private void databaseFilling(){
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_notifications.sql");
+    }
+
+    @Test
+    void updateSeenWithCorrectDataTest(){
+        databaseFilling();
 
         User dummyUser = new User();
         Integer userId = 1;
         dummyUser.setId(userId);
         Integer notificationId = 1;
-        notificationService.updateToSeen(notificationId);
-        Notification afterUpdate = notificationRepository.findById(notificationId).get();
+
+        Notification afterUpdate = notificationService.updateToSeen(notificationId, dummyUser);
 
         assertTrue(afterUpdate.isSeen());
-        assertNotNull(afterUpdate.getReadTime());
+        assertNotNull(afterUpdate.getSentTime());
     }
 
     @Test
     void getAllByUserIdWithCorrectDataTest(){
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
-        executeSqlScript("/sql/insert_notifications.sql");
+        databaseFilling();
 
         User dummyUser = new User();
         Integer userId = 1;
         dummyUser.setId(userId);
+        Integer page = 0;
+        Integer size = 1;
 
-        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.getAllByUserId(dummyUser);
+        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.getAllByUserId(dummyUser, page, size);
 
         assertFalse(notifications.isEmpty());
 
         for (Notification n : notifications) {
             assertEquals(userId, n.getUser().getId());
         }
+
+        assertEquals(1, notifications.size());
     }
 
     @Test
     void seenAllByUserIdWithCorrectDataTest(){
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
-        executeSqlScript("/sql/insert_notifications.sql");
+        databaseFilling();
 
         User dummyUser = new User();
         Integer userId = 1;
         dummyUser.setId(userId);
+        Integer page = 0;
+        Integer size = 1;
 
-        notificationService.updateSeenToAllByUserId(dummyUser);
-
-        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.getAllByUserId(dummyUser);
+        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.updateSeenToAllByUserId(dummyUser, page, size);
 
         assertFalse(notifications.isEmpty());
 
         for (Notification n : notifications) {
             assertEquals(userId, n.getUser().getId());
             assertTrue(n.isSeen());
-            assertNotNull(n.getReadTime());
+            assertNotNull(n.getSentTime());
         }
     }
 
     @Test
     void createNotificationWithCorrectDataTest(){
-        executeSqlScript("/sql/insert_user.sql");
+        databaseFilling();
 
         User dummyUser = new User();
         Integer userId = 1;
         dummyUser.setId(userId);
         String title = "TestTitle";
         String description = "TestDescription";
-        Integer notificationId = 1;
+        Integer notificationId = 5;
 
         notificationService.createNotification(title, description, dummyUser);
 
@@ -98,14 +103,12 @@ public class NotificationServiceTest extends AbstractTestContainers{
         assertEquals(title, afterCreate.getTitle());
         assertEquals(description, afterCreate.getDescription());
         assertFalse(afterCreate.isSeen());
-        assertNull(afterCreate.getReadTime());
+        assertNotNull(afterCreate.getSentTime());
     }
 
     @Test
     void deleteNotificationWithCorrectDataTest(){
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
-        executeSqlScript("/sql/insert_notifications.sql");
+        databaseFilling();
 
         Integer notificationId = 1;
 
