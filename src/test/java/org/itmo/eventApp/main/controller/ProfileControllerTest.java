@@ -4,9 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.itmo.eventapp.main.model.dto.request.UserChangeEmailRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
+import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -16,6 +20,9 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     @WithMockUser(username = "test_mail@test_mail.com")
@@ -27,6 +34,12 @@ public class ProfileControllerTest extends AbstractTestContainers {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+
+
+        User updatedUser = userRepository.findById(1).orElse(null);
+        Assertions.assertNotNull(updatedUser);
+        Assertions.assertEquals("Кодзима", updatedUser.getName());
+        Assertions.assertEquals("Гений", updatedUser.getSurname());
     }
 
     @Test
@@ -63,6 +76,10 @@ public class ProfileControllerTest extends AbstractTestContainers {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+
+        User updatedUser = userRepository.findById(1).orElse(null);
+        Assertions.assertNotNull(updatedUser);
+        Assertions.assertEquals("newEmail@itmo.ru", updatedUser.getUserLoginInfo().getEmail());
     }
 
 
