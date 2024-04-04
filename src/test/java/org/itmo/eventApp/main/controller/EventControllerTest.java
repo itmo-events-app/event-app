@@ -50,7 +50,6 @@ public class EventControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_event.sql");
-//        executeSqlScript("/sql/insert_activity.sql");
     }
 
     private void setUpActivityData() {
