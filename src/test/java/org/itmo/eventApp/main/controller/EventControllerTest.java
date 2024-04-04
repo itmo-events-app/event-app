@@ -184,7 +184,7 @@ public class EventControllerTest extends AbstractTestContainers {
         setUpEventData();
         mockMvc.perform(get("/api/events")
                         .param("parentId", 1)
-                        .param("format", "OFFLINE")
+                        .param("format", "OFFLINE"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())
@@ -198,7 +198,7 @@ public class EventControllerTest extends AbstractTestContainers {
     void doNotGetActivityInEventFilteringTest() throws Exception {
         setUpEventData();
         mockMvc.perform(get("/api/events")
-                        .param("format", "OFFLINE")
+                        .param("format", "OFFLINE"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())
