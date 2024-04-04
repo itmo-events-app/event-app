@@ -122,7 +122,7 @@ class EventServiceTest {
         when(entityManager.createQuery(query)).thenReturn(typedQuery);
         when(typedQuery.getResultList()).thenReturn(expectedEvents);
 
-        List<Event> result = eventService.getAllOrFilteredEvents(page, size, title, startDate, endDate, status, format);
+        List<Event> result = eventService.getAllOrFilteredEvents(page, size, null, title, startDate, endDate, status, format);
 
         verify(criteriaBuilder).equal(root.get("title"), title);
         verify(criteriaBuilder).greaterThanOrEqualTo(root.get("startDate"), startDate);
