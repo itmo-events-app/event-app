@@ -3,7 +3,7 @@ package org.itmo.eventapp.main.model.mapper;
 import org.itmo.eventapp.main.model.dto.response.NotificationResponse;
 import org.itmo.eventapp.main.model.entity.Notification;
 
-public class NotificationMapper {
+public final class NotificationMapper {
 
     private NotificationMapper(){
     }
@@ -13,6 +13,7 @@ public class NotificationMapper {
                 notification.getId(),
                 notification.getTitle(),
                 notification.getDescription(),
-                notification.isSeen());
+                notification.isSeen(),
+                notification.getSentTime());
     }
 }

@@ -6,6 +6,7 @@ public class ExceptionConst {
     public static final String PLACE_NOT_FOUND_MESSAGE = "Place not found";
     public static final String ROLE_NOT_FOUND_MESSAGE = "Role not found";
     public static final String USER_NOT_FOUND_MESSAGE = "User not found";
+    public static final String NOTIFICATION_ERROR_MESSAGE = "Notification fetching error, please refresh";
 
     private ExceptionConst() {
     }
