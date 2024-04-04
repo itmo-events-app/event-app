@@ -174,6 +174,9 @@ public class EventService {
         eventRepository.deleteById(id);
     }
 
+    public List<Integer> getAllSubEventIds(Integer parentId) {
+        return eventRepository.findAllByParent_Id(parentId).stream().map(Event::getId).toList();
+    }
 
     /*TODO: TEST*/
     public boolean checkOneEvent(Event first, Event second) {
@@ -188,4 +191,5 @@ public class EventService {
 
         return firstParent || firstChild || bothChildren;
     }
+
 }
