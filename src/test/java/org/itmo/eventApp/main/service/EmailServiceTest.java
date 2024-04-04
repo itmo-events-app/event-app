@@ -1,4 +1,4 @@
-package org.itmo.eventApp.main.notification;
+package org.itmo.eventApp.main.service;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EmailSendingTest extends AbstractTestContainers {
+public class EmailServiceTest extends AbstractTestContainers {
     @Autowired
     private MailSenderService mailSenderService;
 

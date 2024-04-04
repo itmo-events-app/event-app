@@ -20,11 +20,15 @@ public class NotificationServiceTest extends AbstractTestContainers {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    @Test
-    void updateSeenWithCorrectDataTest(){
+    private void databaseFilling(){
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_notifications.sql");
+    }
+
+    @Test
+    void updateSeenWithCorrectDataTest(){
+        databaseFilling();
 
         User dummyUser = new User();
         Integer userId = 1;
@@ -39,9 +43,7 @@ public class NotificationServiceTest extends AbstractTestContainers {
 
     @Test
     void getAllByUserIdWithCorrectDataTest(){
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
-        executeSqlScript("/sql/insert_notifications.sql");
+        databaseFilling();
 
         User dummyUser = new User();
         Integer userId = 1;
@@ -62,9 +64,7 @@ public class NotificationServiceTest extends AbstractTestContainers {
 
     @Test
     void seenAllByUserIdWithCorrectDataTest(){
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
-        executeSqlScript("/sql/insert_notifications.sql");
+        databaseFilling();
 
         User dummyUser = new User();
         Integer userId = 1;
@@ -85,7 +85,7 @@ public class NotificationServiceTest extends AbstractTestContainers {
 
     @Test
     void createNotificationWithCorrectDataTest(){
-        executeSqlScript("/sql/insert_user.sql");
+        databaseFilling();
 
         User dummyUser = new User();
         Integer userId = 1;
@@ -108,9 +108,7 @@ public class NotificationServiceTest extends AbstractTestContainers {
 
     @Test
     void deleteNotificationWithCorrectDataTest(){
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
-        executeSqlScript("/sql/insert_notifications.sql");
+        databaseFilling();
 
         Integer notificationId = 1;
 
