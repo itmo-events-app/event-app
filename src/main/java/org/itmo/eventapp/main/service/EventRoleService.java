@@ -101,4 +101,9 @@ public class EventRoleService {
     public void saveAll(List<EventRole> eventRoles) {
         eventRoleRepository.saveAll(eventRoles);
     }
+
+    EventRole findByUserIdAndEventId(Integer userId, Integer eventId) {
+        return eventRoleRepository.findByUserIdAndEventId(userId, eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
+    }
 }
