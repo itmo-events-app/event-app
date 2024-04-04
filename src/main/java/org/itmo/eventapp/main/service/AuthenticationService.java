@@ -3,12 +3,14 @@ package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.entity.*;
+import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.entity.enums.EmailStatus;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
 import org.itmo.eventapp.main.repository.*;
 import org.itmo.eventapp.main.security.util.JwtTokenUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,7 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.mail.MessagingException;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,6 +40,11 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
+
+    private final String defaultRole = "Читатель";
+
+    @Autowired
+    private MailSenderService mailSenderService;
 
     public String login(LoginRequest loginRequest) throws BadCredentialsException {
 
@@ -76,12 +87,16 @@ public class AuthenticationService {
         var request = registrationRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Запрос на регистрацию не найден"));
 
+        if (request.getStatus() != RegistrationRequestStatus.NEW) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Запрос уже обработан");
+        }
+
         UserLoginInfo loginInfo = new UserLoginInfo();
         User user = new User();
         UserNotificationInfo notificationInfo = new UserNotificationInfo();
 
-        var reader = roleRepository.findByName("Читатель")
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Роли 'Читатель' не существует"));
+        var reader = roleRepository.findByName(defaultRole)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Роли '" + defaultRole + "' не существует"));
 
         notificationInfo.setDevices(new String[] {});
         notificationInfo.setEnableEmailNotifications(false);
@@ -107,5 +122,30 @@ public class AuthenticationService {
 
         request.setStatus(RegistrationRequestStatus.APPROVED);
         registrationRequestRepository.save(request);
+
+        try {
+            mailSenderService.sendApproveRegistrationRequestMessage(request.getEmail(), request.getName());
+        } catch (MessagingException | IOException e) {}
+    }
+
+    @Transactional
+    public void declineRegistrationRequestCallback(int requestId) {
+        var request = registrationRequestRepository.findById(requestId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Запрос на регистрацию не найден"));
+
+        if (request.getStatus() != RegistrationRequestStatus.NEW) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Запрос уже обработан");
+        }
+
+        request.setStatus(RegistrationRequestStatus.DECLINED);
+        registrationRequestRepository.save(request);
+
+        try {
+            mailSenderService.sendDeclineRegistrationRequestMessage(request.getEmail(), request.getName());
+        } catch (MessagingException | IOException e) {}
+    }
+
+    public List<RegistrationRequest> listRegisterRequestsCallback() {
+        return registrationRequestRepository.getRegistrationRequestsByStatus(RegistrationRequestStatus.NEW);
     }
 }
