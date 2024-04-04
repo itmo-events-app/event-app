@@ -6,7 +6,6 @@ import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.service.EventService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +97,7 @@ class EventServiceTest extends AbstractTestContainers {
                 LocalDateTime.parse("2024-03-30T21:32:23.536819"),
                 LocalDateTime.parse("2024-03-30T21:32:23.536819"));
 
-        EventResponse actualEvent = eventService.getEventById(1);
+        EventResponse actualEvent = eventService.getEventResponseById(1);
 
         assertAll(
                 () -> assertNotNull(actualEvent),

@@ -1,13 +1,14 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
-import org.itmo.eventapp.main.repository.PlaceRepository;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,29 +18,27 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class EventService {
 
     private final EventRepository eventRepository;
-    private final PlaceRepository placeRepository;
+
+    private final PlaceService placeService;
+    private final UserService userService;
+    private final RoleService roleService;
+    private final EventRoleService eventRoleService;
 
     public Event addEvent(EventRequest eventRequest) {
         // TODO: Add privilege validation
-        Place place = placeRepository.findById(eventRequest.placeId()).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.PLACE_NOT_FOUND_MESSAGE));
+        Place place = placeService.findById(eventRequest.placeId());
 
-        Event parent = null;
-        if (eventRequest.parent() != null) {
-            parent = eventRepository.findById(eventRequest.parent()).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_PARENT_NOT_FOUND_MESSAGE));
-        }
+        Event parent = findById(eventRequest.parent());
         Event e = Event.builder()
                 .place(place)
-                .startDate(eventRequest.start())
-                .endDate(eventRequest.end())
+                .startDate(eventRequest.startDate())
+                .endDate(eventRequest.endDate())
                 .title(eventRequest.title())
                 .shortDescription(eventRequest.shortDescription())
                 .fullDescription(eventRequest.fullDescription())
@@ -57,23 +56,37 @@ public class EventService {
         return eventRepository.save(e);
     }
 
+    public Event addEventByOrganizer(CreateEventRequest eventRequest) {
+        Event e = Event.builder()
+                .title(eventRequest.title())
+                .build();
+        Event savedEvent = eventRepository.save(e);
+
+        User user = userService.findById(eventRequest.userId());
+
+        // TODO: Do not get organizer from DB each time.
+        Role role = roleService.findByName("Организатор");
+
+        EventRole eventRole = EventRole.builder()
+                .user(user)
+                .role(role)
+                .event(savedEvent)
+                .build();
+        eventRoleService.save(eventRole);
+        return savedEvent;
+    }
+
     public Event findById(int id) {
-        Optional<Event> event = eventRepository.findById(id);
-
-        if (event.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE);
-        }
-
-        return event.get();
+        return eventRepository.findById(id)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
     }
 
     public EventResponse updateEvent(Integer id, EventRequest eventRequest) {
-        Event parentEvent = null;
         if (!eventRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE);
         }
-        Place place = placeRepository.findById(eventRequest.placeId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.PLACE_NOT_FOUND_MESSAGE));
+        Place place = placeService.findById(eventRequest.placeId());
+        Event parentEvent = null;
         if (eventRequest.parent() != null) {
             parentEvent = eventRepository.findById(eventRequest.parent())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_PARENT_NOT_FOUND_MESSAGE));
@@ -90,7 +103,7 @@ public class EventService {
         return EventMapper.eventsToEventResponseList(events);
     }
 
-    public EventResponse getEventById(Integer id) {
+    public EventResponse getEventResponseById(Integer id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
         return EventMapper.eventToEventResponse(event);
