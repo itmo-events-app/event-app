@@ -58,7 +58,7 @@ public class EventController {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
     }
 
-    @SuppressWarnings("{kava:S107}")
+    @SuppressWarnings("java:S107")
     @GetMapping
     public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
                                                                       @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") int size,

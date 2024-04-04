@@ -131,6 +131,7 @@ public class EventService {
         return updatedEvent;
     }
 
+    @SuppressWarnings("java:S107")
     public List<Event> getAllOrFilteredEvents(int page, int size, Integer parentId, String title,
                                                       LocalDateTime startDate, LocalDateTime endDate,
                                                       EventStatus status, EventFormat format) {
