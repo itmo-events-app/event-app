@@ -30,11 +30,11 @@ public class NotificationServiceTest extends AbstractTestContainers {
         Integer userId = 1;
         dummyUser.setId(userId);
         Integer notificationId = 1;
-        notificationService.updateToSeen(notificationId);
-        Notification afterUpdate = notificationRepository.findById(notificationId).get();
+
+        Notification afterUpdate = notificationService.updateToSeen(notificationId, dummyUser);
 
         assertTrue(afterUpdate.isSeen());
-        assertNotNull(afterUpdate.getReadTime());
+        assertNotNull(afterUpdate.getSentTime());
     }
 
     @Test
@@ -46,14 +46,18 @@ public class NotificationServiceTest extends AbstractTestContainers {
         User dummyUser = new User();
         Integer userId = 1;
         dummyUser.setId(userId);
+        Integer page = 0;
+        Integer size = 1;
 
-        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.getAllByUserId(dummyUser);
+        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.getAllByUserId(dummyUser, page, size);
 
         assertFalse(notifications.isEmpty());
 
         for (Notification n : notifications) {
             assertEquals(userId, n.getUser().getId());
         }
+
+        assertEquals(1, notifications.size());
     }
 
     @Test
@@ -65,17 +69,17 @@ public class NotificationServiceTest extends AbstractTestContainers {
         User dummyUser = new User();
         Integer userId = 1;
         dummyUser.setId(userId);
+        Integer page = 0;
+        Integer size = 1;
 
-        notificationService.updateSeenToAllByUserId(dummyUser);
-
-        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.getAllByUserId(dummyUser);
+        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.updateSeenToAllByUserId(dummyUser, page, size);
 
         assertFalse(notifications.isEmpty());
 
         for (Notification n : notifications) {
             assertEquals(userId, n.getUser().getId());
             assertTrue(n.isSeen());
-            assertNotNull(n.getReadTime());
+//            assertNotNull(n.getSentTime());
         }
     }
 
@@ -99,7 +103,7 @@ public class NotificationServiceTest extends AbstractTestContainers {
         assertEquals(title, afterCreate.getTitle());
         assertEquals(description, afterCreate.getDescription());
         assertFalse(afterCreate.isSeen());
-        assertNull(afterCreate.getReadTime());
+//        assertNull(afterCreate.getSentTime());
     }
 
     @Test

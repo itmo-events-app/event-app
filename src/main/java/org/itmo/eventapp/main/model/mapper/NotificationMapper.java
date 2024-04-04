@@ -13,6 +13,7 @@ public final class NotificationMapper {
                 notification.getId(),
                 notification.getTitle(),
                 notification.getDescription(),
-                notification.isSeen());
+                notification.isSeen(),
+                notification.getSentTime());
     }
 }
