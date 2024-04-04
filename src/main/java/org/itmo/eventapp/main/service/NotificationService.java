@@ -33,10 +33,10 @@ public class NotificationService {
         notificationRepository
                 .findById(notificationId)
                 .ifPresentOrElse(
-                        (n) -> {
-                            n.setSeen(true);
-                            n.setReadTime(LocalDateTime.now());
-                            notificationRepository.save(n);
+                        (notification) -> {
+                            notification.setSeen(true);
+                            notification.setReadTime(LocalDateTime.now());
+                            notificationRepository.save(notification);
                         },
                         () ->
                         {

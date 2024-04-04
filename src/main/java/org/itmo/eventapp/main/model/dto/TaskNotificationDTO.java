@@ -10,5 +10,5 @@ public record TaskNotificationDTO(
         String taskAssigneeEmail,
         String taskEventName,
         String taskStatus
-) implements Serializable {
+) {
 }
