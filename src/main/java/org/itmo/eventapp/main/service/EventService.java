@@ -45,6 +45,7 @@ public class EventService {
     private final UserService userService;
     private final RoleService roleService;
     private final EventRoleService eventRoleService;
+    private final TaskService taskService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -178,5 +179,56 @@ public class EventService {
 
     public List<EventRole> getUsersHavingRoles(Integer id) {
         return eventRoleService.findAllByEventId(id);
+    }
+
+    public Event copyEvent(int id, boolean deep) {
+        Event existingEvent = findById(id);
+        Event copiedEvent = Event.builder()
+                .place(existingEvent.getPlace())
+                .startDate(existingEvent.getStartDate())
+                .endDate(existingEvent.getEndDate())
+                .title(existingEvent.getTitle())
+                .shortDescription(existingEvent.getShortDescription())
+                .fullDescription(existingEvent.getFullDescription())
+                .format(existingEvent.getFormat())
+                .status(existingEvent.getStatus())
+                .registrationStart(existingEvent.getRegistrationStart())
+                .registrationEnd(existingEvent.getRegistrationEnd())
+                .parent(existingEvent)
+                .participantLimit(existingEvent.getParticipantLimit())
+                .participantAgeLowest(existingEvent.getParticipantAgeLowest())
+                .participantAgeHighest(existingEvent.getParticipantAgeHighest())
+                .preparingStart(existingEvent.getPreparingStart())
+                .preparingEnd(existingEvent.getPreparingEnd())
+                .build();
+        Event savedEvent = eventRepository.save(copiedEvent);
+
+        if (deep) {
+            List<EventRole> eventRoles = eventRoleService.findAllByEventId(existingEvent.getId());
+            for (EventRole eventRole : eventRoles) {
+                EventRole copiedEventRole = EventRole.builder()
+                        .event(savedEvent)
+                        .user(eventRole.getUser())
+                        .role(eventRole.getRole())
+                        .build();
+                eventRoleService.save(copiedEventRole);
+            }
+            List<Task> tasks = taskService.findAllByEventId(existingEvent.getId());
+            for (Task task : tasks) {
+                Task copiedTask = Task.builder()
+                        .event(savedEvent)
+                        .assignee(task.getAssignee())
+                        .assigner(task.getAssigner())
+                        .title(task.getTitle())
+                        .description(task.getDescription())
+                        .status(task.getStatus())
+                        .place(task.getPlace())
+                        .deadline(task.getDeadline())
+                        .notificationDeadline(task.getNotificationDeadline())
+                        .build();
+                taskService.save(copiedTask);
+            }
+        }
+        return savedEvent;
     }
 }

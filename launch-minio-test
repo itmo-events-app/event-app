@@ -1,0 +1,15 @@
+#!/bin/bash
+# Create Docker volumes
+docker volume create minio_data
+
+# Run MinIO container with mounted volume
+docker run -d --name minio \
+  -e MINIO_ROOT_USER=minio-admin \
+  -e MINIO_ROOT_PASSWORD=minio-admin \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -v minio_data:/data \
+  minio/minio server ~/minio --console-address :9001
+
+# Cleanup Docker volume (optional)
+#docker volume rm minio_data

@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.*;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
@@ -21,6 +22,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +60,10 @@ class EventServiceTest {
 
     @Mock
     private MinioService minioService;
+    @Mock
+    private TaskService taskService;
+    @Mock
+    private EventRoleService eventRoleService;
     @Mock
     private TypedQuery<Event> typedQuery;
 
@@ -158,5 +164,29 @@ class EventServiceTest {
         assertThrows(ResponseStatusException.class, () -> eventService.getEventById(eventId));
         verify(eventRepository).deleteById(eventId);
         verify(eventRepository, times(1)).deleteById(eventId);
+    }
+
+    @Test
+    void testCopyEvent() {
+        Event existingEvent = new Event();
+        existingEvent.setId(1);
+        existingEvent.setStartDate(LocalDateTime.of(2024, 4, 1, 10, 0));
+        existingEvent.setEndDate(LocalDateTime.of(2024, 4, 2, 10, 0));
+        existingEvent.setTitle("Title");
+
+        when(eventRepository.findById(123)).thenReturn(Optional.of(existingEvent));
+        when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
+            Event event = invocation.getArgument(0);
+            event.setId(2);
+            return event;
+        });
+
+        Event copiedEvent = eventService.copyEvent(1, true);
+
+        verify(eventRepository).save(any(Event.class));
+
+        assertEquals(existingEvent.getStartDate(), copiedEvent.getStartDate());
+        assertEquals(existingEvent.getEndDate(), copiedEvent.getEndDate());
+        assertEquals(existingEvent.getTitle(), copiedEvent.getTitle());
     }
 }

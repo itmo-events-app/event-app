@@ -89,4 +89,13 @@ public class EventController {
         List<EventRole> eventRoles = eventService.getUsersHavingRoles(id);
         return ResponseEntity.ok().body(EventRoleMapper.eventRolesToUserRoleResponses(eventRoles));
     }
+
+    @PostMapping("/{id}/copy")
+    public ResponseEntity<Integer> copyEvent(
+            @Min(1) @PathVariable("id") Integer id,
+            @RequestParam(value = "deep", defaultValue = "false") boolean deep) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(eventService.copyEvent(id, deep).getId());
+    }
 }

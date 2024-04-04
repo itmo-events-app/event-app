@@ -2,14 +2,12 @@ package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
-import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.Place;
-import org.itmo.eventapp.main.model.entity.Task;
-import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -32,5 +30,13 @@ public class TaskService {
         Place place = new Place();
 
         return taskRepository.save(TaskMapper.taskRequestToTask(taskRequest, event, assignee, assigner, place));
+    }
+
+    public Task save(Task task) {
+        return taskRepository.save(task);
+    }
+
+    List<Task> findAllByEventId(Integer eventId) {
+        return taskRepository.findAllByEventId(eventId);
     }
 }
