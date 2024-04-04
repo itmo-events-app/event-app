@@ -15,6 +15,8 @@ import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.repository.TaskRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -41,10 +43,12 @@ public class TaskService {
         // task assigner from principal.name -> findByUsername
         Event event = eventService.findById(taskRequest.eventId());
 
-        /*TODO: GET FROM PRINCIPAL*/
-        User assigner = new User();
-        assigner.setId(1);
-        /*TODO: GET FROM PRINCIPAL*/
+        /*TODO: TEST GETTING ASSIGNER FROM PRINCIPAL*/
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User assigner = userService.findByEmail(email);
+
 
         User assignee = null;
         if (taskRequest.assignee() != null) {
@@ -120,7 +124,6 @@ public class TaskService {
 
         User prevAssignee = task.getAssignee();
 
-        /* TODO: ADD USER SERVICE CALL*/
         User assignee = null;
         if (assigneeId != -1) { // -1 stands for delete option
             assignee = userService.findById(assigneeId); // find by id from request
@@ -148,18 +151,6 @@ public class TaskService {
         return task;
     }
 
-    private boolean checkOneEvent(Event first, Event second) {
-        boolean firstParent = (second.getParent() != null) &&
-                (Objects.equals(second.getParent().getId(), first.getId()));
-        boolean firstChild = (second.getParent() == null) &&
-                (first.getParent() != null) &&
-                (Objects.equals(second.getId(), first.getParent().getId()));
-        boolean bothChildren = (second.getParent() != null) &&
-                (first.getParent() != null) &&
-                (Objects.equals(second.getParent().getId(), first.getParent().getId()));
-
-        return firstParent || firstChild || bothChildren;
-    }
 
     public List<Task> moveTasks(Integer dstEventId, List<Integer> taskIds) {
 
@@ -167,7 +158,7 @@ public class TaskService {
         List<Task> tasks = taskRepository.findAllById(taskIds);
 
         for (Task task : tasks) {
-            if (!checkOneEvent(event, task.getEvent())) {
+            if (!eventService.checkOneEvent(event, task.getEvent())) {
                 throw new IllegalArgumentException("Нельзя переносить задачи между разными мероприятиями! Попроуйте копирование.");
             }
         }

@@ -12,7 +12,10 @@ import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.service.TaskService;
+import org.itmo.eventapp.main.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +29,7 @@ import java.util.Optional;
 @RequestMapping(value = "/api/tasks")
 public class TaskController {
     private final TaskService taskService;
+    private final UserService userService;
 
     // TODO: Add TaskService and move request processing there
 
@@ -78,7 +82,12 @@ public class TaskController {
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id
     ) {
-        Integer userId = 1; // TODO: get from principal
+        /*TODO: TEST work*/
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+
+        Integer userId = userService.findByEmail(currentPrincipalName).getId();
+
         Task updatedTask = taskService.setAssignee(id, userId);
         return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
     }
@@ -105,8 +114,8 @@ public class TaskController {
         return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
     }
 
-    /*TODO: TEST*/
 
+    /*TODO: TEST*/
     //    @PutMapping("/event/{srcEventId}/{dstEventId}")
     @PutMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListMove(
@@ -120,8 +129,6 @@ public class TaskController {
         List<Task> updTasks = taskService.moveTasks(dstEventId, taskIds);
         return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(updTasks));
     }
-
-    /*TODO: TEST*/
 
     //    @PostMapping("/event/{srcEventId}/{dstEventId}")
     @PostMapping("/event/{dstEventId}")

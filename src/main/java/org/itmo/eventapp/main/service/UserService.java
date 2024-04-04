@@ -28,4 +28,9 @@ public class UserService {
     public void save(User user) {
         userRepository.save(user);
     }
+
+    public User findByEmail(String email) {
+        return userRepository.findByUserLoginInfo_Email(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
+    }
 }

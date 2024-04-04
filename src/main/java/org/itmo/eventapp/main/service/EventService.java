@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -152,5 +153,20 @@ public class EventService {
 
     public void deleteEventById(Integer id) {
         eventRepository.deleteById(id);
+    }
+
+
+    /*TODO: TEST*/
+    public boolean checkOneEvent(Event first, Event second) {
+        boolean firstParent = (second.getParent() != null) &&
+                (Objects.equals(second.getParent().getId(), first.getId()));
+        boolean firstChild = (second.getParent() == null) &&
+                (first.getParent() != null) &&
+                (Objects.equals(second.getId(), first.getParent().getId()));
+        boolean bothChildren = (second.getParent() != null) &&
+                (first.getParent() != null) &&
+                (Objects.equals(second.getParent().getId(), first.getParent().getId()));
+
+        return firstParent || firstChild || bothChildren;
     }
 }
