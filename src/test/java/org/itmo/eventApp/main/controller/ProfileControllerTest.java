@@ -25,9 +25,8 @@ public class ProfileControllerTest extends AbstractTestContainers {
     private UserRepository userRepository;
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
+    @WithMockUser(username = "test_mail@itmo.ru")
     public void testChangeName() throws Exception {
-        executeSqlScript("/sql/insert_user.sql");
 
         UserChangeNameRequest request = new UserChangeNameRequest("Кодзима", "Гений");
         mockMvc.perform(put("/api/profile/change-name")
@@ -43,9 +42,8 @@ public class ProfileControllerTest extends AbstractTestContainers {
     }
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
+    @WithMockUser(username = "test_mail@itmo.ru")
     public void testChangePassword() throws Exception {
-        executeSqlScript("/sql/insert_user.sql");
 
         UserChangePasswordRequest request = new UserChangePasswordRequest("oldPassword", "newPassword", "newPassword");
         mockMvc.perform(put("/api/profile/change-password")
@@ -55,9 +53,8 @@ public class ProfileControllerTest extends AbstractTestContainers {
     }
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
+    @WithMockUser(username = "test_mail@itmo.ru")
     public void testChangeMismatchPassword() throws Exception {
-        executeSqlScript("/sql/insert_user.sql");
 
         UserChangePasswordRequest request = new UserChangePasswordRequest("oldPassword", "test123123", "qwerty123");
         mockMvc.perform(put("/api/profile/change-password")
@@ -67,9 +64,8 @@ public class ProfileControllerTest extends AbstractTestContainers {
     }
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
+    @WithMockUser(username = "test_mail@itmo.ru")
     public void testChangeEmail() throws Exception {
-        executeSqlScript("/sql/insert_user.sql");
 
         UserChangeEmailRequest request = new UserChangeEmailRequest("newEmail@itmo.ru");
         mockMvc.perform(put("/api/profile/change-email")
@@ -84,11 +80,8 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
+    @WithMockUser(username = "test_mail@itmo.ru")
     public void testChangeToExistEmail() throws Exception {
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
-        executeSqlScript("/sql/insert_user_3.sql");
 
         UserChangeEmailRequest request = new UserChangeEmailRequest("test_mail3@itmo.ru");
         mockMvc.perform(put("/api/profile/change-email")

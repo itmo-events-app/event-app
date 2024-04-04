@@ -5,6 +5,7 @@ import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.repository.NotificationRepository;
 import org.itmo.eventapp.main.service.NotificationService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,16 +21,13 @@ public class NotificationServiceTest extends AbstractTestContainers {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @BeforeEach
     private void databaseFilling(){
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_notifications.sql");
     }
 
     @Test
     void updateSeenWithCorrectDataTest(){
-        databaseFilling();
-
         User dummyUser = new User();
         Integer userId = 1;
         dummyUser.setId(userId);
@@ -43,8 +41,6 @@ public class NotificationServiceTest extends AbstractTestContainers {
 
     @Test
     void getAllByUserIdWithCorrectDataTest(){
-        databaseFilling();
-
         User dummyUser = new User();
         Integer userId = 1;
         dummyUser.setId(userId);
@@ -64,8 +60,6 @@ public class NotificationServiceTest extends AbstractTestContainers {
 
     @Test
     void seenAllByUserIdWithCorrectDataTest(){
-        databaseFilling();
-
         User dummyUser = new User();
         Integer userId = 1;
         dummyUser.setId(userId);
@@ -85,8 +79,6 @@ public class NotificationServiceTest extends AbstractTestContainers {
 
     @Test
     void createNotificationWithCorrectDataTest(){
-        databaseFilling();
-
         User dummyUser = new User();
         Integer userId = 1;
         dummyUser.setId(userId);
@@ -108,8 +100,6 @@ public class NotificationServiceTest extends AbstractTestContainers {
 
     @Test
     void deleteNotificationWithCorrectDataTest(){
-        databaseFilling();
-
         Integer notificationId = 1;
 
         assertTrue(notificationRepository.findById(notificationId).isPresent());
