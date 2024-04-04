@@ -378,7 +378,8 @@ public class EventControllerTest extends AbstractTestContainers {
     }
 
     @Test
-    void getOrganizersByEventSimple() throws Exception {
+    void getUsersHavingRolesByEventSimple() throws Exception {
+        setUpEventData();
         mockMvc.perform(
                         get("/api/events/1/organizers"))
                 .andExpect(status().isOk())
@@ -386,7 +387,8 @@ public class EventControllerTest extends AbstractTestContainers {
     }
 
     @Test
-    void getOrganizersByEvent() throws Exception {
+    void getUsersHavingRolesByEvent() throws Exception {
+        setUpUserData();
         String eventJson = """
                 {
                     "userId": 1,
@@ -397,12 +399,14 @@ public class EventControllerTest extends AbstractTestContainers {
                                 .content(eventJson)
                                 .contentType(MediaType.APPLICATION_JSON)
                 );
+
+        String expectedJson = """
+                        [{"id":1,"name":"test","surname":"user","roleName":"Организатор"}]
+                        """;
         mockMvc.perform(
-                        get("/api/events/2/organizers"))
+                        get("/api/events/1/organizers"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(content().json("""
-                        [{"id":1,"name":"test","surname":"user","roleName":"Организатор"}]
-                        """));
+                .andExpect(content().json(expectedJson));
     }
 }

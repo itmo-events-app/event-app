@@ -176,8 +176,7 @@ public class EventService {
         eventRepository.deleteById(id);
     }
 
-    public List<UserRoleResponse> getOrganizers(Integer id) {
-        List<EventRole> eventRoles = eventRoleService.findAllByEventId(id);
-        return EventRoleMapper.eventRolesToUserRoleResponses(eventRoles);
+    public List<EventRole> getUsersHavingRoles(Integer id) {
+        return eventRoleService.findAllByEventId(id);
     }
 }
