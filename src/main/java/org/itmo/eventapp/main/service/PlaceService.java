@@ -15,7 +15,7 @@ import java.util.Optional;
 public class PlaceService {
     private final PlaceRepository placeRepository;
 
-    Place findById(int id) {
+    public Place findById(int id) {
         return placeRepository.findById(id)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.PLACE_NOT_FOUND_MESSAGE));
     }
