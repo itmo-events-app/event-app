@@ -17,6 +17,7 @@ import org.itmo.eventapp.main.service.EventRoleService;
 import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
 import org.itmo.eventapp.main.model.dto.response.UserWithSystemPrivilegesResponse;
 import org.itmo.eventapp.main.model.entity.EventRole;
+import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.model.mapper.EventRoleMapper;
 import org.itmo.eventapp.main.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +48,7 @@ public class ProfileController {
         userService.changeEmail(authentication.getName(), request);
         return ResponseEntity.ok().build();
     }
-
+    
     @PutMapping("/change-password")
     public ResponseEntity<Void> changePassword(Authentication authentication, @Valid @RequestBody UserChangePasswordRequest request) {
         userService.changePassword(authentication.getName(), request);
@@ -65,8 +66,9 @@ public class ProfileController {
     }
 
     @GetMapping("/base-info")
-    public ResponseEntity<UserWithSystemPrivilegesResponse> getUserBaseInfoAndSystemPrivileges() {
-        Integer userId = null;
+    public ResponseEntity<UserWithSystemPrivilegesResponse> getUserBaseInfoAndSystemPrivileges(
+            @AuthenticationPrincipal UserLoginInfo userDetails) {
+        Integer userId = userDetails.getUser().getId();
         return ResponseEntity.ok().body(userService.getUserBaseInfoAndSystemPrivileges(userId));
     }
 }
