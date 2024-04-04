@@ -7,3 +7,5 @@ build/
 *.iws
 *.iml
 *.ipr
+launch-db-test
+launch-minio-test
