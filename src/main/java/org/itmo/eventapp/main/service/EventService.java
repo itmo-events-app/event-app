@@ -8,9 +8,11 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
+import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
+import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
 import org.itmo.eventapp.main.model.entity.*;
-import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
@@ -20,6 +22,7 @@ import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -33,6 +36,9 @@ public class EventService {
 
     private final EventRepository eventRepository;
 
+    private final MinioService minioService;
+    private final String bucketName="event-images";
+
     private final PlaceService placeService;
     private final UserService userService;
     private final RoleService roleService;
@@ -44,6 +50,7 @@ public class EventService {
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
+
 
     public Event addEvent(EventRequest eventRequest) {
         Place place = placeService.findById(eventRequest.placeId());
@@ -67,16 +74,22 @@ public class EventService {
                 .preparingStart(eventRequest.preparingStart())
                 .preparingEnd(eventRequest.preparingEnd())
                 .build();
-        return eventRepository.save(e);
+        eventRepository.save(e);
+        MultipartFile image = eventRequest.image();
+        if(!Objects.isNull(image)) {
+            String modifiedImageName = e.getId().toString() + "." + FilenameUtils.getExtension(image.getOriginalFilename());
+            minioService.uploadWithModifiedFileName(image, bucketName, modifiedImageName);
+        }
+        return e;
     }
 
     public Event addEventByOrganizer(CreateEventRequest eventRequest) {
+        User user = userService.findById(eventRequest.userId());
         Event e = Event.builder()
                 .title(eventRequest.title())
                 .build();
         Event savedEvent = eventRepository.save(e);
 
-        User user = userService.findById(eventRequest.userId());
 
         // TODO: Do not get organizer from DB each time.
         Role role = roleService.findByName("Организатор");
@@ -107,6 +120,12 @@ public class EventService {
         }
         Event updatedEvent = EventMapper.eventRequestToEvent(id, eventRequest, place, parentEvent);
         eventRepository.save(updatedEvent);
+        MultipartFile image = eventRequest.image();
+        minioService.deleteImageByEvent(bucketName, updatedEvent.getId().toString());
+        if (!Objects.isNull(image)) {
+            String modifiedImageName = updatedEvent.getId().toString() + "." + FilenameUtils.getExtension(image.getOriginalFilename());
+            minioService.uploadWithModifiedFileName(image, bucketName, modifiedImageName);
+        }
         return updatedEvent;
     }
 

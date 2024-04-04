@@ -30,5 +30,5 @@ public class Notification {
 
     private boolean seen;
 
-    private LocalDateTime readTime;
+    private LocalDateTime sentTime;
 }
