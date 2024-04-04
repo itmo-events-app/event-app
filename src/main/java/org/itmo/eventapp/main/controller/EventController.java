@@ -59,7 +59,6 @@ public class EventController {
     }
 
     @GetMapping
-    @SuppressWarnings("java:S107")
     public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
                                                                       @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") int size,
                                                                       @RequestParam(required = false) Integer parentId,
