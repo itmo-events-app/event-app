@@ -37,18 +37,21 @@ public class AuthController {
 
     @PostMapping(value = "/approveRegister/{requestId}")
     ResponseEntity<Void> approveRegister(@PathVariable("requestId") Integer requestId) {
+        // TODO: check for administrator
         authenticationService.approveRegistrationRequestCallback(requestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping(value = "/declineRegister/{requestId}")
     ResponseEntity<Void> declineRegister(@PathVariable("requestId") Integer requestId) {
+        // TODO: check for administrator
         authenticationService.declineRegistrationRequestCallback(requestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping(value = "/listRegisterRequests")
     ResponseEntity<List<RegistrationRequest>> listRegisterRequests() {
+        // TODO: check for administrator
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(authenticationService.listRegisterRequestsCallback());
