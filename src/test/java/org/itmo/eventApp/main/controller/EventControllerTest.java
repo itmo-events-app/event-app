@@ -28,11 +28,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class EventControllerTest extends AbstractTestContainers {
 
     // TODO: Add Test for event controller here
-    private boolean isImageExist(String object) {
+    private boolean isImageExist(String imageName) {
         try {
             minioClient.statObject(StatObjectArgs.builder()
                     .bucket("event-images")
-                    .object(object).build());
+                    .object(imageName).build());
             return true;
         } catch (ErrorResponseException e) {
             return false;
@@ -144,6 +144,7 @@ public class EventControllerTest extends AbstractTestContainers {
                         .contentType("multipart/form-data"))
                 .andExpect(status().is(404))
                 .andExpect(content().string(containsString("Place not found")));;
+        assertThat(eventRepository.findById(3).isEmpty()).isTrue();
     }
 
     @Test
@@ -174,6 +175,7 @@ public class EventControllerTest extends AbstractTestContainers {
                         .params(params)
                         .contentType("multipart/form-data"))
                 .andExpect(status().is(400));
+        assertThat(eventRepository.findById(3).isEmpty()).isTrue();
     }
     @Test
     void getAllEventsTest() throws Exception {
@@ -200,6 +202,9 @@ public class EventControllerTest extends AbstractTestContainers {
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().is(201));
+        assertThat(eventRepository.findById(1).isPresent()).isTrue();
+        Event event = eventRepository.findById(1).get();
+        assertThat(event.getTitle().equals("test event")).isTrue();
     }
 
     @Test
@@ -216,6 +221,7 @@ public class EventControllerTest extends AbstractTestContainers {
                 )
                 .andExpect(status().is(404))
                 .andExpect(content().string(containsString("User not found")));
+        assertThat(eventRepository.findById(1).isEmpty()).isTrue();
     }
 
     @Test
@@ -241,6 +247,7 @@ public class EventControllerTest extends AbstractTestContainers {
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().is(400));
+        assertThat(eventRepository.findById(1).isEmpty()).isTrue();
     }
 
     @Test

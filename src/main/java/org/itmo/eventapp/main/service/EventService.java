@@ -84,12 +84,12 @@ public class EventService {
     }
 
     public Event addEventByOrganizer(CreateEventRequest eventRequest) {
+        User user = userService.findById(eventRequest.userId());
         Event e = Event.builder()
                 .title(eventRequest.title())
                 .build();
         Event savedEvent = eventRepository.save(e);
 
-        User user = userService.findById(eventRequest.userId());
 
         // TODO: Do not get organizer from DB each time.
         Role role = roleService.findByName("Организатор");
