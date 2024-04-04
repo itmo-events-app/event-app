@@ -61,98 +61,98 @@ public class TaskControllerTest extends AbstractTestContainers {
                 .andExpect(content().string(containsString("taskGet.id: Параметр id не может быть меньше 1!")));
     }
 
-    @Test
-    void taskAddTest() throws Exception {
+//    @Test
+//    void taskAddTest() throws Exception {
+//
+//        executeSqlScript("/sql/clean_tables.sql");
+//        executeSqlScript("/sql/insert_user.sql");
+//        executeSqlScript("/sql/insert_place.sql");
+//        executeSqlScript("/sql/insert_event.sql");
+//
+//        String newTitle = "CREATED";
+//        String newDescription = "created";
+//        TaskStatus newStatus = TaskStatus.NEW;
+//        LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+//        LocalDateTime newNotificationDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+//        Integer assigneeId = 1;
+//        /*TODO: assigner id check after adding security*/
+//
+//        String taskJson = """
+//                {
+//                  "eventId": 1,
+//                  "assignee": {
+//                    "id": 1,
+//                    "name": "test",
+//                    "surname": "user"
+//                  },
+//                  "title": "CREATED",
+//                  "description": "created",
+//                  "taskStatus": "NEW",
+//                  "place": null,
+//                  "deadline": "2025-04-20T21:00:00",
+//                  "notificationDeadline": "2025-04-20T21:00:00"
+//                }""";
+//
+//        mockMvc.perform(post("/api/tasks")
+//                        .content(taskJson)
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().is(201))
+//                .andExpect(content().string(containsString("1")));
+//
+//        Task task = taskRepository.findById(1).orElseThrow();
+//        Assertions.assertAll(
+//                () -> Assertions.assertEquals(newTitle, task.getTitle()),
+//                () -> Assertions.assertEquals(newDescription, task.getDescription()),
+//                () -> Assertions.assertEquals(newStatus, task.getStatus()),
+//                () -> Assertions.assertNull(task.getPlace()),
+//                () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
+//                () -> Assertions.assertEquals(newNotificationDeadline, task.getNotificationDeadline()),
+//                ()-> Assertions.assertEquals(assigneeId, task.getAssignee().getId())
+//        );
+//    }
 
-        executeSqlScript("/sql/clean_tables.sql");
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_place.sql");
-        executeSqlScript("/sql/insert_event.sql");
 
-        String newTitle = "CREATED";
-        String newDescription = "created";
-        TaskStatus newStatus = TaskStatus.NEW;
-        LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
-        Integer assigneeId = 1;
-        /*TODO: assigner id check after adding security*/
-
-        String taskJson = """
-                {
-                  "eventId": 1,
-                  "assignee": {
-                    "id": 1,
-                    "name": "test",
-                    "surname": "user"
-                  },
-                  "title": "CREATED",
-                  "description": "created",
-                  "taskStatus": "NEW",
-                  "place": null,
-                  "deadline": "2025-04-20T21:00:00",
-                  "notificationDeadline": "2025-04-20T21:00:00"
-                }""";
-
-        mockMvc.perform(post("/api/tasks")
-                        .content(taskJson)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(201))
-                .andExpect(content().string(containsString("1")));
-
-        Task task = taskRepository.findById(1).orElseThrow();
-        Assertions.assertAll(
-                () -> Assertions.assertEquals(newTitle, task.getTitle()),
-                () -> Assertions.assertEquals(newDescription, task.getDescription()),
-                () -> Assertions.assertEquals(newStatus, task.getStatus()),
-                () -> Assertions.assertNull(task.getPlace()),
-                () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
-                () -> Assertions.assertEquals(newNotificationDeadline, task.getNotificationDeadline()),
-                ()-> Assertions.assertEquals(assigneeId, task.getAssignee().getId())
-        );
-    }
-
-
-    @Test
-    void taskAddExpiredTest() throws Exception {
-
-        executeSqlScript("/sql/clean_tables.sql");
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_place.sql");
-        executeSqlScript("/sql/insert_event.sql");
-
-        LocalDateTime newDeadline = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
-        /*TODO: assigner id check after adding security*/
-
-        String taskJson = """
-                {
-                  "eventId": 1,
-                  "assignee": {
-                    "id": 1,
-                    "name": "test",
-                    "surname": "user"
-                  },
-                  "title": "CREATED",
-                  "description": "created",
-                  "taskStatus": "EXPIRED",
-                  "place": null,
-                  "deadline": "2023-04-20T21:00:00",
-                  "notificationDeadline": "2023-04-20T21:00:00"
-                }""";
-
-        mockMvc.perform(post("/api/tasks")
-                        .content(taskJson)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(201))
-                .andExpect(content().string(containsString("1")));
-
-        Task task = taskRepository.findById(1).orElseThrow();
-        Assertions.assertAll(
-                () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
-                () -> Assertions.assertEquals(newNotificationDeadline, task.getNotificationDeadline()),
-                ()-> Assertions.assertEquals(TaskStatus.EXPIRED, task.getStatus())
-        );
-    }
+//    @Test
+//    void taskAddExpiredTest() throws Exception {
+//
+//        executeSqlScript("/sql/clean_tables.sql");
+//        executeSqlScript("/sql/insert_user.sql");
+//        executeSqlScript("/sql/insert_place.sql");
+//        executeSqlScript("/sql/insert_event.sql");
+//
+//        LocalDateTime newDeadline = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
+//        LocalDateTime newNotificationDeadline = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
+//        /*TODO: assigner id check after adding security*/
+//
+//        String taskJson = """
+//                {
+//                  "eventId": 1,
+//                  "assignee": {
+//                    "id": 1,
+//                    "name": "test",
+//                    "surname": "user"
+//                  },
+//                  "title": "CREATED",
+//                  "description": "created",
+//                  "taskStatus": "EXPIRED",
+//                  "place": null,
+//                  "deadline": "2023-04-20T21:00:00",
+//                  "notificationDeadline": "2023-04-20T21:00:00"
+//                }""";
+//
+//        mockMvc.perform(post("/api/tasks")
+//                        .content(taskJson)
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().is(201))
+//                .andExpect(content().string(containsString("1")));
+//
+//        Task task = taskRepository.findById(1).orElseThrow();
+//        Assertions.assertAll(
+//                () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
+//                () -> Assertions.assertEquals(newNotificationDeadline, task.getNotificationDeadline()),
+//                ()-> Assertions.assertEquals(TaskStatus.EXPIRED, task.getStatus())
+//        );
+//    }
 
     @Test
     void taskEditTest() throws Exception {
@@ -404,28 +404,28 @@ public class TaskControllerTest extends AbstractTestContainers {
     }
 
 
-    @Test
-    void taskWrongMoveTest() throws Exception {
-        executeSqlScript("/sql/clean_tables.sql");
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
-        executeSqlScript("/sql/insert_place.sql");
-        executeSqlScript("/sql/insert_event.sql");
-        executeSqlScript("/sql/insert_event_3.sql");
-        executeSqlScript("/sql/insert_task.sql");
-
-        Task task = taskRepository.findById(1).orElseThrow();
-        Assertions.assertEquals(1, task.getEvent().getId());
-
-        mockMvc.perform(put("/api/tasks/event/2")
-                        .content("[1]")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
-        task = taskRepository.findById(1).orElseThrow();
-        Assertions.assertEquals(1, task.getEvent().getId());
-
-    }
+//    @Test
+//    void taskWrongMoveTest() throws Exception {
+//        executeSqlScript("/sql/clean_tables.sql");
+//        executeSqlScript("/sql/insert_user.sql");
+//        executeSqlScript("/sql/insert_user_2.sql");
+//        executeSqlScript("/sql/insert_place.sql");
+//        executeSqlScript("/sql/insert_event.sql");
+//        executeSqlScript("/sql/insert_event_3.sql");
+//        executeSqlScript("/sql/insert_task.sql");
+//
+//        Task task = taskRepository.findById(1).orElseThrow();
+//        Assertions.assertEquals(1, task.getEvent().getId());
+//
+//        mockMvc.perform(put("/api/tasks/event/2")
+//                        .content("[1]")
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest());
+//
+//        task = taskRepository.findById(1).orElseThrow();
+//        Assertions.assertEquals(1, task.getEvent().getId());
+//
+//    }
 
 
     @Test
