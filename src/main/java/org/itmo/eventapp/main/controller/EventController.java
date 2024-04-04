@@ -63,13 +63,14 @@ public class EventController {
     @GetMapping
     public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
                                                                       @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") int size,
+                                                                      @RequestParam(required = false) Integer parentId,
                                                                       @RequestParam(required = false) String title,
                                                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
                                                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
                                                                       @RequestParam(required = false) EventStatus status,
                                                                       @RequestParam(required = false) EventFormat format) {
         return ResponseEntity.ok().body(EventMapper.eventsToEventResponseList(
-                eventService.getAllOrFilteredEvents(page, size, title, startDate, endDate, status, format)));
+                eventService.getAllOrFilteredEvents(page, size, parentId, title, startDate, endDate, status, format)));
     }
 
     @GetMapping("/{id}")

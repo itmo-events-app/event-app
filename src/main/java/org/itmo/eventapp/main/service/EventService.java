@@ -131,13 +131,16 @@ public class EventService {
         return updatedEvent;
     }
 
-    public List<Event> getAllOrFilteredEvents(int page, int size, String title,
+    public List<Event> getAllOrFilteredEvents(int page, int size, Integer parentId, String title,
                                                       LocalDateTime startDate, LocalDateTime endDate,
                                                       EventStatus status, EventFormat format) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> query = cb.createQuery(Event.class);
         Root<Event> root = query.from(Event.class);
         List<Predicate> predicates = new ArrayList<>();
+
+        // If parentId is null, we don't want the activities to return
+        predicates.add(cb.equal(root.get("parent_id"), parentId));
 
         if (title != null) {
             predicates.add(cb.equal(root.get("title"), title));
