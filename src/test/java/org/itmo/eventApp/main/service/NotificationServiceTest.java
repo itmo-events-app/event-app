@@ -79,7 +79,7 @@ public class NotificationServiceTest extends AbstractTestContainers {
         for (Notification n : notifications) {
             assertEquals(userId, n.getUser().getId());
             assertTrue(n.isSeen());
-//            assertNotNull(n.getSentTime());
+            assertNotNull(n.getSentTime());
         }
     }
 
@@ -92,7 +92,7 @@ public class NotificationServiceTest extends AbstractTestContainers {
         dummyUser.setId(userId);
         String title = "TestTitle";
         String description = "TestDescription";
-        Integer notificationId = 1;
+        Integer notificationId = 5;
 
         notificationService.createNotification(title, description, dummyUser);
 
@@ -103,7 +103,7 @@ public class NotificationServiceTest extends AbstractTestContainers {
         assertEquals(title, afterCreate.getTitle());
         assertEquals(description, afterCreate.getDescription());
         assertFalse(afterCreate.isSeen());
-//        assertNull(afterCreate.getSentTime());
+        assertNotNull(afterCreate.getSentTime());
     }
 
     @Test
