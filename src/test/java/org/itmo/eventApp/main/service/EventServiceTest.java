@@ -174,7 +174,7 @@ class EventServiceTest {
         existingEvent.setEndDate(LocalDateTime.of(2024, 4, 2, 10, 0));
         existingEvent.setTitle("Title");
 
-        when(eventRepository.findById(123)).thenReturn(Optional.of(existingEvent));
+        when(eventRepository.findById(1)).thenReturn(Optional.of(existingEvent));
         when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
             Event event = invocation.getArgument(0);
             event.setId(2);
