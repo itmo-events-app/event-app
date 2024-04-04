@@ -31,8 +31,8 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<Integer> taskAdd(@Valid @RequestBody TaskRequest taskRequest) {
-        TaskResponse task = taskService.save(taskRequest);
-        return ResponseEntity.status(201).body(task.id());
+        Task task = taskService.save(taskRequest);
+        return ResponseEntity.status(201).body(task.getId());
     }
 
     @GetMapping("/{id}")
@@ -48,8 +48,8 @@ public class TaskController {
     public ResponseEntity<TaskResponse> taskEdit(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                  @PathVariable Integer id,
                                                  @Valid @RequestBody TaskRequest taskRequest) {
-        TaskResponse edited = taskService.edit(id, taskRequest);
-        return ResponseEntity.ok().body(edited);
+        Task edited = taskService.edit(id, taskRequest);
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(edited));
     }
 
     @DeleteMapping("/{id}")
@@ -58,7 +58,7 @@ public class TaskController {
         // delete task
         taskService.delete(id);
         // delete task deadline notification
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(204).build();
     }
 
     @PutMapping("/{id}/assignee/{userId}")
@@ -68,8 +68,8 @@ public class TaskController {
             @Min(value = 1, message = "Параметр userId не может быть меньше 1!")
             @PathVariable Integer userId
     ) {
-        TaskResponse updatedTask = taskService.setAssignee(id, userId);
-        return ResponseEntity.ok().body(updatedTask);
+        Task updatedTask = taskService.setAssignee(id, userId);
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
     }
 
     /*TODO: TEST*/
@@ -79,8 +79,8 @@ public class TaskController {
             @PathVariable Integer id
     ) {
         Integer userId = 1; // TODO: get from principal
-        TaskResponse updatedTask = taskService.setAssignee(id, userId);
-        return ResponseEntity.ok().body(updatedTask);
+        Task updatedTask = taskService.setAssignee(id, userId);
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
     }
 
     // p35 && also delete yourself as privilege 41
@@ -89,8 +89,8 @@ public class TaskController {
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id
     ) {
-        TaskResponse updatedTask = taskService.setAssignee(id, -1);
-        return ResponseEntity.ok().body(updatedTask);
+        Task updatedTask = taskService.setAssignee(id, -1);
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
     }
 
     //privilege 32 && privilege 39
@@ -101,11 +101,8 @@ public class TaskController {
             @NotNull(message = "Параметр newStatus не может быть null!")
             @RequestBody TaskStatus newStatus
     ) {
-        if (newStatus == TaskStatus.EXPIRED) {
-            throw new IllegalArgumentException("Недопустимый для ручного выставления статус!");
-        }
-        TaskResponse updatedTask = taskService.setStatus(id, newStatus);
-        return ResponseEntity.ok().body(updatedTask);
+        Task updatedTask = taskService.setStatus(id, newStatus);
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
     }
 
     /*TODO: TEST*/
@@ -120,8 +117,8 @@ public class TaskController {
             @NotEmpty(message = "Список task id не может быть пустым!")
             @RequestBody List<Integer> taskIds
     ) {
-        List<TaskResponse> updTasks = taskService.moveTasks(dstEventId, taskIds);
-        return ResponseEntity.ok().body(updTasks);
+        List<Task> updTasks = taskService.moveTasks(dstEventId, taskIds);
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(updTasks));
     }
 
     /*TODO: TEST*/
@@ -136,9 +133,9 @@ public class TaskController {
             @NotEmpty(message = "Список task id не может быть пустым!")
             @RequestBody List<Integer> taskIds
     ) {
-        List<TaskResponse> newTasks = taskService.copyTasks(dstEventId, taskIds);
+        List<Task> newTasks = taskService.copyTasks(dstEventId, taskIds);
         // src == dst - ?
-        return ResponseEntity.ok().body(newTasks);
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(newTasks));
     }
 
     @GetMapping("/event/{eventId}")

@@ -227,7 +227,7 @@ public class TaskControllerTest extends AbstractTestContainers {
         Assertions.assertTrue(taskRepository.findById(1).isPresent());
 
         mockMvc.perform(delete("/api/tasks/1"))
-                .andExpect(status().isOk());
+                .andExpect(status().is(204));
 
         Assertions.assertFalse(taskRepository.findById(1).isPresent());
     }
@@ -400,6 +400,30 @@ public class TaskControllerTest extends AbstractTestContainers {
 
         task = taskRepository.findById(1).orElseThrow();
         Assertions.assertEquals(2, task.getEvent().getId());
+
+    }
+
+
+    @Test
+    void taskWrongMoveTest() throws Exception {
+        executeSqlScript("/sql/clean_tables.sql");
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_3.sql");
+        executeSqlScript("/sql/insert_task.sql");
+
+        Task task = taskRepository.findById(1).orElseThrow();
+        Assertions.assertEquals(1, task.getEvent().getId());
+
+        mockMvc.perform(put("/api/tasks/event/2")
+                        .content("[1]")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        task = taskRepository.findById(1).orElseThrow();
+        Assertions.assertEquals(1, task.getEvent().getId());
 
     }
 

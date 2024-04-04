@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class TaskService {
         return taskRepository.findById(id);
     }
 
-    public TaskResponse save(TaskRequest taskRequest) {
+    public Task save(TaskRequest taskRequest) {
 
         // task assigner from principal.name -> findByUsername
         Event event = eventService.findById(taskRequest.eventId());
@@ -46,11 +47,11 @@ public class TaskService {
         /*TODO: GET FROM PRINCIPAL*/
 
         User assignee = null;
-        if (taskRequest.assignee()!= null) {
+        if (taskRequest.assignee() != null) {
             assignee = userService.findById(taskRequest.assignee().id());
         }
         Place place = null;
-        if (taskRequest.place()!= null) {
+        if (taskRequest.place() != null) {
             place = placeService.findById(taskRequest.place().id());
         }
 
@@ -68,12 +69,12 @@ public class TaskService {
 
         /*TODO: schedule task deadline notification for assigner & assignee */
 
-        return TaskMapper.taskToTaskResponse(newTask);
+        return newTask;
     }
 
-    public TaskResponse edit(Integer id, TaskRequest taskRequest) {
+    public Task edit(Integer id, TaskRequest taskRequest) {
 
-        Task task = taskRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
 
         Event event = eventService.findById(taskRequest.eventId());
         User assigner = task.getAssigner();
@@ -81,11 +82,11 @@ public class TaskService {
         User prevAssignee = task.getAssignee();
 
         User assignee = null;
-        if (taskRequest.assignee()!= null) {
+        if (taskRequest.assignee() != null) {
             assignee = userService.findById(taskRequest.assignee().id());
         }
         Place place = null;
-        if (taskRequest.place()!= null) {
+        if (taskRequest.place() != null) {
             place = placeService.findById(taskRequest.place().id());
         }
 
@@ -103,7 +104,7 @@ public class TaskService {
             /*TODO: unset task deadline notification for prev assignee */
         }
 
-        return TaskMapper.taskToTaskResponse(newTaskData);
+        return newTaskData;
     }
 
     public void delete(Integer id) {
@@ -113,9 +114,9 @@ public class TaskService {
     }
 
 
-    public TaskResponse setAssignee(Integer taskId, Integer assigneeId) {
+    public Task setAssignee(Integer taskId, Integer assigneeId) {
 
-        Task task = taskRepository.findById(taskId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
 
         User prevAssignee = task.getAssignee();
 
@@ -135,41 +136,57 @@ public class TaskService {
             /*TODO: unset task deadline notification for prev assignee */
         }
 
-        return TaskMapper.taskToTaskResponse(task);
+        return task;
 
     }
 
 
-    public TaskResponse setStatus(Integer taskId, TaskStatus taskStatus) {
-        Task task = taskRepository.findById(taskId).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+    public Task setStatus(Integer taskId, TaskStatus taskStatus) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
         task.setStatus(taskStatus);
         task = taskRepository.save(task);
-        return TaskMapper.taskToTaskResponse(task);
+        return task;
     }
 
-    public List<TaskResponse> moveTasks(Integer dstEventId, List<Integer> taskIds) {
+    private boolean checkOneEvent(Event first, Event second) {
+        boolean firstParent = (second.getParent() != null) &&
+                (Objects.equals(second.getParent().getId(), first.getId()));
+        boolean firstChild = (second.getParent() == null) &&
+                (first.getParent() != null) &&
+                (Objects.equals(second.getId(), first.getParent().getId()));
+        boolean bothChildren = (second.getParent() != null) &&
+                (first.getParent() != null) &&
+                (Objects.equals(second.getParent().getId(), first.getParent().getId()));
+
+        return firstParent || firstChild || bothChildren;
+    }
+
+    public List<Task> moveTasks(Integer dstEventId, List<Integer> taskIds) {
 
         Event event = eventService.findById(dstEventId);
-        List<Task> tasks = taskRepository.findAllById(taskIds).stream().map(
-                (task)-> {
-                    task.setEvent(event);
-                    return task;
-                }
-        ).toList();
+        List<Task> tasks = taskRepository.findAllById(taskIds);
 
-        tasks = taskRepository.saveAll(tasks);
+        for (Task task : tasks) {
+            if (!checkOneEvent(event, task.getEvent())) {
+                throw new IllegalArgumentException("Нельзя переносить задачи между разными мероприятиями! Попроуйте копирование.");
+            }
+        }
 
-        return TaskMapper.tasksToTaskResponseList(tasks);
+        for (Task task : tasks) {
+            task.setEvent(event);
+        }
+
+        return taskRepository.saveAll(tasks);
     }
 
 
-    public List<TaskResponse> copyTasks(Integer dstEventId, List<Integer> taskIds) {
+    public List<Task> copyTasks(Integer dstEventId, List<Integer> taskIds) {
 
         Event event = eventService.findById(dstEventId);
         List<Task> tasks = taskRepository.findAllById(taskIds);
 
         List<Task> newTasks = new ArrayList<>();
-        for (Task task: tasks) {
+        for (Task task : tasks) {
 
             Task newTask = new Task();
             newTask.setEvent(event);
@@ -193,11 +210,11 @@ public class TaskService {
 
         newTasks = taskRepository.saveAll(newTasks);
 
-        for (Task newTask: newTasks) {
+        for (Task newTask : newTasks) {
             /*TODO: schedule task deadline notification for assigner */
         }
 
-        return TaskMapper.tasksToTaskResponseList(newTasks);
+        return newTasks;
     }
 
 }
