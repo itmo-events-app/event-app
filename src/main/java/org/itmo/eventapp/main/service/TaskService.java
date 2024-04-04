@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
+import org.itmo.eventapp.main.model.dto.request.TaskFilterRequest;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Event;
@@ -208,4 +209,7 @@ public class TaskService {
         return newTasks;
     }
 
+    public List<Task> getEventTasksWithFilter(Integer eventId, TaskFilterRequest filter) {
+        return null;
+    }
 }

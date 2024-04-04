@@ -82,7 +82,7 @@ public class TaskController {
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id
     ) {
-        /*TODO: TEST work*/
+        /*TODO: TEST*/
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
@@ -116,6 +116,7 @@ public class TaskController {
 
 
     /*TODO: TEST*/
+
     //    @PutMapping("/event/{srcEventId}/{dstEventId}")
     @PutMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListMove(
@@ -146,31 +147,31 @@ public class TaskController {
     }
 
     @GetMapping("/event/{eventId}")
-    public ResponseEntity<List<TaskRequest>> taskListShowInEvent(
+    public ResponseEntity<List<TaskResponse>> taskListShowInEvent(
             @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
             @PathVariable Integer eventId,
             @Valid @RequestBody TaskFilterRequest filter
     ) {
-        List<TaskRequest> eventTasks = new ArrayList<>();
+        List<Task> eventTasks = taskService.getEventTasksWithFilter(eventId, filter);
         // apply filtering in db - ???
-        return ResponseEntity.ok().body(eventTasks);
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(eventTasks));
     }
 
     @GetMapping("/event/{eventId}/where-assignee")
-    public ResponseEntity<List<TaskRequest>> taskListShowInEventWhereAssignee(
+    public ResponseEntity<List<TaskResponse>> taskListShowInEventWhereAssignee(
             @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
             @PathVariable Integer eventId
     ) {
-        List<TaskRequest> eventUserTasks = new ArrayList<>();
+        List<Task> eventUserTasks = new ArrayList<>();
         // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
-        return ResponseEntity.ok().body(eventUserTasks);
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(eventUserTasks));
     }
 
     @GetMapping("/where-assignee")
-    public ResponseEntity<List<TaskRequest>> taskListShowWhereAssignee() {
-        List<TaskRequest> userTasks = new ArrayList<>();
+    public ResponseEntity<List<TaskResponse>> taskListShowWhereAssignee() {
+        List<Task> userTasks = new ArrayList<>();
         // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
-        return ResponseEntity.ok().body(userTasks);
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(userTasks));
     }
 
 
