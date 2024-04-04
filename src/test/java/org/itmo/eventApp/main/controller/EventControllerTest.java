@@ -54,14 +54,7 @@ public class EventControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_event.sql");
     }
 
-    private void setUpUserData() {
-        executeSqlScript("/sql/insert_user.sql");
-    }
 
-    @AfterEach
-    public void cleanUp() {
-        executeSqlScript("/sql/clean_tables.sql");
-    }
 
     @Test
     void getAllOrFilteredEventsTest() throws Exception {
@@ -190,7 +183,6 @@ public class EventControllerTest extends AbstractTestContainers {
 
     @Test
     void addProperEventByOrganizer() throws Exception {
-        setUpUserData();
         String eventJson = """
                 {
                     "userId": 1,
