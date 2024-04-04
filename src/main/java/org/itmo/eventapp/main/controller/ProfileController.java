@@ -14,6 +14,10 @@ import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.model.mapper.EventRoleMapper;
 import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.service.EventRoleService;
+import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
+import org.itmo.eventapp.main.model.dto.response.UserWithSystemPrivilegesResponse;
+import org.itmo.eventapp.main.model.entity.EventRole;
+import org.itmo.eventapp.main.model.mapper.EventRoleMapper;
 import org.itmo.eventapp.main.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -58,5 +62,11 @@ public class ProfileController {
         Integer userId = userDetails.getUser().getId();
         return ResponseEntity.ok(
                 PrivilegeMapper.privilegesToPrivilegeResponseList(eventRoleService.getUserEventPrivileges(userId, id)));
+    }
+
+    @GetMapping("/base-info")
+    public ResponseEntity<UserWithSystemPrivilegesResponse> getUserBaseInfoAndSystemPrivileges() {
+        Integer userId = null;
+        return ResponseEntity.ok().body(userService.getUserBaseInfoAndSystemPrivileges(userId));
     }
 }

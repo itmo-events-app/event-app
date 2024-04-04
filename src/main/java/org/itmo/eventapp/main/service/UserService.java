@@ -8,6 +8,12 @@ import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.repository.EventRoleRepository;
+import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
+import org.itmo.eventapp.main.model.dto.response.UserWithSystemPrivilegesResponse;
+import org.itmo.eventapp.main.model.entity.Role;
+import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.repository.UserLoginInfoRepository;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -70,5 +76,13 @@ public class UserService {
         }
 
         userLoginInfoService.setPassword(user.getUserLoginInfo(), request.newPassword());
+    }
+
+    public UserWithSystemPrivilegesResponse getUserBaseInfoAndSystemPrivileges(Integer userId) {
+        User user = findById(userId);
+        return new UserWithSystemPrivilegesResponse(
+                user.getName(),
+                user.getSurname(),
+                PrivilegeMapper.privilegesToPrivilegeResponseList(user.getRole().getPrivileges()));
     }
 }
