@@ -13,15 +13,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class NotificationControllerTest extends AbstractTestContainers{
 
-    //todo make working tests
+    //todo make this work
     private void databaseFilling(){
-//        executeSqlScript("/sql/insert_user.sql");
-//        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_notifications.sql");
     }
 
     @Test
-//    @WithUserDetails("test_mail@itmo.ru")
+//    @WithUserDetails("test_mail@test_mail.com")
     void getNotificationsTest() throws Exception {
 //        databaseFilling();
 //        mockMvc.perform(get("/api/notifications")
@@ -58,7 +58,6 @@ public class NotificationControllerTest extends AbstractTestContainers{
 //    @WithUserDetails("test_mail@test_mail.com")
     void oneSeenNotificationsTest() throws Exception {
 //        databaseFilling();
-//
 //        mockMvc.perform(put("/api/notifications/1")
 //                        .param("page", "0")
 //                        .param("size", "10"))

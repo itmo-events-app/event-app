@@ -30,7 +30,7 @@ public class NotificationService {
                 .title(title)
                 .description(description)
                 .seen(false)
-                .sentTime(null)
+                .sentTime(LocalDateTime.now())
                 .build());
     }
 
@@ -52,13 +52,12 @@ public class NotificationService {
 
     public List<Notification> updateSeenToAllByUserId(@NotNull User user, Integer page, Integer size) {
         notificationRepository.updateAllSeenByUserId(user.getId());
-        Pageable pageRequest = PageRequest.of(page, size, Sort.by("sent_time").descending());
-
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("sentTime").descending());
         return notificationRepository.getAllByUserId(user.getId(), pageRequest);
     }
 
     public List<Notification> getAllByUserId(@NotNull User user, Integer page, Integer size) {
-        Pageable pageRequest = PageRequest.of(page, size, Sort.by("sent_time").descending());
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("sentTime").descending());
         return notificationRepository.getAllByUserId(user.getId(), pageRequest);
     }
 
