@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.dto.request.NotificationRequest;
 import org.itmo.eventapp.main.model.dto.response.NotificationResponse;
 import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
@@ -54,15 +53,15 @@ public class NotificationController {
         return ResponseEntity.ok(responseBody);
     }
 
-    @PutMapping
+    @PutMapping(path = "/{notificationId}")
     public ResponseEntity<NotificationResponse> setOneAsSeenNotification(
             @AuthenticationPrincipal UserLoginInfo userDetails,
-            @Valid @RequestBody NotificationRequest request
+            @Valid @PathVariable Integer notificationId
     ) {
         NotificationResponse responseBody = NotificationMapper
                 .notificationToNotificationResponse(
                         notificationService.updateToSeen(
-                            request.id(),
+                            notificationId,
                             userDetails.getUser()));
         return ResponseEntity.ok(responseBody);
     }

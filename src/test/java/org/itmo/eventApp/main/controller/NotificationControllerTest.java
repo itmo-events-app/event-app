@@ -1,11 +1,7 @@
 package org.itmo.eventApp.main.controller;
 
-import org.itmo.eventapp.main.controller.NotificationController;
-import org.itmo.eventapp.main.model.dto.request.NotificationRequest;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,9 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class NotificationControllerTest extends AbstractTestContainers{
-
-    @Autowired
-    private NotificationController notificationController;
 
     private void databaseFilling(){
         executeSqlScript("/sql/insert_user.sql");
@@ -61,14 +54,9 @@ public class NotificationControllerTest extends AbstractTestContainers{
     void oneSeenNotificationsTest() throws Exception {
         databaseFilling();
 
-        NotificationRequest notificationRequest = new NotificationRequest(1);
-        ObjectMapper mapper = new ObjectMapper();
-        String requestJson = mapper.writeValueAsString(notificationRequest);
-
-        mockMvc.perform(put("/api/notifications")
+        mockMvc.perform(put("/api/notifications/1")
                         .param("page", "0")
-                        .param("size", "10")
-                        .content(requestJson))
+                        .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$.id").value("1"))
