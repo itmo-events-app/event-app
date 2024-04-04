@@ -13,6 +13,7 @@ public class AuthControllerTest extends AbstractTestContainers {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
+
     //todo assert incorrect, need to fix
 //    @Test
 //    @WithAnonymousUser

@@ -8,6 +8,7 @@ import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 
 import java.time.LocalDateTime;
+import org.springframework.web.multipart.MultipartFile;
 
 // TODO: Add correct annotations
 public record EventRequest(
@@ -47,7 +48,7 @@ public record EventRequest(
         @NotNull(message = "Поле preparingStart не может быть null!")
         LocalDateTime preparingStart,
         @NotNull(message = "Поле preparingEnd не может быть null!")
-        LocalDateTime preparingEnd
-
+        LocalDateTime preparingEnd,
+        MultipartFile image
 ) {
 }

@@ -11,10 +11,11 @@ import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.service.EventService;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,28 +35,27 @@ import java.util.List;
 @Validated
 public class EventController {
     private final EventService eventService;
-
     // TODO: Add privilege validation
-
-    @PostMapping("/activity")
-    public ResponseEntity<Integer> addEvent(@RequestBody @Valid EventRequest eventRequest) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(eventService.addEvent(eventRequest).getId());
+    @PostMapping(value = "/activity", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Integer> addActivity(@Valid EventRequest eventRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(eventService.addEvent(eventRequest).getId());
     }
 
     @PostMapping
-    public ResponseEntity<Integer> addEventByOrganizer(@RequestBody @Valid CreateEventRequest eventRequest) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(eventService.addEventByOrganizer(eventRequest).getId());
+    public ResponseEntity<Integer> addEventByOrganizer(@RequestBody @Valid CreateEventRequest eventRequest){
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(eventService.addEventByOrganizer(eventRequest).getId());
     }
 
+    // TODO: Return images in response
     @PutMapping("/{id}")
     public ResponseEntity<EventResponse> updateEvent(@Min(1) @PathVariable("id") Integer id,
-                                                     @RequestBody @Valid EventRequest eventRequest) {
+                                                     @Valid EventRequest eventRequest) {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
     }
+
+    // TODO: Add filtering by fields: title, dates, status, format
 
     @GetMapping
     public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
