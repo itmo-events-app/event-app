@@ -43,6 +43,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    //TODO добавить нотификацию о смене почты и его подтверждения
     public void changeEmail(String email, UserChangeEmailRequest request) {
         User user = userLoginInfoService.findByEmail(email).getUser();
 
