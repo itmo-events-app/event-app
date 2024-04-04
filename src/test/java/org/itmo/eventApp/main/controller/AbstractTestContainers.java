@@ -3,6 +3,7 @@ package org.itmo.eventApp.main.controller;
 import io.minio.MinioClient;
 import io.minio.RemoveBucketArgs;
 import org.itmo.eventapp.main.Main;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,7 @@ public abstract class AbstractTestContainers {
         System.setProperty("MINIO_SECRET_KEY", minioContainer.getPassword());
     }
 
-    @BeforeEach
+    @AfterEach
     public void cleanUp() throws Exception {
         try {
             executeSqlScript("/sql/clean_tables.sql");
