@@ -5,6 +5,7 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.repository.UserLoginInfoRepository;
+import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,10 +37,12 @@ public class UserLoginInfoService {
 
     public void setEmail(UserLoginInfo userLoginInfo, String email){
         userLoginInfo.setEmail(email);
+        userLoginInfoRepository.save(userLoginInfo);
     }
 
     public void setPassword(UserLoginInfo userLoginInfo, String password){
         userLoginInfo.setPasswordHash(passwordEncoder.encode(password));
+        userLoginInfoRepository.save(userLoginInfo);
     }
 
 }
