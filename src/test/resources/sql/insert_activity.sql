@@ -1,4 +1,4 @@
--- assumed, that place event exists.
+-- assumed, that event exists.
 -- You can use insert_event.sql for this purpose
 
 insert into event (
