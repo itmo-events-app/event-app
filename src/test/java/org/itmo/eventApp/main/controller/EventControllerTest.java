@@ -26,8 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class EventControllerTest extends AbstractTestContainers {
-
-    // TODO: Add Test for event controller here
     private boolean isImageExist(String imageName) {
         try {
             minioClient.statObject(StatObjectArgs.builder()
@@ -52,6 +50,10 @@ public class EventControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_event.sql");
+//        executeSqlScript("/sql/insert_activity.sql");
+    }
+
+    private void setUpActivityData() {
         executeSqlScript("/sql/insert_activity.sql");
     }
 
@@ -62,22 +64,6 @@ public class EventControllerTest extends AbstractTestContainers {
     @AfterEach
     public void cleanUp() {
         executeSqlScript("/sql/clean_tables.sql");
-    }
-
-    @Test
-    void getAllOrFilteredEventsTest() throws Exception {
-        setUpEventData();
-        mockMvc.perform(get("/api/events")
-                        .param("title", "party")
-                        .param("format", "OFFLINE")
-                        .param("status", "PUBLISHED"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isNotEmpty())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].title").value("party"))
-                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
-                .andExpect(jsonPath("$[0].status").value("PUBLISHED"));
     }
 
     @Test
@@ -180,8 +166,25 @@ public class EventControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    void getAllOrFilteredEventsTest() throws Exception {
+        setUpEventData();
+        mockMvc.perform(get("/api/events")
+                        .param("title", "party")
+                        .param("format", "OFFLINE")
+                        .param("status", "PUBLISHED"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].title").value("party"))
+                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
+                .andExpect(jsonPath("$[0].status").value("PUBLISHED"));
+    }
+
+    @Test
     void filterActivityTest() throws Exception {
         setUpEventData();
+        setUpActivityData();
         mockMvc.perform(get("/api/events")
                         .param("parentId", "1")
                         .param("format", "OFFLINE"))
@@ -197,13 +200,15 @@ public class EventControllerTest extends AbstractTestContainers {
     @Test
     void doNotGetActivityInEventFilteringTest() throws Exception {
         setUpEventData();
+        setUpActivityData();
         mockMvc.perform(get("/api/events")
                         .param("format", "OFFLINE"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(1));
+                // Two activities from setUpEventData
+                .andExpect(jsonPath("$.length()").value(2));
     }
 
     @Test

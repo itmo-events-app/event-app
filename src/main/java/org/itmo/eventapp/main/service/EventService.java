@@ -140,7 +140,11 @@ public class EventService {
         List<Predicate> predicates = new ArrayList<>();
 
         // If parentId is null, we don't want the activities to return
-        predicates.add(cb.equal(root.get("parent_id"), parentId));
+        if (parentId == null) {
+            predicates.add(cb.isNull(root.get("parent")));
+        } else {
+            predicates.add(cb.equal(root.get("parent").get("id"), parentId));
+        }
 
         if (title != null) {
             predicates.add(cb.equal(root.get("title"), title));
