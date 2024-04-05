@@ -11,6 +11,10 @@ import java.util.List;
 
 public class TaskSpecification {
 
+    private TaskSpecification() {
+
+    }
+
     public static Specification<Task> filterByEventIdAndExtraParams(Integer eventId,
                                                                     Integer assigneeId,
                                                                     Integer assignerId,
