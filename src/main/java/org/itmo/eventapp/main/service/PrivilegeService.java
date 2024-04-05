@@ -3,6 +3,7 @@ package org.itmo.eventapp.main.service;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.entity.Privilege;
+import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
 import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.repository.PrivilegeRepository;
@@ -24,7 +25,12 @@ public class PrivilegeService {
     }
 
     public List<Privilege> getPrivilegeByType(PrivilegeType type) {
-        return privilegeRepository.findAllByType(type);
+        var privileges = privilegeRepository.findAllByType(type);
+        if (type.equals(PrivilegeType.SYSTEM)) {
+            var assignOrganizerPrivilege = privilegeRepository.findByName(PrivilegeName.ASSIGN_ORGANIZER_ROLE);
+            privileges.add(assignOrganizerPrivilege);
+        }
+        return privileges;
     }
 
     public List<Privilege> getAll() {
