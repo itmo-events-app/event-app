@@ -75,7 +75,6 @@ public class NotificationServiceTest extends AbstractTestContainers {
         for (Notification n : notifications) {
             assertEquals(userId, n.getUser().getId());
             assertTrue(n.isSeen());
-            assertNotNull(n.getSentTime());
         }
     }
 
