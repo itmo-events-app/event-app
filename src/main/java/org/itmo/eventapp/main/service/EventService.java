@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -46,6 +47,7 @@ public class EventService {
     private final UserService userService;
     private final RoleService roleService;
     private final EventRoleService eventRoleService;
+    private final TaskService taskService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -209,4 +211,42 @@ public class EventService {
     public List<EventRole> getUsersHavingRoles(Integer id) {
         return eventRoleService.findAllByEventId(id);
     }
+
+    @Transactional
+    public Event copyEvent(int id, boolean deep) {
+        Event existingEvent = findById(id);
+        Event savedEvent = copyEventByOne(existingEvent, existingEvent.getParent());
+        if (deep) {
+            List<Event> childEvents = findAllByParentId(existingEvent.getId());
+            childEvents.forEach(childEvent -> copyEventByOne(childEvent, savedEvent));
+        }
+        return savedEvent;
+    }
+
+    List<Event> findAllByParentId(Integer parentId) {
+        return  eventRepository.findAllByParent_Id(parentId);
+    }
+
+    @Transactional
+    public void saveAll(List<Event> events) {
+        eventRepository.saveAll(events);
+    }
+
+    @Transactional
+    public Event copyEventByOne(Event existingEvent, Event parentEvent) {
+        Event copiedEvent = EventMapper.eventToEvent(existingEvent, parentEvent);
+        Event savedEvent = eventRepository.save(copiedEvent);
+
+        List<EventRole> eventRoles = eventRoleService.findAllByEventId(existingEvent.getId());
+        List<EventRole> copiedEventRoles = eventRoles.stream()
+                .map(eventRole -> EventRole.builder()
+                        .event(savedEvent)
+                        .user(eventRole.getUser())
+                        .role(eventRole.getRole())
+                        .build())
+                .collect(Collectors.toList());
+        eventRoleService.saveAll(copiedEventRoles);
+        return savedEvent;
+    }
+
 }

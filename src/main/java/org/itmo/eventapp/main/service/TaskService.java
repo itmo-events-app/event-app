@@ -15,6 +15,7 @@ import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.repository.TaskRepository;
+import org.springframework.context.annotation.Lazy;
 import org.itmo.eventapp.main.service.specification.TaskSpecification;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,15 +27,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @Service
 public class TaskService {
+    @Lazy
     private final EventService eventService;
     private final UserService userService;
     private final PlaceService placeService;
@@ -251,6 +254,14 @@ public class TaskService {
         }
 
 
+    }
+
+    public Task save(Task task) {
+        return taskRepository.save(task);
+    }
+
+    List<Task> findAllByEventId(Integer eventId) {
+        return taskRepository.findAllByEventId(eventId);
     }
 
 
