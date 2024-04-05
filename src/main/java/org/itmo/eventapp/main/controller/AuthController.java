@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,14 +36,14 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PostMapping(value = "/approveRegister/{requestId}")
+    @PutMapping(value = "/approveRegister/{requestId}")
     ResponseEntity<Void> approveRegister(@PathVariable("requestId") Integer requestId) {
         // TODO: check for administrator
         authenticationService.approveRegistrationRequestCallback(requestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PostMapping(value = "/declineRegister/{requestId}")
+    @PutMapping(value = "/declineRegister/{requestId}")
     ResponseEntity<Void> declineRegister(@PathVariable("requestId") Integer requestId) {
         // TODO: check for administrator
         authenticationService.declineRegistrationRequestCallback(requestId);
