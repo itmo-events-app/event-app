@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends ListCrudRepository<Task, Integer> {
-    List<Task> findAllByNotificationDeadlineAfter(LocalDateTime dateTime);
-    List<Task> findAllByDeadlineAfter(LocalDateTime dateTime);
+    List<Task> findAllByNotificationDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime);
+    List<Task> findAllByDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime);
 }
