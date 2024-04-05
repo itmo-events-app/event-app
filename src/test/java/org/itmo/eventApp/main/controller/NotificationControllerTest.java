@@ -76,9 +76,5 @@ public class NotificationControllerTest extends AbstractTestContainers{
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.seen").value("true"));
-        assertTrue(true);
     }
-
-
-
 }
