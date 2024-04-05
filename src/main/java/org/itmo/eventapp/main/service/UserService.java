@@ -36,6 +36,11 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public User findByEmail(String email) {
+        return userRepository.findByUserLoginInfo_Email(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
+    }
+
     public void changeName(String email, UserChangeNameRequest request) {
         User user = userLoginInfoService.findByEmail(email).getUser();
         user.setName(request.name());
@@ -65,5 +70,4 @@ public class UserService {
 
         userLoginInfoService.setPassword(user.getUserLoginInfo(), request.newPassword());
     }
-
 }

@@ -176,6 +176,19 @@ public class EventService {
         eventRepository.deleteById(id);
     }
 
+    /*TODO: TEST*/
+    public boolean checkOneEvent(Event first, Event second) {
+        boolean firstParent = (second.getParent() != null) &&
+                (Objects.equals(second.getParent().getId(), first.getId()));
+        boolean firstChild = (second.getParent() == null) &&
+                (first.getParent() != null) &&
+                (Objects.equals(second.getId(), first.getParent().getId()));
+        boolean bothChildren = (second.getParent() != null) &&
+                (first.getParent() != null) &&
+                (Objects.equals(second.getParent().getId(), first.getParent().getId()));
+
+        return firstParent || firstChild || bothChildren;
+    }
     public List<EventRole> getUsersHavingRoles(Integer id) {
         return eventRoleService.findAllByEventId(id);
     }

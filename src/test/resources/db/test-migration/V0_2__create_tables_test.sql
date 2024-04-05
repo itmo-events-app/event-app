@@ -110,11 +110,12 @@ create table if not exists task
 (
     id int generated always as identity primary key not null,
     event_id integer not null references event(id),
-    assignee_id integer not null references user_t(id),
+    assignee_id integer references user_t(id),
     assigner_id integer not null references user_t(id),
     description text not null,
     status task_status not null,
     title varchar(128) not null,
+    creation_time timestamp not null,
     deadline timestamp not null,
     place_id int references place(id),
     notification_deadline timestamp not null

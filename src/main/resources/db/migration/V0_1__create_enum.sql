@@ -11,7 +11,8 @@ CREATE TYPE place_format AS ENUM (
 CREATE TYPE task_status AS ENUM (
     'NEW',
     'IN_PROGRESS',
-    'DONE'
+    'DONE',
+    'EXPIRED'
 );
 CREATE TYPE event_status AS ENUM (
     'DRAFT',
