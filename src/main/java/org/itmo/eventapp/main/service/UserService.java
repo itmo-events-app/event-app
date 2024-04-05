@@ -72,7 +72,7 @@ public class UserService {
 
         userLoginInfoService.setPassword(user.getUserLoginInfo(), request.newPassword());
     }
-    
+
     public Set<Privilege> getUserEventPrivileges(Integer userId, Integer eventId) {
         EventRole eventRole = eventRoleService.findByUserIdAndEventId(userId, eventId);
         return eventRole.getRole().getPrivileges();
