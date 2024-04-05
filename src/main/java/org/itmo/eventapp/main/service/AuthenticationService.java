@@ -35,14 +35,11 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final UserLoginInfoRepository userLoginInfoRepository;
     private final UserNotificationInfoRepository userNotificationInfoRepository;
-    private final RoleRepository roleRepository;
     private final RegistrationRequestRepository registrationRequestRepository;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
-
-    private final String defaultRole = "Читатель";
 
     @Autowired
     private MailSenderService mailSenderService;
