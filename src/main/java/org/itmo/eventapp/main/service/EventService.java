@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -46,6 +47,7 @@ public class EventService {
     private final UserService userService;
     private final RoleService roleService;
     private final EventRoleService eventRoleService;
+    private final TaskService taskService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -135,13 +137,21 @@ public class EventService {
         return updatedEvent;
     }
 
-    public List<Event> getAllOrFilteredEvents(int page, int size, String title,
+    @SuppressWarnings("java:S107")
+    public List<Event> getAllOrFilteredEvents(int page, int size, Integer parentId, String title,
                                                       LocalDateTime startDate, LocalDateTime endDate,
                                                       EventStatus status, EventFormat format) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> query = cb.createQuery(Event.class);
         Root<Event> root = query.from(Event.class);
         List<Predicate> predicates = new ArrayList<>();
+
+        // If parentId is null, we don't want the activities to return
+        if (parentId == null) {
+            predicates.add(cb.isNull(root.get("parent")));
+        } else {
+            predicates.add(cb.equal(root.get("parent").get("id"), parentId));
+        }
 
         if (title != null) {
             predicates.add(cb.equal(root.get("title"), title));
@@ -180,6 +190,10 @@ public class EventService {
         eventRepository.deleteById(id);
     }
 
+    public List<Integer> getAllSubEventIds(Integer parentId) {
+        return eventRepository.findAllByParent_Id(parentId).stream().map(Event::getId).toList();
+    }
+
     /*TODO: TEST*/
     public boolean checkOneEvent(Event first, Event second) {
         boolean firstParent = (second.getParent() != null) &&
@@ -193,7 +207,46 @@ public class EventService {
 
         return firstParent || firstChild || bothChildren;
     }
+
     public List<EventRole> getUsersHavingRoles(Integer id) {
         return eventRoleService.findAllByEventId(id);
     }
+
+    @Transactional
+    public Event copyEvent(int id, boolean deep) {
+        Event existingEvent = findById(id);
+        Event savedEvent = copyEventByOne(existingEvent, existingEvent.getParent());
+        if (deep) {
+            List<Event> childEvents = findAllByParentId(existingEvent.getId());
+            childEvents.forEach(childEvent -> copyEventByOne(childEvent, savedEvent));
+        }
+        return savedEvent;
+    }
+
+    List<Event> findAllByParentId(Integer parentId) {
+        return  eventRepository.findAllByParent_Id(parentId);
+    }
+
+    @Transactional
+    public void saveAll(List<Event> events) {
+        eventRepository.saveAll(events);
+    }
+
+    @Transactional
+    public Event copyEventByOne(Event existingEvent, Event parentEvent) {
+        Event copiedEvent = EventMapper.eventToEvent(existingEvent, parentEvent);
+        Event savedEvent = eventRepository.save(copiedEvent);
+
+        List<EventRole> eventRoles = eventRoleService.findAllByEventId(existingEvent.getId());
+        List<EventRole> copiedEventRoles = eventRoles.stream()
+                .map(eventRole -> EventRole.builder()
+                        .event(savedEvent)
+                        .user(eventRole.getUser())
+                        .role(eventRole.getRole())
+                        .build())
+                .collect(Collectors.toList());
+        eventRoleService.saveAll(copiedEventRoles);
+        return savedEvent;
+    }
+
 }
