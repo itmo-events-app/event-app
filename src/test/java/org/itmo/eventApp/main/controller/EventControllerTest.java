@@ -26,8 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class EventControllerTest extends AbstractTestContainers {
-
-    // TODO: Add Test for event controller here
     private boolean isImageExist(String imageName) {
         try {
             minioClient.statObject(StatObjectArgs.builder()
@@ -54,6 +52,10 @@ public class EventControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_event.sql");
     }
 
+    private void setUpActivityData() {
+        executeSqlScript("/sql/insert_activity.sql");
+    }
+
     private void setUpUserData() {
         executeSqlScript("/sql/insert_user.sql");
     }
@@ -61,22 +63,6 @@ public class EventControllerTest extends AbstractTestContainers {
     @AfterEach
     public void cleanUp() {
         executeSqlScript("/sql/clean_tables.sql");
-    }
-
-    @Test
-    void getAllOrFilteredEventsTest() throws Exception {
-        setUpEventData();
-        mockMvc.perform(get("/api/events")
-                        .param("title", "party")
-                        .param("format", "OFFLINE")
-                        .param("status", "PUBLISHED"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isNotEmpty())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].title").value("party"))
-                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
-                .andExpect(jsonPath("$[0].status").value("PUBLISHED"));
     }
 
     @Test
@@ -177,6 +163,53 @@ public class EventControllerTest extends AbstractTestContainers {
                 .andExpect(status().is(400));
         assertThat(eventRepository.findById(3).isEmpty()).isTrue();
     }
+
+    @Test
+    void getAllOrFilteredEventsTest() throws Exception {
+        setUpEventData();
+        mockMvc.perform(get("/api/events")
+                        .param("title", "party")
+                        .param("format", "OFFLINE")
+                        .param("status", "PUBLISHED"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].title").value("party"))
+                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
+                .andExpect(jsonPath("$[0].status").value("PUBLISHED"));
+    }
+
+    @Test
+    void filterActivityTest() throws Exception {
+        setUpEventData();
+        setUpActivityData();
+        mockMvc.perform(get("/api/events")
+                        .param("parentId", "1")
+                        .param("format", "OFFLINE"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].title").value("partys activity"))
+                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
+                .andExpect(jsonPath("$[0].status").value("PUBLISHED"));
+    }
+
+    @Test
+    void doNotGetActivityInEventFilteringTest() throws Exception {
+        setUpEventData();
+        setUpActivityData();
+        mockMvc.perform(get("/api/events")
+                        .param("format", "OFFLINE"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$").isArray())
+                // Two activities from setUpEventData
+                .andExpect(jsonPath("$.length()").value(2));
+    }
+
     @Test
     void getAllEventsTest() throws Exception {
         setUpEventData();

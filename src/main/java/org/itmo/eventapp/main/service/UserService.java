@@ -5,9 +5,9 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.request.UserChangeEmailRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
-import org.itmo.eventapp.main.model.entity.Role;
-import org.itmo.eventapp.main.model.entity.User;
-import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
+import org.itmo.eventapp.main.model.entity.*;
+import org.itmo.eventapp.main.repository.EventRoleRepository;
 import org.itmo.eventapp.main.repository.UserLoginInfoRepository;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +35,11 @@ public class UserService {
 
     public void save(User user) {
         userRepository.save(user);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByUserLoginInfo_Email(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
     public void changeName(String email, UserChangeNameRequest request) {
@@ -65,5 +71,4 @@ public class UserService {
 
         userLoginInfoService.setPassword(user.getUserLoginInfo(), request.newPassword());
     }
-
 }
