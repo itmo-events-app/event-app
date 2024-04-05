@@ -57,7 +57,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 //        privileges.add(1);
 //        privileges.add(2);
 //        privileges.add(3);
-//        privileges.add(4); // to refactor (stackOverflow)
+//        privileges.add(4); // Todo refactor (Laze + transaction -> stackOverflow problem)
         // TODO Check if name is actually unique
         RoleRequest roleRequest = new RoleRequest(
                 "Новая_Фэйк_Роль",
@@ -153,7 +153,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 //        privileges.add(1);
 //        privileges.add(2);
 //        privileges.add(3);
-//        privileges.add(4); // to refactor (stackOverflow)
+//        privileges.add(4); // Todo refactor (Laze + transaction -> stackOverflow problem)
         RoleRequest roleRequest = new RoleRequest(
                 "Фэйк_Роль_1",
                 "Фэйк_Описание",
@@ -204,7 +204,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 //        privileges.add(1);
 //        privileges.add(2);
 //        privileges.add(3);
-//        privileges.add(4); // to refactor (stackOverflow)
+//        privileges.add(4); // Todo refactor (Laze + transaction -> stackOverflow problem)
 
         RoleRequest roleRequest = new RoleRequest(
                 "Фэйк_Роль_1",
@@ -316,6 +316,112 @@ public class RoleServiceTest extends AbstractTestContainers {
                 exception.getReason()); // to refactor
     }
 
+    @Test
+    @DisplayName("[getOrganizational] (Neg) Getting not created organizational roles")
+    public void getOrganizationalNotCreatedRolesTest() {
+        List<Role> roles = roleService.getOrganizational();
+
+        roles.forEach(role ->
+                assertNotEquals(role.getType(), RoleType.EVENT));
+    }
+
+    @Test
+    @DisplayName("[getOrganizational] (Pos) Getting all organizational roles")
+    public void getOrganizationalRolesTest() {
+        insertBasicFilling();
+
+        List<Role> roles = roleService.getOrganizational();
+
+        long eventRoleCount = roles.stream()
+                .filter(role -> role.getType().equals(RoleType.EVENT))
+                .count();
+
+        assertNotEquals(0, eventRoleCount);
+    }
+
+    @Test
+    @DisplayName("[searchByName]-(Pos) Getting basic roles by name")
+    public void searchByNameTest() {
+        insertBasicFilling();
+
+        List<Role> adminRoles = roleService.searchByName(basicRolesNames.get(0));
+        assertNotNull(adminRoles);
+        assertFalse(adminRoles.isEmpty());
+        adminRoles.forEach(adminRole -> assertAll(
+                () -> assertEquals(basicRolesNames.get(0), adminRole.getName()),
+                () -> assertEquals("Имеет полный доступ к системе", adminRole.getDescription()),
+                () -> assertEquals(RoleType.SYSTEM, adminRole.getType())
+        ));
+
+        List<Role> readerRoles = roleService.searchByName(basicRolesNames.get(1));
+        assertNotNull(readerRoles);
+        assertFalse(readerRoles.isEmpty());
+        readerRoles.forEach(readerRole -> assertAll(
+                () -> assertEquals(basicRolesNames.get(1), readerRole.getName()),
+                () -> assertEquals("Базовая пользовательская система", readerRole.getDescription()),
+                () -> assertEquals(RoleType.SYSTEM, readerRole.getType())
+        ));
+
+        List<Role> organizerRoles = roleService.searchByName(basicRolesNames.get(2));
+        assertNotNull(organizerRoles);
+        assertFalse(organizerRoles.isEmpty());
+        organizerRoles.forEach(organizerRole -> assertAll(
+                () -> assertEquals(basicRolesNames.get(2), organizerRole.getName()),
+                () -> assertEquals("Организатор мероприятия", organizerRole.getDescription()),
+                () -> assertEquals(RoleType.EVENT, organizerRole.getType())
+        ));
+
+        List<Role> assistantRoles = roleService.searchByName(basicRolesNames.get(3));
+        assertNotNull(assistantRoles);
+        assertFalse(assistantRoles.isEmpty());
+        assistantRoles.forEach(assistantRole -> assertAll(
+                () -> assertEquals(basicRolesNames.get(3), assistantRole.getName()),
+                () -> assertEquals("Помощь в мероприятиях", assistantRole.getDescription()),
+                () -> assertEquals(RoleType.EVENT, assistantRole.getType())
+        ));
+    }
+
+    // TODO test assignSystemRole
+
+    // TODO test revokeSystemRole
+
+    @Test
+    @DisplayName("[findByName]-(Pos) Getting basic roles by name")
+    public void findRoleByNameTest() {
+        insertBasicFilling();
+
+        Role adminRole = roleService.findByName(basicRolesNames.get(0));
+        assertNotNull(adminRole);
+        assertAll(
+                () -> assertEquals(basicRolesNames.get(0), adminRole.getName()),
+                () -> assertEquals("Имеет полный доступ к системе", adminRole.getDescription()),
+                () -> assertEquals(RoleType.SYSTEM, adminRole.getType())
+        );
+
+        Role readerRoles = roleService.findByName(basicRolesNames.get(1));
+        assertNotNull(readerRoles);
+        assertAll(
+                () -> assertEquals(basicRolesNames.get(1), readerRoles.getName()),
+                () -> assertEquals("Базовая пользовательская система", readerRoles.getDescription()),
+                () -> assertEquals(RoleType.SYSTEM, readerRoles.getType())
+        );
+
+        Role organizerRoles = roleService.findByName(basicRolesNames.get(2));
+        assertNotNull(organizerRoles);
+        assertAll(
+                () -> assertEquals(basicRolesNames.get(2), organizerRoles.getName()),
+                () -> assertEquals("Организатор мероприятия", organizerRoles.getDescription()),
+                () -> assertEquals(RoleType.EVENT, organizerRoles.getType())
+        );
+
+        Role assistantRoles = roleService.findByName(basicRolesNames.get(3));
+        assertNotNull(assistantRoles);
+        assertAll(
+                () -> assertEquals(basicRolesNames.get(3), assistantRoles.getName()),
+                () -> assertEquals("Помощь в мероприятиях", assistantRoles.getDescription()),
+                () -> assertEquals(RoleType.EVENT, assistantRoles.getType())
+        );
+    }
 
     private void insertFilling() {
         executeSqlScript("/sql/insert_roles.sql");
