@@ -1,9 +1,14 @@
 package org.itmo.eventApp.main.controller;
 
+import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.repository.NotificationRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
+
+import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -14,6 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NotificationControllerTest extends AbstractTestContainers{
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     private void databaseFilling(){
         executeSqlScript("/sql/insert_user.sql");
@@ -62,6 +69,10 @@ public class NotificationControllerTest extends AbstractTestContainers{
                 .andExpect(jsonPath("$[1].id").value("2"))
                 .andExpect(jsonPath("$[0].seen").value("true"))
                 .andExpect(jsonPath("$[1].seen").value("true"));
+        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationRepository.getAllByUserId(1, null);
+        for (Notification n : notifications) {
+            assertTrue(n.isSeen());
+        }
     }
 
     @Test
@@ -76,5 +87,7 @@ public class NotificationControllerTest extends AbstractTestContainers{
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.seen").value("true"));
+        Notification notification = notificationRepository.findById(1).get();
+        assertTrue(notification.isSeen());
     }
 }
