@@ -2,7 +2,6 @@ package org.itmo.eventapp.main.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
@@ -101,7 +100,7 @@ public class RoleController {
     public ResponseEntity<Void> assignOrganizationalRole(
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
             @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer eventId,
-            @RequestBody Integer roleId) {
+            @Positive(message = "Параметр roleId не может быть меньше 1!") @RequestBody Integer roleId) {
         eventRoleService.assignOrganizationalRole(userId, roleId, eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -129,7 +128,7 @@ public class RoleController {
     public ResponseEntity<Void> revokeOrganizationalRole(
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
             @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer eventId,
-            @RequestBody Integer roleId) {
+            @Positive(message = "Параметр roleId не может быть меньше 1!") @RequestBody Integer roleId) {
         eventRoleService.revokeOrganizationalRole(userId, roleId, eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
