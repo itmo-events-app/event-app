@@ -6,6 +6,7 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.repository.NotificationRepository;
+import org.itmo.eventapp.main.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +22,12 @@ import java.util.List;
 @Service
 public class NotificationService {
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
-    public void createNotification(String title, String description, @NotNull User user) {
-        //todo add exception throw if user not exist somehow
+    public void createNotification(String title, String description, Integer userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new EntityNotFoundException("User not found!(" + userId + ")"));
 
         notificationRepository.save(Notification.builder()
                 .user(user)
@@ -34,13 +38,13 @@ public class NotificationService {
                 .build());
     }
 
-    public Notification updateToSeen(Integer notificationId, User user) {
+    public Notification updateToSeen(Integer notificationId, Integer userId) {
 
         Notification notification = notificationRepository
                 .findById(notificationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.NOTIFICATION_ERROR_MESSAGE));
 
-        if (!notification.getUser().getId().equals(user.getId())) {
+        if (!notification.getUser().getId().equals(userId)) {
             // abort operation if user id mismatch
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.NOTIFICATION_ERROR_MESSAGE);
         }
@@ -50,15 +54,15 @@ public class NotificationService {
         return notification;
     }
 
-    public List<Notification> updateSeenToAllByUserId(@NotNull User user, Integer page, Integer size) {
-        notificationRepository.updateAllSeenByUserId(user.getId());
+    public List<Notification> updateSeenToAllByUserId(@NotNull Integer userId, Integer page, Integer size) {
+        notificationRepository.updateAllSeenByUserId(userId);
         Pageable pageRequest = PageRequest.of(page, size, Sort.by("sentTime").descending());
-        return notificationRepository.getAllByUserId(user.getId(), pageRequest);
+        return notificationRepository.getAllByUserId(userId, pageRequest);
     }
 
-    public List<Notification> getAllByUserId(@NotNull User user, Integer page, Integer size) {
+    public List<Notification> getAllByUserId(@NotNull Integer userId, Integer page, Integer size) {
         Pageable pageRequest = PageRequest.of(page, size, Sort.by("sentTime").descending());
-        return notificationRepository.getAllByUserId(user.getId(), pageRequest);
+        return notificationRepository.getAllByUserId(userId, pageRequest);
     }
 
     public void deleteNotification(Integer notificationId) {

@@ -35,7 +35,7 @@ public class NotificationServiceTest extends AbstractTestContainers {
         dummyUser.setId(userId);
         Integer notificationId = 1;
 
-        Notification afterUpdate = notificationService.updateToSeen(notificationId, dummyUser);
+        Notification afterUpdate = notificationService.updateToSeen(notificationId, userId);
 
         assertTrue(afterUpdate.isSeen());
         assertNotNull(afterUpdate.getSentTime());
@@ -45,13 +45,11 @@ public class NotificationServiceTest extends AbstractTestContainers {
     void getAllByUserIdWithCorrectDataTest(){
         databaseFilling();
 
-        User dummyUser = new User();
         Integer userId = 1;
-        dummyUser.setId(userId);
         Integer page = 0;
         Integer size = 1;
 
-        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.getAllByUserId(dummyUser, page, size);
+        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.getAllByUserId(userId, page, size);
 
         assertFalse(notifications.isEmpty());
 
@@ -66,13 +64,11 @@ public class NotificationServiceTest extends AbstractTestContainers {
     void seenAllByUserIdWithCorrectDataTest(){
         databaseFilling();
 
-        User dummyUser = new User();
         Integer userId = 1;
-        dummyUser.setId(userId);
         Integer page = 0;
         Integer size = 1;
 
-        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.updateSeenToAllByUserId(dummyUser, page, size);
+        ArrayList<Notification> notifications = (ArrayList<Notification>) notificationService.updateSeenToAllByUserId(userId, page, size);
 
         assertFalse(notifications.isEmpty());
 
@@ -87,14 +83,12 @@ public class NotificationServiceTest extends AbstractTestContainers {
     void createNotificationWithCorrectDataTest(){
         databaseFilling();
 
-        User dummyUser = new User();
         Integer userId = 1;
-        dummyUser.setId(userId);
         String title = "TestTitle";
         String description = "TestDescription";
         Integer notificationId = 5;
 
-        notificationService.createNotification(title, description, dummyUser);
+        notificationService.createNotification(title, description, userId);
 
         Notification afterCreate = notificationRepository.findById(notificationId).get();
 
