@@ -21,6 +21,8 @@ import java.util.List;
 @Component
 public class TaskNotificationUtils {
 
+
+    private final TaskNotificationUtils taskNotificationUtils;
     private final MailSenderService mailSenderService;
 
     private final NotificationService notificationService;
@@ -108,7 +110,7 @@ public class TaskNotificationUtils {
         List<Task> overdueTasks = getTasksWithDeadlineBetween(startTime, endTime);
 
         for (Task task: overdueTasks) {
-            createOverdueTaskNotification(task);
+            taskNotificationUtils.createOverdueTaskNotification(task);
         }
     }
 
@@ -120,7 +122,7 @@ public class TaskNotificationUtils {
         List<Task> overdueTasks = getTasksWithNotificationDeadlineBetween(startTime, endTime);
 
         for (Task task: overdueTasks) {
-            createReminderTaskNotification(task);
+            taskNotificationUtils.createReminderTaskNotification(task);
         }
     }
 
