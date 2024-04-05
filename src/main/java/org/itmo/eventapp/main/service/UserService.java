@@ -24,8 +24,6 @@ public class UserService {
 
     private final UserLoginInfoService userLoginInfoService;
 
-    private final EventRoleRepository eventRoleRepository;
-
     public User findById(Integer id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
@@ -72,11 +70,5 @@ public class UserService {
         }
 
         userLoginInfoService.setPassword(user.getUserLoginInfo(), request.newPassword());
-    }
-
-    public Set<Privilege> getUserEventPrivileges(Integer userId, Integer eventId) {
-        EventRole eventRole = eventRoleRepository.findByUserIdAndEventId(userId, eventId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
-        return eventRole.getRole().getPrivileges();
     }
 }
