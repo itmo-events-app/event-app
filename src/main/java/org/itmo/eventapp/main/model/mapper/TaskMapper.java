@@ -16,6 +16,7 @@ public final class TaskMapper {
     public static TaskResponse taskToTaskResponse(Task task) {
         return new TaskResponse(
                 task.getId(),
+                task.getEvent().getId(),
                 task.getTitle(),
                 task.getDescription(),
                 task.getStatus(),
