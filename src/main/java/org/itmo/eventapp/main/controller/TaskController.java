@@ -9,16 +9,20 @@ import org.itmo.eventapp.main.model.dto.request.TaskFilterRequest;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Task;
+import org.itmo.eventapp.main.model.entity.enums.EventFormat;
+import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.service.TaskService;
 import org.itmo.eventapp.main.service.UserService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -150,27 +154,72 @@ public class TaskController {
     public ResponseEntity<List<TaskResponse>> taskListShowInEvent(
             @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
             @PathVariable Integer eventId,
-            @Valid @RequestBody TaskFilterRequest filter
+            @RequestParam(required = false) Integer assigneeId,
+            @RequestParam(required = false) Integer assignerId,
+            @RequestParam(required = false) TaskStatus taskStatus,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineLowerLimit,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineUpperLimit,
+            @RequestParam(required = false, defaultValue = "false") Boolean subEventTasksGet
     ) {
-        List<Task> eventTasks = taskService.getEventTasksWithFilter(eventId, filter);
-        // apply filtering in db - ???
+        List<Task> eventTasks =
+                taskService.getEventTasksWithFilter(eventId,
+                        assigneeId,
+                        assignerId,
+                        taskStatus,
+                        deadlineLowerLimit,
+                        deadlineUpperLimit,
+                        subEventTasksGet);
         return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(eventTasks));
     }
 
     @GetMapping("/event/{eventId}/where-assignee")
     public ResponseEntity<List<TaskResponse>> taskListShowInEventWhereAssignee(
             @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
-            @PathVariable Integer eventId
+            @PathVariable Integer eventId,
+            @RequestParam(required = false) Integer assignerId,
+            @RequestParam(required = false) TaskStatus taskStatus,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineLowerLimit,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineUpperLimit,
+            @RequestParam(required = false, defaultValue = "false") Boolean subEventTasksGet
     ) {
-        List<Task> eventUserTasks = new ArrayList<>();
-        // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+
+        Integer userId = userService.findByEmail(currentPrincipalName).getId();
+
+        List<Task> eventUserTasks =
+                taskService.getEventTasksWithFilter(eventId,
+                        userId,
+                        assignerId,
+                        taskStatus,
+                        deadlineLowerLimit,
+                        deadlineUpperLimit,
+                        subEventTasksGet);
+
         return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(eventUserTasks));
     }
 
     @GetMapping("/where-assignee")
-    public ResponseEntity<List<TaskResponse>> taskListShowWhereAssignee() {
-        List<Task> userTasks = new ArrayList<>();
-        // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
+    public ResponseEntity<List<TaskResponse>> taskListShowWhereAssignee(
+            @RequestParam(required = false) Integer eventId,
+            @RequestParam(required = false) Integer assignerId,
+            @RequestParam(required = false) TaskStatus taskStatus,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineLowerLimit,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineUpperLimit
+            ) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+
+        Integer userId = userService.findByEmail(currentPrincipalName).getId();
+
+        List<Task> userTasks = taskService.getUserTasksWithFilter(eventId,
+                userId,
+                assignerId,
+                taskStatus,
+                deadlineLowerLimit,
+                deadlineUpperLimit);
         return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(userTasks));
     }
 

@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.*;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
@@ -21,6 +22,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +60,10 @@ class EventServiceTest {
 
     @Mock
     private MinioService minioService;
+    @Mock
+    private TaskService taskService;
+    @Mock
+    private EventRoleService eventRoleService;
     @Mock
     private TypedQuery<Event> typedQuery;
 
@@ -158,5 +164,57 @@ class EventServiceTest {
         assertThrows(ResponseStatusException.class, () -> eventService.getEventById(eventId));
         verify(eventRepository).deleteById(eventId);
         verify(eventRepository, times(1)).deleteById(eventId);
+    }
+
+    @Test
+    void testCopyEventNoChilds() {
+        Event existingEvent = Event.builder()
+                .id(1).title("Existing event")
+                .startDate(LocalDateTime.of(2024, 4, 1, 10, 0))
+                .endDate(LocalDateTime.of(2024, 4, 2, 10, 0))
+                .build();
+        when(eventRepository.findById(1)).thenReturn(Optional.of(existingEvent));
+        when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
+            Event event = invocation.getArgument(0);
+            event.setId(2);
+            return event;
+        });
+        Event copiedEvent = eventService.copyEvent(1, false);
+
+        verify(eventRepository).save(any(Event.class));
+        assertEquals(copiedEvent.getId(), 2);
+        assertEquals(existingEvent.getStartDate(), copiedEvent.getStartDate());
+        assertEquals(existingEvent.getEndDate(), copiedEvent.getEndDate());
+        assertEquals(existingEvent.getTitle(), copiedEvent.getTitle());
+    }
+    @Test
+    void testCopyEvent() {
+        int[] startingId = new int[]{1};
+        Event existingEvent = Event.builder()
+                .id(startingId[0]++)
+                .build();
+        Event childEvent = Event.builder()
+                .id(startingId[0]++)
+                .build();
+        List<Event> childEvents = new ArrayList<>();
+        childEvents.add(childEvent);
+        when(eventRepository.findById(1)).thenReturn(Optional.of(existingEvent));
+        when(eventRepository.findAllByParent_Id(1)).thenReturn(childEvents);
+        when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
+            Event event = invocation.getArgument(0);
+            event.setId(startingId[0]++);
+            return event;
+        });
+        Event copiedEvent = eventService.copyEvent(1, true);
+
+        verify(eventRepository,times(2)).save(any(Event.class));
+        assertEquals(startingId[0], 5);
+        assertNotEquals(existingEvent.getId(), copiedEvent.getId());
+    }
+    @Test
+    void testCopyEventNotFound() {
+        when(eventRepository.findById(1)).thenReturn(Optional.empty());
+        assertThrows(ResponseStatusException.class, () -> eventService.copyEvent(1, true));
+        verify(eventRepository, never()).save(any(Event.class));
     }
 }
