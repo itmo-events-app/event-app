@@ -38,14 +38,14 @@ public class RoleService {
 
     @Transactional
     public Role editRole(Integer id, RoleRequest roleRequest) {
-        if (basicRoles.contains(roleRequest.name()))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно изменить эту роль");
-        var role = roleRepository.findByName(roleRequest.name()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Роли с id %d не существует", id)));
-        if (!role.getId().equals(id)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Роль с таким именем уже существует");
-
         var editedRole = roleRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Роли с id %d не существует", id)));
-
+        if (basicRoles.contains(editedRole.getName()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно изменить эту роль");
+        var role = roleRepository.findByName(roleRequest.name());
+        if (role.isPresent() && !role.get().getId().equals(id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Роль с таким именем уже существует");
+        }
         editedRole.setName(roleRequest.name());
         editedRole.setDescription(roleRequest.description());
         editedRole.setType(roleRequest.isEvent() ? RoleType.EVENT : RoleType.SYSTEM);
@@ -53,8 +53,7 @@ public class RoleService {
         roleRequest.privileges().stream()
                 .map(privilegeService::findById)
                 .forEach(editedRole::addPrivilege);
-        roleRepository.save(editedRole);
-        return editedRole;
+        return roleRepository.save(editedRole);
     }
 
     @Transactional
@@ -125,6 +124,4 @@ public class RoleService {
     public Role getOrganizerRole() {
         return findByName("Организатор");
     }
-
-
 }
