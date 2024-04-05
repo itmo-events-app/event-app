@@ -41,8 +41,7 @@ public class RoleService {
 
     @Transactional
     public Role editRole(Integer id, RoleRequest roleRequest) {
-        var editedRole = roleRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Роли с id %d не существует", id)));
+        var editedRole = findRoleById(id);
         if (basicRoles.contains(editedRole.getName()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно изменить эту роль");
         var role = roleRepository.findByName(roleRequest.name());
@@ -82,7 +81,7 @@ public class RoleService {
 
     public Role findRoleById(Integer id) {
         return roleRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.ROLE_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Роли с id %d не существует", id)));
     }
 
     public List<Role> getOrganizational() {
@@ -109,7 +108,7 @@ public class RoleService {
         var user = userService.findById(userId);
         var userWithEmail = userLoginInfoService.findByEmail(email);
         if (userWithEmail.getUser().getId().equals(userId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно назначить роль себе");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно лишить роли себя");
         user.setRole(getReaderRole());
         userService.save(user);
     }
