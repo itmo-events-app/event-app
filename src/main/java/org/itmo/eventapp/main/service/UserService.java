@@ -7,6 +7,7 @@ import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.entity.*;
+import org.itmo.eventapp.main.repository.EventRoleRepository;
 import org.itmo.eventapp.main.repository.UserLoginInfoRepository;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class UserService {
 
     private final UserLoginInfoService userLoginInfoService;
 
-    private final EventRoleService eventRoleService;
+    private final EventRoleRepository eventRoleRepository;
 
     public User findById(Integer id) {
         return userRepository.findById(id)
@@ -74,7 +75,8 @@ public class UserService {
     }
 
     public Set<Privilege> getUserEventPrivileges(Integer userId, Integer eventId) {
-        EventRole eventRole = eventRoleService.findByUserIdAndEventId(userId, eventId);
+        EventRole eventRole = eventRoleRepository.findByUserIdAndEventId(userId, eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
         return eventRole.getRole().getPrivileges();
     }
 }
