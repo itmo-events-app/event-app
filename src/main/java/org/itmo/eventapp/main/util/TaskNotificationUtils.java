@@ -31,11 +31,11 @@ public class TaskNotificationUtils {
 
     private final TaskRepository taskRepository;
 
-    @Value(value = "${notifications.baseUrl}${notifications.taskUrl}")
-    private final String TASK_FULL_URL;
+    @Value(value = "${notifications.taskUrl}")
+    private String TASK_FULL_URL;
 
     @Value(value = "${notifications.cron.sending-period-in-minutes}")
-    private final Integer SENDING_PERIOD_IN_MINUTES;
+    private Integer SENDING_PERIOD_IN_MINUTES;
 
     @Async
     public void createIncomingTaskNotification(Task task){
@@ -134,6 +134,7 @@ public class TaskNotificationUtils {
 
     @Scheduled(cron = "${notifications.cron.create-notification-job}")
     public void sendNotificationsOnDeadline(){
+        System.out.println("DEADLINE JOB STARTED:" + LocalDateTime.now().toString());
         LocalDateTime endTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
         LocalDateTime startTime = endTime.minusMinutes(SENDING_PERIOD_IN_MINUTES);
 
@@ -152,7 +153,7 @@ public class TaskNotificationUtils {
         List<Task> overdueTasks = getTasksWithNotificationDeadlineBetween(startTime, endTime);
 
         for (Task task: overdueTasks) {
-            createOverdueTaskNotification(task);
+            createReminderTaskNotification(task);
         }
     }
 

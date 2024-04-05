@@ -43,7 +43,6 @@ springdoc:
 
 notifications:
   cron:
-    create-notification-job: "*/15 * * * *"
+    create-notification-job: '0 0/15 * * * *'
     sending-period-in-minutes: 15
-  baseUrl: "http://localhost:8080"
-  taskUrl: "/task/"
+  taskUrl: 'http://localhost:8080/task/'
