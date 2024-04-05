@@ -6,6 +6,7 @@ import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
+import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
 import org.itmo.eventapp.main.model.entity.enums.EmailStatus;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
 import org.itmo.eventapp.main.repository.*;
@@ -145,7 +146,15 @@ public class AuthenticationService {
         } catch (MessagingException | IOException e) {}
     }
 
-    public List<RegistrationRequest> listRegisterRequestsCallback() {
-        return registrationRequestRepository.getRegistrationRequestsByStatus(RegistrationRequestStatus.NEW);
+    public List<RegistrationRequestForAdmin> listRegisterRequestsCallback() {
+        return registrationRequestRepository.getRegistrationRequestsByStatus(RegistrationRequestStatus.NEW)
+                .stream()
+                .map((request) -> new RegistrationRequestForAdmin(
+                        request.getEmail(),
+                        request.getName(),
+                        request.getSurname(),
+                        request.getStatus(),
+                        request.getSentTime()))
+                .toList();
     }
 }
