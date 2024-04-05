@@ -167,26 +167,54 @@ class EventServiceTest {
     }
 
     @Test
-    void testCopyEvent() {
-        Event existingEvent = new Event();
-        existingEvent.setId(1);
-        existingEvent.setStartDate(LocalDateTime.of(2024, 4, 1, 10, 0));
-        existingEvent.setEndDate(LocalDateTime.of(2024, 4, 2, 10, 0));
-        existingEvent.setTitle("Title");
-
+    void testCopyEventNoChilds() {
+        Event existingEvent = Event.builder()
+                .id(1).title("Existing event")
+                .startDate(LocalDateTime.of(2024, 4, 1, 10, 0))
+                .endDate(LocalDateTime.of(2024, 4, 2, 10, 0))
+                .build();
         when(eventRepository.findById(1)).thenReturn(Optional.of(existingEvent));
         when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
             Event event = invocation.getArgument(0);
             event.setId(2);
             return event;
         });
-
-        Event copiedEvent = eventService.copyEvent(1, true);
+        Event copiedEvent = eventService.copyEvent(1, false);
 
         verify(eventRepository).save(any(Event.class));
-
+        assertEquals(copiedEvent.getId(), 2);
         assertEquals(existingEvent.getStartDate(), copiedEvent.getStartDate());
         assertEquals(existingEvent.getEndDate(), copiedEvent.getEndDate());
         assertEquals(existingEvent.getTitle(), copiedEvent.getTitle());
+    }
+    @Test
+    void testCopyEvent() {
+        int[] startingId = new int[]{1};
+        Event existingEvent = Event.builder()
+                .id(startingId[0]++)
+                .build();
+        Event childEvent = Event.builder()
+                .id(startingId[0]++)
+                .build();
+        List<Event> childEvents = new ArrayList<>();
+        childEvents.add(childEvent);
+        when(eventRepository.findById(1)).thenReturn(Optional.of(existingEvent));
+        when(eventRepository.findAllByParentId(1)).thenReturn(childEvents);
+        when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
+            Event event = invocation.getArgument(0);
+            event.setId(startingId[0]++);
+            return event;
+        });
+        Event copiedEvent = eventService.copyEvent(1, true);
+
+        verify(eventRepository,times(2)).save(any(Event.class));
+        assertEquals(startingId[0], 5);
+        assertNotEquals(existingEvent.getId(), copiedEvent.getId());
+    }
+    @Test
+    void testCopyEventNotFound() {
+        when(eventRepository.findById(1)).thenReturn(Optional.empty());
+        assertThrows(ResponseStatusException.class, () -> eventService.copyEvent(1, true));
+        verify(eventRepository, never()).save(any(Event.class));
     }
 }

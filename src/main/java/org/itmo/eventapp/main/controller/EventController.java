@@ -90,6 +90,7 @@ public class EventController {
         return ResponseEntity.ok().body(EventRoleMapper.eventRolesToUserRoleResponses(eventRoles));
     }
 
+    // TODO: Add privilege validation
     @PostMapping("/{id}/copy")
     public ResponseEntity<Integer> copyEvent(
             @Min(1) @PathVariable("id") Integer id,

@@ -96,4 +96,9 @@ public class EventRoleService {
     List<EventRole> findAllByEventId(Integer eventId) {
         return  eventRoleRepository.findAllByEventId(eventId);
     }
+
+    @Transactional
+    public void saveAll(List<EventRole> eventRoles) {
+        eventRoleRepository.saveAll(eventRoles);
+    }
 }

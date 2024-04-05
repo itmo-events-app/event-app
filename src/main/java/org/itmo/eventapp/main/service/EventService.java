@@ -207,8 +207,30 @@ public class EventService {
         return eventRoleService.findAllByEventId(id);
     }
 
+    @Transactional
     public Event copyEvent(int id, boolean deep) {
         Event existingEvent = findById(id);
+        Event savedEvent = copyEventByOne(existingEvent, existingEvent.getParent());
+        if (deep) {
+            List<Event> childEvents = findAllByParentId(existingEvent.getId());
+            for (Event childEvent : childEvents) {
+                copyEventByOne(childEvent, savedEvent);
+            }
+        }
+        return savedEvent;
+    }
+
+    List<Event> findAllByParentId(Integer parentId) {
+        return  eventRepository.findAllByParentId(parentId);
+    }
+
+    @Transactional
+    public void saveAll(List<Event> events) {
+        eventRepository.saveAll(events);
+    }
+
+    @Transactional
+    public Event copyEventByOne(Event existingEvent, Event parentEvent) {
         Event copiedEvent = Event.builder()
                 .place(existingEvent.getPlace())
                 .startDate(existingEvent.getStartDate())
@@ -220,7 +242,7 @@ public class EventService {
                 .status(existingEvent.getStatus())
                 .registrationStart(existingEvent.getRegistrationStart())
                 .registrationEnd(existingEvent.getRegistrationEnd())
-                .parent(existingEvent)
+                .parent(parentEvent)
                 .participantLimit(existingEvent.getParticipantLimit())
                 .participantAgeLowest(existingEvent.getParticipantAgeLowest())
                 .participantAgeHighest(existingEvent.getParticipantAgeHighest())
@@ -229,19 +251,16 @@ public class EventService {
                 .build();
         Event savedEvent = eventRepository.save(copiedEvent);
 
-        if (deep) {
-            List<EventRole> eventRoles = eventRoleService.findAllByEventId(existingEvent.getId());
-            for (EventRole eventRole : eventRoles) {
-                EventRole copiedEventRole = EventRole.builder()
+        List<EventRole> eventRoles = eventRoleService.findAllByEventId(existingEvent.getId());
+        List<EventRole> copiedEventRoles = eventRoles.stream()
+                .map(eventRole -> EventRole.builder()
                         .event(savedEvent)
                         .user(eventRole.getUser())
                         .role(eventRole.getRole())
-                        .build();
-                eventRoleService.save(copiedEventRole);
-            }
-            List<Integer> taskIds = taskService.findAllByEventId(existingEvent.getId()).stream().map(Task::getId).collect(Collectors.toList());
-            taskService.copyTasks(savedEvent.getId(),taskIds);
-        }
+                        .build())
+                .collect(Collectors.toList());
+        eventRoleService.saveAll(copiedEventRoles);
         return savedEvent;
     }
+
 }
