@@ -38,18 +38,21 @@ public class ProfileController {
 
     private final EventRoleService eventRoleService;
 
+    @Operation(summary = "Смена имени пользователя")
     @PutMapping("/change-name")
     public ResponseEntity<Void> changeName(Authentication authentication, @Valid @RequestBody UserChangeNameRequest request) {
         userService.changeName(authentication.getName(), request);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Смена email пользователя")
     @PutMapping("/change-email")
     public ResponseEntity<Void> changeEmail(Authentication authentication, @Valid @RequestBody UserChangeEmailRequest request) {
         userService.changeEmail(authentication.getName(), request);
         return ResponseEntity.ok().build();
     }
-    
+
+    @Operation(summary = "Смена пароля пользователя")
     @PutMapping("/change-password")
     public ResponseEntity<Void> changePassword(Authentication authentication, @Valid @RequestBody UserChangePasswordRequest request) {
         userService.changePassword(authentication.getName(), request);
@@ -66,6 +69,7 @@ public class ProfileController {
                 PrivilegeMapper.privilegesToPrivilegeResponseList(eventRoleService.getUserEventPrivileges(userId, id)));
     }
 
+    @Operation(summary = "Получение списка системных привилегий пользователя")
     @GetMapping("/system-privileges")
     public ResponseEntity<List<PrivilegeResponse>> getUserSystemPrivileges(
             @AuthenticationPrincipal UserLoginInfo userDetails) {

@@ -149,8 +149,10 @@ public class ProfileControllerTest extends AbstractTestContainers {
     public void testGetBaseInfo() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
-        mockMvc.perform(get("/api/profile/system-privileges"))
+        mockMvc.perform(get("/api/profile/system-privileges")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(22));
     }
 }
