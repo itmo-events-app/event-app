@@ -3,6 +3,8 @@ package org.itmo.eventapp.main.exceptionhandling;
 public class ExceptionConst {
     public static final String EVENT_NOT_FOUND_MESSAGE = "Event not found";
     public static final String EVENT_PARENT_NOT_FOUND_MESSAGE = "Event's parent not found";
+
+    public static final String ACTIVITY_RECURSION = "Cannot create activity for another activity";
     public static final String PLACE_NOT_FOUND_MESSAGE = "Place not found";
     public static final String ROLE_NOT_FOUND_MESSAGE = "Role not found";
     public static final String USER_NOT_FOUND_MESSAGE = "User not found";
