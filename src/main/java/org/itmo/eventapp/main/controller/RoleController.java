@@ -15,6 +15,7 @@ import org.itmo.eventapp.main.service.PrivilegeService;
 import org.itmo.eventapp.main.service.RoleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -154,17 +155,19 @@ public class RoleController {
     @Operation(summary = "Назначение пользователю системной роли")
     @PutMapping("/system/{userId}")
     public ResponseEntity<Void> assignSystemRole(
+            Authentication authentication,
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
             @Positive(message = "Параметр eventId не может быть меньше 1!") @RequestBody Integer roleId) {
-        roleService.assignSystemRole(userId, roleId);
+        roleService.assignSystemRole(authentication.getName(), userId, roleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Лишение пользователя системной роли")
     @PutMapping("/system-revoke/{userId}")
     public ResponseEntity<Void> revokeSystemRole(
+            Authentication authentication,
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId) {
-        roleService.revokeSystemRole(userId);
+        roleService.revokeSystemRole(authentication.getName(), userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

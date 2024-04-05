@@ -26,6 +26,7 @@ public class RoleService {
     private final UserService userService;
     private final List<String> basicRoles = Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
     private final EventRoleRepository eventRoleRepository;
+    private final UserLoginInfoService userLoginInfoService;
 
     @Transactional
     public Role createRole(RoleRequest roleRequest) {
@@ -92,8 +93,11 @@ public class RoleService {
         return roleRepository.findByNameContainingIgnoreCase(name);
     }
 
-    public void assignSystemRole(Integer userId, Integer roleId) {
+    public void assignSystemRole(String email, Integer userId, Integer roleId) {
         var user = userService.findById(userId);
+        var userWithEmail = userLoginInfoService.findByEmail(email);
+        if (userWithEmail.getUser().getId().equals(userId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно назначить роль себе");
         var role = findRoleById(roleId);
         if (role.getType().equals(RoleType.EVENT))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Неверный тип роли: ожидалась системная роль");
@@ -101,8 +105,11 @@ public class RoleService {
         userService.save(user);
     }
 
-    public void revokeSystemRole(Integer userId) {
+    public void revokeSystemRole(String email, Integer userId) {
         var user = userService.findById(userId);
+        var userWithEmail = userLoginInfoService.findByEmail(email);
+        if (userWithEmail.getUser().getId().equals(userId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно назначить роль себе");
         user.setRole(getReaderRole());
         userService.save(user);
     }
