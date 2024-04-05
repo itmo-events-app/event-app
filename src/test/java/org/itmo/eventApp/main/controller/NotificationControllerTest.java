@@ -15,14 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class NotificationControllerTest extends AbstractTestContainers{
 
-    //todo make this work
     private void databaseFilling(){
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_notifications.sql");
     }
 
-    private UserLoginInfo getUserLoginInfo(Integer userId){
+    private UserLoginInfo getUserLoginInfo(){
         UserLoginInfo userDetails = new UserLoginInfo();
         User dummyUser = new User();
         dummyUser.setId(1);
@@ -38,7 +37,7 @@ public class NotificationControllerTest extends AbstractTestContainers{
         mockMvc.perform(get("/api/notifications")
                         .param("page", "0")
                         .param("size", "10")
-                        .with(user(getUserLoginInfo(1))))
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$").isArray())
@@ -54,7 +53,7 @@ public class NotificationControllerTest extends AbstractTestContainers{
         mockMvc.perform(put("/api/notifications")
                         .param("page", "0")
                         .param("size", "10")
-                        .with(user(getUserLoginInfo(1))))
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$").isArray())
@@ -72,7 +71,7 @@ public class NotificationControllerTest extends AbstractTestContainers{
         mockMvc.perform(put("/api/notifications/1")
                         .param("page", "0")
                         .param("size", "10")
-                        .with(user(getUserLoginInfo(1))))
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$.id").value("1"))
