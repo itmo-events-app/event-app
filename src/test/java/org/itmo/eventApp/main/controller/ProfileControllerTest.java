@@ -5,6 +5,7 @@ import org.itmo.eventapp.main.model.dto.request.UserChangeEmailRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ProfileControllerTest extends AbstractTestContainers {
 
@@ -22,6 +25,14 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
     @Autowired
     private UserRepository userRepository;
+
+    private UserLoginInfo getUserLoginInfo() {
+        UserLoginInfo userDetails = new UserLoginInfo();
+        User dummyUser = new User();
+        dummyUser.setId(1);
+        userDetails.setUser(dummyUser);
+        return userDetails;
+    }
 
     @Test
     @WithMockUser(username = "test_mail@itmo.ru")
@@ -94,5 +105,40 @@ public class ProfileControllerTest extends AbstractTestContainers {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
+    public void testGetUserEventPrivilegesNotFound() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+
+        mockMvc.perform(get("/api/profile/event-privileges/1")
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
+    public void testGetUserEventPrivileges() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+        String eventJson = """
+                {
+                    "userId": 1,
+                    "title": "test event"
+                }""";
+        mockMvc.perform(
+                        post("/api/events")
+                                .content(eventJson)
+                                .contentType(MediaType.APPLICATION_JSON)
+                );
+
+        mockMvc.perform(get("/api/profile/event-privileges/1")
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(25));
     }
 }
