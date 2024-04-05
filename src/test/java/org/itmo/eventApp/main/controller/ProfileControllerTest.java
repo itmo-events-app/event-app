@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -25,7 +24,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
     private UserRepository userRepository;
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
+    @WithMockUser(username = "test_mail@itmo.ru")
     public void testChangeName() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
@@ -43,7 +42,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
     }
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
+    @WithMockUser(username = "test_mail@itmo.ru")
     public void testChangePassword() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
@@ -55,7 +54,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
     }
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
+    @WithMockUser(username = "test_mail@itmo.ru")
     public void testChangeMismatchPassword() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
@@ -67,7 +66,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
     }
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
+    @WithMockUser(username = "test_mail@itmo.ru")
     public void testChangeEmail() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
@@ -84,7 +83,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
+    @WithMockUser(username = "test_mail@itmo.ru")
     public void testChangeToExistEmail() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
