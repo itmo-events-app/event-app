@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
@@ -53,11 +54,14 @@ public class EventService {
         this.entityManager = entityManager;
     }
 
-
     public Event addEvent(EventRequest eventRequest) {
         Place place = placeService.findById(eventRequest.placeId());
 
         Event parent = findById(eventRequest.parent());
+        if (parent.getParent() != null) {
+            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, ExceptionConst.ACTIVITY_RECURSION);
+        }
+
         Event e = Event.builder()
                 .place(place)
                 .startDate(eventRequest.startDate())
@@ -85,6 +89,7 @@ public class EventService {
         return e;
     }
 
+    @Transactional
     public Event addEventByOrganizer(CreateEventRequest eventRequest) {
         User user = userService.findById(eventRequest.userId());
         Event e = Event.builder()
@@ -92,9 +97,8 @@ public class EventService {
                 .build();
         Event savedEvent = eventRepository.save(e);
 
-
         // TODO: Do not get organizer from DB each time.
-        Role role = roleService.findByName("Организатор");
+        Role role = roleService.getOrganizerRole();
 
         EventRole eventRole = EventRole.builder()
                 .user(user)
