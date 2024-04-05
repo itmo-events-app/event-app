@@ -7,9 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
+import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
+import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
+import org.itmo.eventapp.main.model.mapper.EventRoleMapper;
 import org.itmo.eventapp.main.service.EventService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -79,5 +82,11 @@ public class EventController {
     public ResponseEntity<Void> deleteEventById(@Min(1) @PathVariable("id") Integer id) {
         eventService.deleteEventById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/organizers")
+    public ResponseEntity<List<UserRoleResponse>> getUsersHavingRoles(@Min(1) @PathVariable("id") Integer id) {
+        List<EventRole> eventRoles = eventService.getUsersHavingRoles(id);
+        return ResponseEntity.ok().body(EventRoleMapper.eventRolesToUserRoleResponses(eventRoles));
     }
 }
