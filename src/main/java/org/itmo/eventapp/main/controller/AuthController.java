@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
+import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
 import org.itmo.eventapp.main.model.entity.RegistrationRequest;
 import org.itmo.eventapp.main.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
@@ -51,10 +52,18 @@ public class AuthController {
     }
 
     @GetMapping(value = "/listRegisterRequests")
-    ResponseEntity<List<RegistrationRequest>> listRegisterRequests() {
+    ResponseEntity<List<RegistrationRequestForAdmin>> listRegisterRequests() {
         // TODO: check for administrator
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(authenticationService.listRegisterRequestsCallback());
+                .body(authenticationService.listRegisterRequestsCallback()
+                        .stream()
+                        .map((request) -> new RegistrationRequestForAdmin(
+                                request.getEmail(),
+                                request.getName(),
+                                request.getSurname(),
+                                request.getStatus(),
+                                request.getSentTime()))
+                        .toList());
     }
 }
