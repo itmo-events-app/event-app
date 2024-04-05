@@ -183,7 +183,6 @@ public class TaskController {
             @RequestParam(required = false, defaultValue = "false") Boolean subEventTasksGet
     ) {
 
-        /*TODO: TEST*/
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
@@ -210,19 +209,17 @@ public class TaskController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineUpperLimit
             ) {
 
-        /*TODO: TEST*/
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
         Integer userId = userService.findByEmail(currentPrincipalName).getId();
 
-        List<Task> userTasks = taskService.getEventTasksWithFilter(eventId,
+        List<Task> userTasks = taskService.getUserTasksWithFilter(eventId,
                 userId,
                 assignerId,
                 taskStatus,
                 deadlineLowerLimit,
-                deadlineUpperLimit,
-                false);
+                deadlineUpperLimit);
         return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(userTasks));
     }
 

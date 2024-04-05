@@ -224,12 +224,14 @@ public class TaskService {
 
         Event event = eventService.findById(eventId);
 
-        if (event.getParent().getId() == null && subEventTasksGet) {
+        if (event.getParent() == null && subEventTasksGet) {
             List<Integer> ids = eventService.getAllSubEventIds(event.getId());
-            ids.add(event.getId());
+            List<Integer> idsWithParent = new ArrayList<>();
+            idsWithParent.add(event.getId());
+            idsWithParent.addAll(ids);
 
             Specification<Task> taskSpecification =
-                    TaskSpecification.filterByEventIdsListAndExtraParams(ids,
+                    TaskSpecification.filterByEventIdsListAndExtraParams(idsWithParent,
                             assigneeId,
                             assignerId,
                             taskStatus,
@@ -250,4 +252,24 @@ public class TaskService {
 
 
     }
+
+
+    public List<Task> getUserTasksWithFilter(Integer eventId,
+                                             Integer userId,
+                                             Integer assignerId,
+                                             TaskStatus taskStatus,
+                                             LocalDateTime deadlineLowerLimit,
+                                             LocalDateTime deadlineUpperLimit) {
+
+
+        Specification<Task> taskSpecification =
+                TaskSpecification.filterByEventIdAndExtraParams(eventId,
+                        userId,
+                        assignerId,
+                        taskStatus,
+                        deadlineLowerLimit,
+                        deadlineUpperLimit);
+        return taskRepository.findAll(taskSpecification);
+    }
+
 }
