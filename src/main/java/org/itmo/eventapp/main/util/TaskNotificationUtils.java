@@ -1,7 +1,7 @@
 package org.itmo.eventapp.main.util;
 
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.entity.Task;
@@ -12,13 +12,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,111 +28,82 @@ public class TaskNotificationUtils {
     private final TaskRepository taskRepository;
 
     @Value(value = "${notifications.taskUrl}")
-    private String TASK_FULL_URL;
+    private String taskFullUrl;
 
     @Value(value = "${notifications.cron.sending-period-in-minutes}")
-    private Integer SENDING_PERIOD_IN_MINUTES;
+    private Integer sendingPeriodInMinutes;
 
     @Async
+    @SneakyThrows
     public void createIncomingTaskNotification(Task task){
-        Map<String, String> taskFields = taskMapper(task);
         String notificationTitle = "Новая задача!";
-        String notificationDescription = "Вам назначена новая задача - " + taskFields.get("taskTitle")
-                + " в мероприятии " + taskFields.get("taskEventTitle");
+        String notificationDescription = "Вам назначена новая задача - " + task.getTitle()
+                + " в мероприятии " + task.getEvent().getTitle();
 
         notificationService.createNotification(notificationTitle,
                 notificationDescription,
-                Integer.parseInt(taskFields.get("taskAssigneeId")));
+                task.getAssignee().getId());
 
-        try {
-            mailSenderService.sendIncomingTaskMessage(
-                    taskFields.get("taskAssigneeEmail"),
-                    taskFields.get("taskAssigneeName"),
-                    taskFields.get("taskEventTitle"),
-                    taskFields.get("taskTitle"),
-                    taskFields.get("taskUrl")
-            );
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        mailSenderService.sendIncomingTaskMessage(
+                task.getAssignee().getUserLoginInfo().getEmail(),
+                task.getAssignee().getName(),
+                task.getEvent().getTitle(),
+                task.getTitle(),
+                taskFullUrl + task.getId().toString());
     }
 
     @Async
+    @SneakyThrows
     public void createOverdueTaskNotification(Task task){
-        Map<String, String> taskFields = taskMapper(task);
         String notificationTitle = "Просроченная задача!";
-        String notificationDescription = "Прошёл срок исполнения задачи - " + taskFields.get("taskTitle")
-                + " в мероприятии " + taskFields.get("taskEventTitle");
+        String notificationDescription = "Прошёл срок исполнения задачи - " + task.getTitle()
+                + " в мероприятии " + task.getEvent().getTitle();
 
         notificationService.createNotification(notificationTitle,
                 notificationDescription,
-                Integer.parseInt(taskFields.get("taskAssigneeId")));
+                task.getAssignee().getId());
         notificationService.createNotification(notificationTitle,
                 notificationDescription,
-                Integer.parseInt(taskFields.get("taskAssignerId")));
+                task.getAssigner().getId());
 
-        try {
-            mailSenderService.sendIncomingTaskMessage(
-                    taskFields.get("taskAssigneeEmail"),
-                    taskFields.get("taskAssigneeName"),
-                    taskFields.get("taskEventTitle"),
-                    taskFields.get("taskTitle"),
-                    taskFields.get("taskUrl")
-            );
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        mailSenderService.sendOverdueTaskMessage(
+                task.getAssignee().getUserLoginInfo().getEmail(),
+                task.getAssignee().getName(),
+                task.getEvent().getTitle(),
+                task.getTitle(),
+                taskFullUrl + task.getId().toString());
 
-        try {
-            mailSenderService.sendIncomingTaskMessage(
-                    taskFields.get("taskAssignerEmail"),
-                    taskFields.get("taskAssignerName"),
-                    taskFields.get("taskEventTitle"),
-                    taskFields.get("taskTitle"),
-                    taskFields.get("taskUrl")
-            );
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        mailSenderService.sendOverdueTaskMessage(
+                task.getAssigner().getUserLoginInfo().getEmail(),
+                task.getAssigner().getName(),
+                task.getEvent().getTitle(),
+                task.getTitle(),
+                taskFullUrl + task.getId().toString());
     }
 
     @Async
+    @SneakyThrows
     public void createReminderTaskNotification(Task task){
-        Map<String, String> taskFields = taskMapper(task);
         String notificationTitle = "Не забудьте выполнить задачу!";
-        String notificationDescription = "Не забудьте выполнить задачу - " + taskFields.get("taskTitle")
-                + " в мероприятии " + taskFields.get("taskEventTitle");
+        String notificationDescription = "Не забудьте выполнить задачу - " + task.getTitle()
+                + " в мероприятии " + task.getEvent().getTitle();
 
         notificationService.createNotification(notificationTitle,
                 notificationDescription,
-                Integer.parseInt(taskFields.get("taskAssigneeId")));
+                task.getAssignee().getId());
 
-        try {
-            mailSenderService.sendIncomingTaskMessage(
-                    taskFields.get("taskAssigneeEmail"),
-                    taskFields.get("taskAssigneeName"),
-                    taskFields.get("taskEventTitle"),
-                    taskFields.get("taskTitle"),
-                    taskFields.get("taskUrl")
-            );
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        mailSenderService.sendReminderTaskMessage(
+                task.getAssignee().getUserLoginInfo().getEmail(),
+                task.getAssignee().getName(),
+                task.getEvent().getTitle(),
+                task.getTitle(),
+                taskFullUrl + task.getId().toString());
     }
 
     @Scheduled(cron = "${notifications.cron.create-notification-job}")
     public void sendNotificationsOnDeadline(){
-        System.out.println("DEADLINE JOB STARTED:" + LocalDateTime.now().toString());
         LocalDateTime endTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        LocalDateTime startTime = endTime.minusMinutes(SENDING_PERIOD_IN_MINUTES);
+        LocalDateTime startTime = endTime.minusMinutes(sendingPeriodInMinutes);
 
         List<Task> overdueTasks = getTasksWithDeadlineBetween(startTime, endTime);
 
@@ -148,28 +115,13 @@ public class TaskNotificationUtils {
     @Scheduled(cron = "${notifications.cron.create-notification-job}")
     public void sendNotificationsOnNotificationDeadline(){
         LocalDateTime endTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        LocalDateTime startTime = endTime.minusMinutes(SENDING_PERIOD_IN_MINUTES);
+        LocalDateTime startTime = endTime.minusMinutes(sendingPeriodInMinutes);
 
         List<Task> overdueTasks = getTasksWithNotificationDeadlineBetween(startTime, endTime);
 
         for (Task task: overdueTasks) {
             createReminderTaskNotification(task);
         }
-    }
-
-    private Map<String, String> taskMapper(Task task){
-        return Stream.of(new String[][] {
-                { "taskId", task.getId().toString() },
-                { "taskTitle", task.getTitle() },
-                { "taskAssignerId", task.getAssigner().getId().toString() },
-                { "taskAssignerName", task.getAssigner().getName() },
-                { "taskAssignerEmail", task.getAssigner().getUserLoginInfo().getEmail() },
-                { "taskAssigneeId", task.getAssigner().getId().toString() },
-                { "taskAssigneeName", task.getAssignee().getName() },
-                { "taskAssigneeEmail", task.getAssignee().getUserLoginInfo().getEmail() },
-                { "taskEventTitle", task.getEvent().getTitle() },
-                { "taskUrl", TASK_FULL_URL + task.getId().toString() },
-        }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
     }
 
     private List<Task> getTasksWithDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
