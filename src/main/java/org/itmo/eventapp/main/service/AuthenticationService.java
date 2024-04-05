@@ -45,6 +45,7 @@ public class AuthenticationService {
 
     @Autowired
     private MailSenderService mailSenderService;
+    private RoleService roleService;
 
     public String login(LoginRequest loginRequest) throws BadCredentialsException {
 
@@ -95,8 +96,7 @@ public class AuthenticationService {
         User user = new User();
         UserNotificationInfo notificationInfo = new UserNotificationInfo();
 
-        var reader = roleRepository.findByName(defaultRole)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Роли '" + defaultRole + "' не существует"));
+        var reader = roleService.getReaderRole();
 
         notificationInfo.setDevices(new String[] {});
         notificationInfo.setEnableEmailNotifications(false);
