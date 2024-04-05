@@ -11,7 +11,6 @@ public record TaskRequest(
         @NotNull
         @Min(value = 1, message = "Поле eventId не может быть меньше 1!")
         Integer eventId,
-        @NotNull(message = "Поле assignee не может быть null!")
         UserShortDataRequest assignee,
         @NotBlank(message = "Поле title не может быть пустым!")
         String title,

@@ -21,7 +21,6 @@ public class TaskControllerTest extends AbstractTestContainers {
 
     @Test
     void taskGetTest() throws Exception {
-        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
@@ -64,7 +63,7 @@ public class TaskControllerTest extends AbstractTestContainers {
 //    @Test
 //    void taskAddTest() throws Exception {
 //
-//        executeSqlScript("/sql/clean_tables.sql");
+//
 //        executeSqlScript("/sql/insert_user.sql");
 //        executeSqlScript("/sql/insert_place.sql");
 //        executeSqlScript("/sql/insert_event.sql");
@@ -110,12 +109,12 @@ public class TaskControllerTest extends AbstractTestContainers {
 //                ()-> Assertions.assertEquals(assigneeId, task.getAssignee().getId())
 //        );
 //    }
-
-
+//
+//
 //    @Test
 //    void taskAddExpiredTest() throws Exception {
 //
-//        executeSqlScript("/sql/clean_tables.sql");
+//
 //        executeSqlScript("/sql/insert_user.sql");
 //        executeSqlScript("/sql/insert_place.sql");
 //        executeSqlScript("/sql/insert_event.sql");
@@ -156,7 +155,6 @@ public class TaskControllerTest extends AbstractTestContainers {
 
     @Test
     void taskEditTest() throws Exception {
-        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -217,7 +215,6 @@ public class TaskControllerTest extends AbstractTestContainers {
 
     @Test
     void taskDeleteTest() throws Exception {
-        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -234,7 +231,6 @@ public class TaskControllerTest extends AbstractTestContainers {
 
     @Test
     void taskSetAssigneeTest() throws Exception {
-        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -276,7 +272,6 @@ public class TaskControllerTest extends AbstractTestContainers {
 
     @Test
     void taskDeleteAssigneeTest() throws Exception {
-        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -314,7 +309,6 @@ public class TaskControllerTest extends AbstractTestContainers {
 
     @Test
     void taskSetStatusTest() throws Exception {
-        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -359,7 +353,6 @@ public class TaskControllerTest extends AbstractTestContainers {
 
     @Test
     void taskMoveTest() throws Exception {
-        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -404,33 +397,31 @@ public class TaskControllerTest extends AbstractTestContainers {
     }
 
 
-//    @Test
-//    void taskWrongMoveTest() throws Exception {
-//        executeSqlScript("/sql/clean_tables.sql");
-//        executeSqlScript("/sql/insert_user.sql");
-//        executeSqlScript("/sql/insert_user_2.sql");
-//        executeSqlScript("/sql/insert_place.sql");
-//        executeSqlScript("/sql/insert_event.sql");
-//        executeSqlScript("/sql/insert_event_3.sql");
-//        executeSqlScript("/sql/insert_task.sql");
-//
-//        Task task = taskRepository.findById(1).orElseThrow();
-//        Assertions.assertEquals(1, task.getEvent().getId());
-//
-//        mockMvc.perform(put("/api/tasks/event/2")
-//                        .content("[1]")
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//
-//        task = taskRepository.findById(1).orElseThrow();
-//        Assertions.assertEquals(1, task.getEvent().getId());
-//
-//    }
+    @Test
+    void taskWrongMoveTest() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_3.sql");
+        executeSqlScript("/sql/insert_task.sql");
+
+        Task task = taskRepository.findById(1).orElseThrow();
+        Assertions.assertEquals(1, task.getEvent().getId());
+
+        mockMvc.perform(put("/api/tasks/event/2")
+                        .content("[1]")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        task = taskRepository.findById(1).orElseThrow();
+        Assertions.assertEquals(1, task.getEvent().getId());
+
+    }
 
 
     @Test
     void taskCopyTest() throws Exception {
-        executeSqlScript("/sql/clean_tables.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
