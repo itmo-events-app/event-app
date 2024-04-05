@@ -199,7 +199,7 @@ class EventServiceTest {
         List<Event> childEvents = new ArrayList<>();
         childEvents.add(childEvent);
         when(eventRepository.findById(1)).thenReturn(Optional.of(existingEvent));
-        when(eventRepository.findAllByParentId(1)).thenReturn(childEvents);
+        when(eventRepository.findAllByParent_Id(1)).thenReturn(childEvents);
         when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
             Event event = invocation.getArgument(0);
             event.setId(startingId[0]++);

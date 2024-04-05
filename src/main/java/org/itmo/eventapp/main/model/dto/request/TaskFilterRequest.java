@@ -5,7 +5,9 @@ import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import java.time.LocalDateTime;
 
 public record TaskFilterRequest(Integer assigneeId,
-                            Integer assignerId,
-                            TaskStatus taskStatus,
-                            LocalDateTime deadline) {
+                                Integer assignerId,
+                                TaskStatus taskStatus,
+                                LocalDateTime deadlineLowerLimit,
+                                LocalDateTime deadlineUpperLimit,
+                                Boolean subEventTasksGet) {
 }

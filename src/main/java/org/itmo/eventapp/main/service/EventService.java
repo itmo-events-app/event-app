@@ -190,6 +190,10 @@ public class EventService {
         eventRepository.deleteById(id);
     }
 
+    public List<Integer> getAllSubEventIds(Integer parentId) {
+        return eventRepository.findAllByParent_Id(parentId).stream().map(Event::getId).toList();
+    }
+
     /*TODO: TEST*/
     public boolean checkOneEvent(Event first, Event second) {
         boolean firstParent = (second.getParent() != null) &&
@@ -203,6 +207,7 @@ public class EventService {
 
         return firstParent || firstChild || bothChildren;
     }
+
     public List<EventRole> getUsersHavingRoles(Integer id) {
         return eventRoleService.findAllByEventId(id);
     }
@@ -219,7 +224,7 @@ public class EventService {
     }
 
     List<Event> findAllByParentId(Integer parentId) {
-        return  eventRepository.findAllByParentId(parentId);
+        return  eventRepository.findAllByParent_Id(parentId);
     }
 
     @Transactional
