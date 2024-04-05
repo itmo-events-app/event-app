@@ -23,7 +23,9 @@ public class RoleServiceTest extends AbstractTestContainers {
     @Autowired
     private RoleService roleService;
 
-    private final List<String> basicRolesNames = Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
+
+    private final List<String> basicRolesNames
+            = Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
 
 
     @Test
@@ -83,19 +85,19 @@ public class RoleServiceTest extends AbstractTestContainers {
 
         Role adminRole = roleService.getAdminRole();
         assertNotNull(adminRole);
-        assertEquals(adminRole.getName(), basicRolesNames.get(0));
+        assertEquals(basicRolesNames.get(0), adminRole.getName());
 
         Role readerRole = roleService.getReaderRole();
         assertNotNull(readerRole);
-        assertEquals(readerRole.getName(), basicRolesNames.get(1));
+        assertEquals(basicRolesNames.get(1), readerRole.getName());
 
         Role organizerRole = roleService.getOrganizerRole();
         assertNotNull(organizerRole);
-        assertEquals(organizerRole.getName(), basicRolesNames.get(2));
+        assertEquals(basicRolesNames.get(2), organizerRole.getName());
 
         Role assistantRole = roleService.getAssistantRole();
         assertNotNull(assistantRole);
-        assertEquals(assistantRole.getName(), basicRolesNames.get(3));
+        assertEquals(basicRolesNames.get(3), assistantRole.getName());
     }
 
     @Test
@@ -125,6 +127,7 @@ public class RoleServiceTest extends AbstractTestContainers {
     @DisplayName("[editRole]-(Neg) Editing a non existent role")
     public void editNonExistRoleTest() {
         List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4);
+//        List<Integer> privileges = new LinkedList<>();
 
         RoleRequest roleRequest = new RoleRequest(
                 "Новая_Фэйк_Роль",
@@ -166,7 +169,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[editRole]-(Pos) Editing role")
-    public void editRoleDoNotKeepName() {
+    public void editRoleDoNotKeepNameTest() {
         insertFilling();
 
         List<Integer> privileges = new ArrayList<>();
@@ -194,7 +197,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[editRole]-(Pos) Editing role but keeping previous name")
-    public void editRoleKeepName() {
+    public void editRoleKeepNameTest() {
         insertFilling();
 
         List<Integer> privileges = new ArrayList<>();
@@ -219,6 +222,100 @@ public class RoleServiceTest extends AbstractTestContainers {
         );
     }
 
+    @Test
+    @DisplayName("[deleteRole]-(Neg) Deleting basic role")
+    public void deleteBasicRoleTest() {
+        insertBasicFilling();
+
+        basicRolesNames.stream()
+                .map(roleService::findByName)
+                .forEach(basicRole -> {
+                    ResponseStatusException exception = assertThrows(
+                            ResponseStatusException.class,
+                            () -> roleService.deleteRole(basicRole.getId()),
+                            "It is forbidden to delete the basic roles");
+                    assertEquals("Невозможно удалить эту роль", exception.getReason());
+                });
+    }
+
+    @Test
+    @DisplayName("[deleteRole]-(Neg) Deleting role assigned to user")
+    public void deleteRoleAssignedTest() {
+        insertFilling();
+        insertUsersFilling();
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> roleService.deleteRole(1),
+                "It is forbidden to delete assigned roles");
+        assertEquals("Невозможно удалить роль, так как существуют пользователи, которым она назначена",
+                exception.getReason());
+    }
+
+    // TODO Deleting role used in event (eventRole)
+
+    @Test
+    @DisplayName("[deleteRole]-(Neg) Deleting unnecessary role")
+    public void deleteRole() {
+        insertFilling();
+
+        roleService.deleteRole(1);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> roleService.findRoleById(1),
+                "Deleted role can not be accessed");
+        assertTrue(exception.getMessage().contains("не существует"),
+                exception.getReason()); // to refactor
+    }
+
+    @Test
+    @DisplayName("[getAll] (Pos) Getting all roles")
+    public void getAllRoles() {
+        insertBasicFilling();   // 4
+        insertFilling();        // 4
+
+        List<Role> allRoles = roleService.getAll();
+
+        assertNotNull(allRoles);
+        assertEquals(8, allRoles.size());
+        // to refactor
+    }
+
+    @Test
+    @DisplayName(("[findRoleById] (Pos) Getting roles by Id"))
+    public void findRoleById() {
+        insertBasicFilling();
+
+        Role adminRole = roleService.findRoleById(1);
+        assertNotNull(adminRole);
+        assertEquals(basicRolesNames.get(0), adminRole.getName());
+
+        Role readerRole = roleService.findRoleById(2);
+        assertNotNull(readerRole);
+        assertEquals(basicRolesNames.get(1), readerRole.getName());
+
+        Role organizerRole = roleService.findRoleById(3);
+        assertNotNull(organizerRole);
+        assertEquals(basicRolesNames.get(2), organizerRole.getName());
+
+        Role assistantRole = roleService.findRoleById(4);
+        assertNotNull(assistantRole);
+        assertEquals(basicRolesNames.get(3), assistantRole.getName());
+    }
+
+    @Test
+    @DisplayName(("[findRoleById] (Neg) Getting non existing roles by Id"))
+    public void findNonExistRoleById() {
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> roleService.findRoleById(1),
+                "Non existing role can not be accessed");
+        assertTrue(exception.getMessage().contains("не существует"),
+                exception.getReason()); // to refactor
+    }
+
 
     private void insertFilling() {
         executeSqlScript("/sql/insert_roles.sql");
@@ -227,5 +324,9 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     private void insertBasicFilling() {
         executeSqlScript("/db/test-migration/V0_3__fill_tables_test.sql");
+    }
+
+    private void insertUsersFilling() {
+        executeSqlScript("/sql/insert_user.sql");
     }
 }
