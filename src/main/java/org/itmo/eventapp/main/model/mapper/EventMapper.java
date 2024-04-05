@@ -61,4 +61,28 @@ public final class EventMapper {
                 .map(EventMapper::eventToEventResponse)
                 .toList();
     }
+
+    public static Event eventToEvent(Event source, Event parentEvent) {
+        if (source == null) {
+            return null;
+        }
+        return Event.builder()
+                .place(source.getPlace())
+                .startDate(source.getStartDate())
+                .endDate(source.getEndDate())
+                .title(source.getTitle())
+                .shortDescription(source.getShortDescription())
+                .fullDescription(source.getFullDescription())
+                .format(source.getFormat())
+                .status(source.getStatus())
+                .registrationStart(source.getRegistrationStart())
+                .registrationEnd(source.getRegistrationEnd())
+                .parent(parentEvent)
+                .participantLimit(source.getParticipantLimit())
+                .participantAgeLowest(source.getParticipantAgeLowest())
+                .participantAgeHighest(source.getParticipantAgeHighest())
+                .preparingStart(source.getPreparingStart())
+                .preparingEnd(source.getPreparingEnd())
+                .build();
+    }
 }
