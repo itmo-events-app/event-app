@@ -15,10 +15,15 @@ import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.repository.TaskRepository;
+import org.itmo.eventapp.main.service.specification.TaskSpecification;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -209,7 +214,40 @@ public class TaskService {
         return newTasks;
     }
 
-    public List<Task> getEventTasksWithFilter(Integer eventId, TaskFilterRequest filter) {
-        return null;
+    public List<Task> getEventTasksWithFilter(Integer eventId,
+                                              Integer assigneeId,
+                                              Integer assignerId,
+                                              TaskStatus taskStatus,
+                                              LocalDateTime deadlineLowerLimit,
+                                              LocalDateTime deadlineUpperLimit,
+                                              Boolean subEventTasksGet) {
+
+        Event event = eventService.findById(eventId);
+
+        if (event.getParent().getId() == null && subEventTasksGet) {
+            List<Integer> ids = eventService.getAllSubEventIds(event.getId());
+            ids.add(event.getId());
+
+            Specification<Task> taskSpecification =
+                    TaskSpecification.filterByEventIdsListAndExtraParams(ids,
+                            assigneeId,
+                            assignerId,
+                            taskStatus,
+                            deadlineLowerLimit,
+                            deadlineUpperLimit);
+            return taskRepository.findAll(taskSpecification);
+
+        } else {
+            Specification<Task> taskSpecification =
+                    TaskSpecification.filterByEventIdAndExtraParams(eventId,
+                            assigneeId,
+                            assignerId,
+                            taskStatus,
+                            deadlineLowerLimit,
+                            deadlineUpperLimit);
+            return taskRepository.findAll(taskSpecification);
+        }
+
+
     }
 }
