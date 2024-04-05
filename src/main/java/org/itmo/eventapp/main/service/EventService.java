@@ -213,9 +213,7 @@ public class EventService {
         Event savedEvent = copyEventByOne(existingEvent, existingEvent.getParent());
         if (deep) {
             List<Event> childEvents = findAllByParentId(existingEvent.getId());
-            for (Event childEvent : childEvents) {
-                copyEventByOne(childEvent, savedEvent);
-            }
+            childEvents.forEach(childEvent -> copyEventByOne(childEvent, savedEvent));
         }
         return savedEvent;
     }
