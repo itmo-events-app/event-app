@@ -8,6 +8,7 @@ insert into task (
     description,
     status,
     title,
+    creation_time,
     deadline,
     place_id,
     notification_deadline
@@ -18,7 +19,8 @@ insert into task (
     'write sql script for tests',
     'NEW',
     'VERY DIFFICULT TASK',
-    '2024-03-30T21:32:23.536819',
+    '2025-03-10T21:32:23.536819',
+    '2025-03-30T21:32:23.536819',
     1,
-    '2024-03-30T21:32:23.536819'
+    '2025-03-30T21:32:23.536819'
 );

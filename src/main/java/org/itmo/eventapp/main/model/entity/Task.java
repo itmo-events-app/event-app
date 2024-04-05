@@ -42,6 +42,8 @@ public class Task {
     @JoinColumn(name = "place_id")
     private Place place;
 
+    private LocalDateTime creationTime;
+
     private LocalDateTime deadline;
 
     private LocalDateTime notificationDeadline;
