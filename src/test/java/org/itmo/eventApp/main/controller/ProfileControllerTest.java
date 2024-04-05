@@ -131,10 +131,10 @@ public class ProfileControllerTest extends AbstractTestContainers {
                     "title": "test event"
                 }""";
         mockMvc.perform(
-                        post("/api/events")
-                                .content(eventJson)
-                                .contentType(MediaType.APPLICATION_JSON)
-                );
+                post("/api/events")
+                        .content(eventJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
 
         mockMvc.perform(get("/api/profile/event-privileges/1")
                         .with(user(getUserLoginInfo())))
@@ -142,5 +142,15 @@ public class ProfileControllerTest extends AbstractTestContainers {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(25));
+    }
+
+    @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
+    public void testGetBaseInfo() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+
+        mockMvc.perform(get("/api/profile/base-info"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{}"));
     }
 }
