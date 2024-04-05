@@ -229,24 +229,7 @@ public class EventService {
 
     @Transactional
     public Event copyEventByOne(Event existingEvent, Event parentEvent) {
-        Event copiedEvent = Event.builder()
-                .place(existingEvent.getPlace())
-                .startDate(existingEvent.getStartDate())
-                .endDate(existingEvent.getEndDate())
-                .title(existingEvent.getTitle())
-                .shortDescription(existingEvent.getShortDescription())
-                .fullDescription(existingEvent.getFullDescription())
-                .format(existingEvent.getFormat())
-                .status(existingEvent.getStatus())
-                .registrationStart(existingEvent.getRegistrationStart())
-                .registrationEnd(existingEvent.getRegistrationEnd())
-                .parent(parentEvent)
-                .participantLimit(existingEvent.getParticipantLimit())
-                .participantAgeLowest(existingEvent.getParticipantAgeLowest())
-                .participantAgeHighest(existingEvent.getParticipantAgeHighest())
-                .preparingStart(existingEvent.getPreparingStart())
-                .preparingEnd(existingEvent.getPreparingEnd())
-                .build();
+        Event copiedEvent = EventMapper.eventToEvent(existingEvent, parentEvent);
         Event savedEvent = eventRepository.save(copiedEvent);
 
         List<EventRole> eventRoles = eventRoleService.findAllByEventId(existingEvent.getId());
