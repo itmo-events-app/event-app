@@ -7,6 +7,7 @@ import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.model.mapper.RoleMapper;
+import org.itmo.eventapp.main.repository.EventRoleRepository;
 import org.itmo.eventapp.main.repository.RoleRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class RoleService {
     private final PrivilegeService privilegeService;
     private final UserService userService;
     private final List<String> basicRoles = Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
+    private final EventRoleRepository eventRoleRepository;
 
     @Transactional
     public Role createRole(RoleRequest roleRequest) {
@@ -64,10 +66,11 @@ public class RoleService {
         if (role.getType().equals(RoleType.SYSTEM)) {
             if (!userService.findAllByRole(role).isEmpty())
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно удалить роль, так как существуют пользователи, которым она назначена");
-        } // else {
-//            if (!eventRoleService.findAllByRole(role).isEmpty())
-//                throw new NotAllowedException("Невозможно удалить роль, так как существуют пользователи, которым она назначена");
-//        }
+        } else {
+            // TODO: временно, надо будет переделать
+            if (!eventRoleRepository.findAllByRole(role).isEmpty())
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно удалить роль, так как существуют пользователи, которым она назначена");
+        }
         role.setPrivileges(null);
         roleRepository.deleteById(id);
     }
