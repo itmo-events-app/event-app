@@ -9,16 +9,12 @@ import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.repository.EventRoleRepository;
 import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
-import org.itmo.eventapp.main.model.entity.Privilege;
-import org.itmo.eventapp.main.model.entity.Role;
-import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
