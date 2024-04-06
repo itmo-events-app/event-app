@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -19,5 +20,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     @Transactional
     @Query(value = "update notification set seen = true where user_id = :id and seen = false;", nativeQuery = true)
     void updateAllSeenByUserId(Integer id);
+
+    void deleteNotificationsBySentTimeBefore(LocalDateTime time);
 
 }
