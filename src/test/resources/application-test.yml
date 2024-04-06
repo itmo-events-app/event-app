@@ -32,4 +32,6 @@ notifications:
   cron:
     create-notification-job: '0 0/15 * * * *'
     sending-period-in-minutes: 15
+    delete-notification-job: '0 0 0 * * MON' # каждый понедельник 00:00
+    delete-period-in-days: 7
   taskUrl: 'http://localhost:8080/task/'
