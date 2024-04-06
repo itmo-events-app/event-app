@@ -8,6 +8,7 @@ import org.itmo.eventapp.main.service.NotificationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -104,10 +105,11 @@ public class NotificationServiceTest extends AbstractTestContainers {
         databaseFilling();
 
         Integer notificationId = 1;
+        LocalDateTime beforeTime = LocalDateTime.of(2025, 1, 1, 0, 0);
 
         assertTrue(notificationRepository.findById(notificationId).isPresent());
 
-        notificationService.deleteNotification(notificationId);
+        notificationService.deleteNotificationsBeforeSentTime(beforeTime);
 
         assertTrue(notificationRepository.findById(notificationId).isEmpty());
 

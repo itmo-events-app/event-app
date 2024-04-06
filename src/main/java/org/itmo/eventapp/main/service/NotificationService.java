@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -56,6 +57,7 @@ public class NotificationService {
         return notification;
     }
 
+    @Transactional
     public List<Notification> updateSeenToAllByUserId(@NotNull Integer userId, Integer page, Integer size) {
         notificationRepository.updateAllSeenByUserId(userId);
         Pageable pageRequest = PageRequest.of(page, size, Sort.by("sentTime").descending());
@@ -67,11 +69,8 @@ public class NotificationService {
         return notificationRepository.getAllByUserId(userId, pageRequest);
     }
 
-    public void deleteNotification(Integer notificationId) {
-        if (notificationRepository.existsById(notificationId)) {
-            notificationRepository.deleteById(notificationId);
-        } else {
-            throw new EntityNotFoundException("Уведомление с заданным ID не найдено!(" + notificationId + ")");
-        }
+    @Transactional
+    public void deleteNotificationsBeforeSentTime(LocalDateTime beforeTime) {
+        notificationRepository.deleteNotificationsBySentTimeBefore(beforeTime);
     }
 }

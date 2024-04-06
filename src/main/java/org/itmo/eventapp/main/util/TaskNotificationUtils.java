@@ -9,31 +9,19 @@ import org.itmo.eventapp.main.service.NotificationService;
 import org.itmo.eventapp.main.service.TaskService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class TaskNotificationUtils {
 
-
-    private final TaskNotificationUtils taskNotificationUtils;
     private final MailSenderService mailSenderService;
-
     private final NotificationService notificationService;
 
-    private final TaskService taskService;
 
     @Value(value = "${notifications.taskUrl}")
     private String taskFullUrl;
-
-    @Value(value = "${notifications.cron.sending-period-in-minutes}")
-    private Integer sendingPeriodInMinutes;
 
     @Async
     @SneakyThrows
@@ -101,25 +89,4 @@ public class TaskNotificationUtils {
                 task.getTitle(),
                 taskFullUrl + task.getId().toString());
     }
-
-    @Scheduled(cron = "${notifications.cron.create-notification-job}")
-    public void sendNotificationsOnDeadline(){
-        LocalDateTime endTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        LocalDateTime startTime = endTime.minusMinutes(sendingPeriodInMinutes);
-
-        List<Task> overdueTasks = taskService.getTasksWithDeadlineBetween(startTime, endTime);
-
-        overdueTasks.forEach(taskNotificationUtils::createOverdueTaskNotification);
-    }
-
-    @Scheduled(cron = "${notifications.cron.create-notification-job}")
-    public void sendNotificationsOnNotificationDeadline(){
-        LocalDateTime endTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        LocalDateTime startTime = endTime.minusMinutes(sendingPeriodInMinutes);
-
-        List<Task> overdueTasks = taskService.getTasksWithNotificationDeadlineBetween(startTime, endTime);
-
-        overdueTasks.forEach(taskNotificationUtils::createReminderTaskNotification);
-    }
-
 }
