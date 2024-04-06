@@ -17,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Arrays;
 import java.util.List;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -85,10 +84,6 @@ public class EventRoleService {
         EventRole eventRole = eventRoleRepository.findByUserIdAndEventId(userId, eventId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_ROLE_NOT_FOUND_MESSAGE));
         return eventRole.getRole().getPrivileges();
-    }
-
-    public List<EventRole> findAllByRole(Role role) {
-        return eventRoleRepository.findAllByRole(role);
     }
 
     EventRole save(EventRole eventRole) {

@@ -25,7 +25,7 @@ public class RoleService {
     private final PrivilegeService privilegeService;
     private final UserService userService;
     private final List<String> basicRoles = Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
-    private final EventRoleRepository eventRoleRepository;
+    private  final EventRoleRepository eventRoleRepository;
     private final UserLoginInfoService userLoginInfoService;
 
     @Transactional
@@ -64,11 +64,11 @@ public class RoleService {
         if (basicRoles.contains(role.getName()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно удалить эту роль");
         if (role.getType().equals(RoleType.SYSTEM)) {
-            if (!userService.findAllByRole(role).isEmpty())
+            if (userService.existsByRole(role))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно удалить роль, так как существуют пользователи, которым она назначена");
         } else {
             // TODO: временно, надо будет переделать
-            if (!eventRoleRepository.findAllByRole(role).isEmpty())
+            if (eventRoleRepository.existsByRole(role))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно удалить роль, так как существуют пользователи, которым она назначена");
         }
         role.setPrivileges(null);
