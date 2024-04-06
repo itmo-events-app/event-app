@@ -1,5 +1,4 @@
 package org.itmo.eventapp.main.model.mapper;
-import org.itmo.eventapp.main.model.dto.TaskNotificationDTO;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Event;
@@ -16,6 +15,7 @@ public final class TaskMapper {
     public static TaskResponse taskToTaskResponse(Task task) {
         return new TaskResponse(
                 task.getId(),
+                task.getEvent().getId(),
                 task.getTitle(),
                 task.getDescription(),
                 task.getStatus(),
@@ -54,15 +54,4 @@ public final class TaskMapper {
                 .toList();
     }
 
-    public static TaskNotificationDTO taskToTaskNotificationDTO(Task task){
-        return new TaskNotificationDTO(
-                task.getTitle(),
-                task.getAssigner().getName(),
-                task.getAssigner().getUserLoginInfo().getEmail(),
-                task.getAssignee().getName(),
-                task.getAssignee().getUserLoginInfo().getEmail(),
-                task.getEvent().getTitle(),
-                task.getStatus().toString()
-        );
-    }
 }

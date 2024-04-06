@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EmailServiceTest extends AbstractTestContainers {
+class EmailServiceTest extends AbstractTestContainers {
     @Autowired
     private MailSenderService mailSenderService;
 
