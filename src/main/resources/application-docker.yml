@@ -41,6 +41,6 @@ springdoc:
 
 notifications:
   cron:
-    create-notification-job: '0 0/15 * * * *'
-    sending-period-in-minutes: 15
+    create-notification-job: '0 0/15 * * * *' # каждая 15-я минута часа -- для подробностей смотри https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html
+    sending-period-in-minutes: 15 # это число должно совпадать с частотой срабатывания выражения выше, иначе будем отслылать дубликаты
   taskUrl: 'http://localhost:8080/task/'
