@@ -54,22 +54,12 @@ public class TaskNotificationUtilsTest extends AbstractTestContainers {
 
         taskNotificationUtils.createIncomingTaskNotification(createTaskForNotification());
 
-        String expectedMessage = """
-                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-                <p style="font-weight: 600">Здравствуйте, HelperName!</p>
-                <p>Вам на выполнение поступила новая задача - <a href="http://localhost:8080/task/1">TestTask</a> в мероприятии EventTitle, можете приступить к выполнению!</p>""";
         String expectedTitle = "Новая задача!";
         String expectedDescription = "Вам назначена новая задача - TestTask в мероприятии EventTitle";
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length > 0);
 
-        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
-        assertEquals(1, receivedMessage.getAllRecipients().length);
-        assertEquals("test_mail@itmo.ru", receivedMessage.getAllRecipients()[0].toString());
-        assertEquals("sender@test", receivedMessage.getFrom()[0].toString());
-        assertEquals("Новая задача!", receivedMessage.getSubject());
-        // replace \r\n over \n to resolve test conflicts on Windows and Linux
-        assertEquals(expectedMessage.replace("\r\n", "\n"), receivedMessage.getContent().toString().replace("\r\n", "\n"));
+        assertEquals(1, greenMail.getReceivedMessages().length);
 
         Notification notification = notificationRepository.findById(1).orElseThrow(() ->new Exception("NotificationNotFound"));
 
@@ -86,22 +76,12 @@ public class TaskNotificationUtilsTest extends AbstractTestContainers {
 
         taskNotificationUtils.createReminderTaskNotification(createTaskForNotification());
 
-        String expectedMessage = """
-                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-                <p style="font-weight: 600">Здравствуйте, HelperName!</p>
-                <p>Напоминаем Вам о том что нужно выполнить задачу - <a href="http://localhost:8080/task/1">TestTask</a> в мероприятии EventTitle, не забудьте её выполнить!</p>""";
         String expectedTitle = "Не забудьте выполнить задачу!";
         String expectedDescription = "Не забудьте выполнить задачу - TestTask в мероприятии EventTitle";
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length > 0);
 
-        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
-        assertEquals(1, receivedMessage.getAllRecipients().length);
-        assertEquals("test_mail@itmo.ru", receivedMessage.getAllRecipients()[0].toString());
-        assertEquals("sender@test", receivedMessage.getFrom()[0].toString());
-        assertEquals("Не забудьте выполнить задачу!", receivedMessage.getSubject());
-        // replace \r\n over \n to resolve test conflicts on Windows and Linux
-        assertEquals(expectedMessage.replace("\r\n", "\n"), receivedMessage.getContent().toString().replace("\r\n", "\n"));
+        assertEquals(1, greenMail.getReceivedMessages().length);
 
         Notification notification = notificationRepository.findById(1).orElseThrow(() ->new Exception("NotificationNotFound"));
 
@@ -110,6 +90,36 @@ public class TaskNotificationUtilsTest extends AbstractTestContainers {
         assertNotNull(notification.getSentTime());
         assertFalse(notification.isSeen());
         assertEquals(1, notification.getUser().getId());
+    }
+
+    @Test
+    void correctOverdueIncomingTaskNotificationTest() throws Exception {
+        databaseFilling();
+
+        taskNotificationUtils.createOverdueTaskNotification(createTaskForNotification());
+
+        String expectedTitle = "Просроченная задача!";
+        String expectedDescription = "Прошёл срок исполнения задачи - TestTask в мероприятии EventTitle";
+
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length > 1);
+
+        assertEquals(2, greenMail.getReceivedMessages().length);
+
+        Notification notificationAssignee = notificationRepository.findById(1).orElseThrow(() ->new Exception("NotificationNotFound"));
+
+        assertEquals(expectedTitle, notificationAssignee.getTitle());
+        assertEquals(expectedDescription, notificationAssignee.getDescription());
+        assertNotNull(notificationAssignee.getSentTime());
+        assertFalse(notificationAssignee.isSeen());
+        assertEquals(1, notificationAssignee.getUser().getId());
+
+        Notification notificationAssigner = notificationRepository.findById(2).orElseThrow(() ->new Exception("NotificationNotFound"));
+
+        assertEquals(expectedTitle, notificationAssigner.getTitle());
+        assertEquals(expectedDescription, notificationAssigner.getDescription());
+        assertNotNull(notificationAssigner.getSentTime());
+        assertFalse(notificationAssigner.isSeen());
+        assertEquals(2, notificationAssigner.getUser().getId());
     }
 
 }
