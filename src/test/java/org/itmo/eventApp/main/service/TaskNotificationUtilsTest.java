@@ -80,4 +80,36 @@ public class TaskNotificationUtilsTest extends AbstractTestContainers {
         assertEquals(1, notification.getUser().getId());
     }
 
+    @Test
+    void correctReminderIncomingTaskNotificationTest() throws Exception {
+        databaseFilling();
+
+        taskNotificationUtils.createReminderTaskNotification(createTaskForNotification());
+
+        String expectedMessage = """
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+                <p style="font-weight: 600">Здравствуйте, HelperName!</p>
+                <p>Напоминаем Вам о том что нужно выполнить задачу - <a href="http://localhost:8080/task/1">TestTask</a> в мероприятии EventTitle, не забудьте её выполнить!</p>""";
+        String expectedTitle = "Не забудьте выполнить задачу!";
+        String expectedDescription = "Не забудьте выполнить задачу - TestTask в мероприятии EventTitle";
+
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
+
+        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        assertEquals(1, receivedMessage.getAllRecipients().length);
+        assertEquals("test_mail@itmo.ru", receivedMessage.getAllRecipients()[0].toString());
+        assertEquals("sender@test", receivedMessage.getFrom()[0].toString());
+        assertEquals("Не забудьте выполнить задачу!", receivedMessage.getSubject());
+        // replace \r\n over \n to resolve test conflicts on Windows and Linux
+        assertEquals(expectedMessage.replace("\r\n", "\n"), receivedMessage.getContent().toString().replace("\r\n", "\n"));
+
+        Notification notification = notificationRepository.findById(1).orElseThrow(() ->new Exception("NotificationNotFound"));
+
+        assertEquals(expectedTitle, notification.getTitle());
+        assertEquals(expectedDescription, notification.getDescription());
+        assertNotNull(notification.getSentTime());
+        assertFalse(notification.isSeen());
+        assertEquals(1, notification.getUser().getId());
+    }
+
 }
