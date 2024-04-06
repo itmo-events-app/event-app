@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class TaskControllerTest extends AbstractTestContainers {
+class TaskControllerTest extends AbstractTestContainers {
     @Autowired
     TaskRepository taskRepository;
 

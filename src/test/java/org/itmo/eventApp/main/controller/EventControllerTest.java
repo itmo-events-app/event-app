@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class EventControllerTest extends AbstractTestContainers {
+class EventControllerTest extends AbstractTestContainers {
     private boolean isImageExist(String imageName) {
         try {
             minioClient.statObject(StatObjectArgs.builder()
