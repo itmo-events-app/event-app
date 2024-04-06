@@ -28,7 +28,7 @@ public class NotificationControllerTest extends AbstractTestContainers{
         executeSqlScript("/sql/insert_notifications.sql");
     }
 
-    private UserLoginInfo getUserLoginInfo(){
+    private UserLoginInfo getUserLoginInfo() {
         UserLoginInfo userDetails = new UserLoginInfo();
         User dummyUser = new User();
         dummyUser.setId(1);

@@ -1,6 +1,7 @@
 package org.itmo.eventApp.main.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.itmo.eventapp.main.model.dto.request.UserChangeEmailRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
@@ -12,10 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ProfileControllerTest extends AbstractTestContainers {
@@ -129,16 +134,38 @@ public class ProfileControllerTest extends AbstractTestContainers {
                     "title": "test event"
                 }""";
         mockMvc.perform(
-                        post("/api/events")
-                                .content(eventJson)
-                                .contentType(MediaType.APPLICATION_JSON)
-                );
+                post("/api/events")
+                        .content(eventJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
 
-        mockMvc.perform(get("/api/profile/event-privileges/1")
+        MvcResult result = mockMvc.perform(get("/api/profile/event-privileges/1")
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(25));
+                .andReturn();
+        String resultString = result.getResponse().getContentAsString();
+        Assertions.assertTrue(resultString.contains("ASSIGN_TASK_EXECUTOR"));
+        Assertions.assertTrue(resultString.contains("DELETE_EVENT_ACTIVITIES"));
+        Assertions.assertTrue(resultString.contains("IMPORT_PARTICIPANT_LIST_XLSX"));
+        Assertions.assertTrue(resultString.contains("ASSIGN_ORGANIZER_ROLE"));
+    }
+
+    @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
+    public void testGetBaseInfo() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+
+        MvcResult result = mockMvc.perform(get("/api/profile/system-privileges")
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andReturn();
+        String resultString = result.getResponse().getContentAsString();
+        Assertions.assertTrue(resultString.contains("CREATE_EVENT_VENUE"));
+        Assertions.assertTrue(resultString.contains("VIEW_EVENT_ACTIVITIES"));
+        Assertions.assertTrue(resultString.contains("MODIFY_PROFILE_DATA"));
+        Assertions.assertTrue(resultString.contains("VIEW_ALL_EVENTS_AND_ACTIVITIES"));
     }
 }

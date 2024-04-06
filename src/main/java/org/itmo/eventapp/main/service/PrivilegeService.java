@@ -30,5 +30,4 @@ public class PrivilegeService {
     public List<Privilege> getAll() {
         return privilegeRepository.findAll();
     }
-
 }
