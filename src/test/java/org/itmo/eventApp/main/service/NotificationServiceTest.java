@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NotificationServiceTest extends AbstractTestContainers {
+class NotificationServiceTest extends AbstractTestContainers {
 
     @Autowired
     private NotificationService notificationService;

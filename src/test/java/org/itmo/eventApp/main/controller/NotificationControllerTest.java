@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NotificationControllerTest extends AbstractTestContainers{
+class NotificationControllerTest extends AbstractTestContainers{
     @Autowired
     private NotificationRepository notificationRepository;
 

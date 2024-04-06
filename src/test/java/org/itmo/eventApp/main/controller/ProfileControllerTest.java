@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class ProfileControllerTest extends AbstractTestContainers {
+class ProfileControllerTest extends AbstractTestContainers {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -41,7 +41,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
     @Test
     @WithMockUser(username = "test_mail@itmo.ru")
-    public void testChangeName() throws Exception {
+    void testChangeName() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
         UserChangeNameRequest request = new UserChangeNameRequest("Кодзима", "Гений");
@@ -59,7 +59,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
     @Test
     @WithMockUser(username = "test_mail@itmo.ru")
-    public void testChangePassword() throws Exception {
+    void testChangePassword() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
         UserChangePasswordRequest request = new UserChangePasswordRequest("oldPassword", "newPassword", "newPassword");
@@ -71,7 +71,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
     @Test
     @WithMockUser(username = "test_mail@itmo.ru")
-    public void testChangeMismatchPassword() throws Exception {
+    void testChangeMismatchPassword() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
         UserChangePasswordRequest request = new UserChangePasswordRequest("oldPassword", "test123123", "qwerty123");
@@ -83,7 +83,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
     @Test
     @WithMockUser(username = "test_mail@itmo.ru")
-    public void testChangeEmail() throws Exception {
+    void testChangeEmail() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
         UserChangeEmailRequest request = new UserChangeEmailRequest("newEmail@itmo.ru");
@@ -100,7 +100,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
     @Test
     @WithMockUser(username = "test_mail@itmo.ru")
-    public void testChangeToExistEmail() throws Exception {
+    void testChangeToExistEmail() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_user_3.sql");
@@ -114,7 +114,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
     @Test
     @WithMockUser(username = "test_mail@test_mail.com")
-    public void testGetUserEventPrivilegesNotFound() throws Exception {
+    void testGetUserEventPrivilegesNotFound() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
@@ -126,7 +126,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
     @Test
     @WithMockUser(username = "test_mail@test_mail.com")
-    public void testGetUserEventPrivileges() throws Exception {
+    void testGetUserEventPrivileges() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         String eventJson = """
                 {
@@ -154,7 +154,7 @@ public class ProfileControllerTest extends AbstractTestContainers {
 
     @Test
     @WithMockUser(username = "test_mail@test_mail.com")
-    public void testGetBaseInfo() throws Exception {
+    void testGetBaseInfo() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
         MvcResult result = mockMvc.perform(get("/api/profile/system-privileges")
