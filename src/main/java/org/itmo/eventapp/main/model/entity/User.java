@@ -28,7 +28,7 @@ public class User {
     private UserLoginInfo userLoginInfo;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<EventRole> userEvents;
+    private List<EventRole> eventRoles;
 
     private String name;
 
