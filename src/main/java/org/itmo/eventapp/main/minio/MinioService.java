@@ -98,7 +98,7 @@ public class MinioService {
                         CopyObjectArgs.builder()
                                 .source(CopySource.builder().bucket(sourceBucket).object(sourceObjectName).build())
                                 .bucket(destinationBucket)
-                                .object(destinationObjectName) // 在目标桶中设置新的对象名称
+                                .object(destinationObjectName) 
                                 .build()
                 );
             }
