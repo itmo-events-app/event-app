@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 public record TaskResponse(
         Integer id,
+        Integer eventId,
         String title,
         String description,
         TaskStatus taskStatus,
