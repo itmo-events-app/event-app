@@ -45,7 +45,6 @@ public class EventService {
     private final UserService userService;
     private final RoleService roleService;
     private final EventRoleService eventRoleService;
-    private final TaskService taskService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -244,6 +243,10 @@ public class EventService {
                         .build())
                 .collect(Collectors.toList());
         eventRoleService.saveAll(copiedEventRoles);
+        // copy image
+        String imagePrefix = existingEvent.getId().toString();
+        String newImagePrefix = savedEvent.getId().toString();
+        minioService.copyImagesWithPrefix(BUCKET_NAME,BUCKET_NAME,imagePrefix,newImagePrefix);
         return savedEvent;
     }
 
