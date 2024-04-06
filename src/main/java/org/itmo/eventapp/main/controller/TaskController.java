@@ -5,12 +5,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.dto.request.TaskFilterRequest;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Task;
-import org.itmo.eventapp.main.model.entity.enums.EventFormat;
-import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.service.TaskService;
@@ -23,7 +20,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,8 +30,6 @@ import java.util.Optional;
 public class TaskController {
     private final TaskService taskService;
     private final UserService userService;
-
-    // TODO: Add TaskService and move request processing there
 
     @PostMapping
     public ResponseEntity<Integer> taskAdd(@Valid @RequestBody TaskRequest taskRequest) {
