@@ -5,8 +5,10 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.request.UserChangeEmailRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
-import org.itmo.eventapp.main.model.entity.Role;
-import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
+import org.itmo.eventapp.main.model.entity.*;
+import org.itmo.eventapp.main.repository.EventRoleRepository;
+import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -67,5 +69,10 @@ public class UserService {
         }
 
         userLoginInfoService.setPassword(user.getUserLoginInfo(), request.newPassword());
+    }
+
+    public Set<Privilege> getUserSystemPrivileges(Integer userId) {
+        User user = findById(userId);
+        return user.getRole().getPrivileges();
     }
 }
