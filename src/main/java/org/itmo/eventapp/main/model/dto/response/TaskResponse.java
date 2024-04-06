@@ -1,6 +1,5 @@
 package org.itmo.eventapp.main.model.dto.response;
 
-import org.itmo.eventapp.main.model.dto.request.PlaceShortDataRequest;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 
 import java.time.LocalDateTime;

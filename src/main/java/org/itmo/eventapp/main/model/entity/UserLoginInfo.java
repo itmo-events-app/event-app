@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+@SuppressWarnings("java:S1948")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

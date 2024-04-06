@@ -1,4 +1,4 @@
-package org.itmo.eventapp.main.security.permissionEvaluator;
+package org.itmo.eventapp.main.security.permissionevaluator;
 
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;

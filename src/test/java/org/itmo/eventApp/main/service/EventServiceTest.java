@@ -182,11 +182,12 @@ class EventServiceTest {
         Event copiedEvent = eventService.copyEvent(1, false);
 
         verify(eventRepository).save(any(Event.class));
-        assertEquals(copiedEvent.getId(), 2);
+        assertEquals(2, copiedEvent.getId());
         assertEquals(existingEvent.getStartDate(), copiedEvent.getStartDate());
         assertEquals(existingEvent.getEndDate(), copiedEvent.getEndDate());
         assertEquals(existingEvent.getTitle(), copiedEvent.getTitle());
     }
+
     @Test
     void testCopyEvent() {
         int[] startingId = new int[]{1};
@@ -207,10 +208,11 @@ class EventServiceTest {
         });
         Event copiedEvent = eventService.copyEvent(1, true);
 
-        verify(eventRepository,times(2)).save(any(Event.class));
-        assertEquals(startingId[0], 5);
+        verify(eventRepository, times(2)).save(any(Event.class));
+        assertEquals(5, startingId[0]);
         assertNotEquals(existingEvent.getId(), copiedEvent.getId());
     }
+
     @Test
     void testCopyEventNotFound() {
         when(eventRepository.findById(1)).thenReturn(Optional.empty());

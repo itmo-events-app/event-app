@@ -8,7 +8,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class AuthControllerTest extends AbstractTestContainers {
+class AuthControllerTest extends AbstractTestContainers {
 
     @Autowired
     JwtTokenUtil jwtTokenUtil;
