@@ -6,7 +6,6 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.repository.NotificationRepository;
-import org.itmo.eventapp.main.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,12 +21,15 @@ import java.util.List;
 @Service
 public class NotificationService {
     private final NotificationRepository notificationRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public void createNotification(String title, String description, Integer userId) {
-
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new EntityNotFoundException("User not found!(" + userId + ")"));
+        User user;
+        try {
+            user = userService.findById(userId);
+        } catch (ResponseStatusException e) {
+            throw new EntityNotFoundException("User not found!(" + userId + ")");
+        }
 
         notificationRepository.save(Notification.builder()
                 .user(user)

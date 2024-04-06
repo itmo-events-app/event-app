@@ -1,13 +1,8 @@
 package org.itmo.eventapp.main.service;
 
-import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
-import org.itmo.eventapp.main.model.dto.request.TaskFilterRequest;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
-import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.Task;
@@ -18,20 +13,15 @@ import org.itmo.eventapp.main.repository.TaskRepository;
 import org.springframework.context.annotation.Lazy;
 import org.itmo.eventapp.main.service.specification.TaskSpecification;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
@@ -281,6 +271,14 @@ public class TaskService {
                         deadlineLowerLimit,
                         deadlineUpperLimit);
         return taskRepository.findAll(taskSpecification);
+    }
+
+    public List<Task> getTasksWithDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
+        return taskRepository.findAllByDeadlineBetween(startTime, endTime);
+    }
+
+    public List<Task> getTasksWithNotificationDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
+        return taskRepository.findAllByNotificationDeadlineBetween(startTime, endTime);
     }
 
 }

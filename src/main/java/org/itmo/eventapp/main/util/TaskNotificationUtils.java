@@ -5,8 +5,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.entity.Task;
-import org.itmo.eventapp.main.repository.TaskRepository;
 import org.itmo.eventapp.main.service.NotificationService;
+import org.itmo.eventapp.main.service.TaskService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,7 +27,7 @@ public class TaskNotificationUtils {
 
     private final NotificationService notificationService;
 
-    private final TaskRepository taskRepository;
+    private final TaskService taskService;
 
     @Value(value = "${notifications.taskUrl}")
     private String taskFullUrl;
@@ -107,11 +107,9 @@ public class TaskNotificationUtils {
         LocalDateTime endTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
         LocalDateTime startTime = endTime.minusMinutes(sendingPeriodInMinutes);
 
-        List<Task> overdueTasks = getTasksWithDeadlineBetween(startTime, endTime);
+        List<Task> overdueTasks = taskService.getTasksWithDeadlineBetween(startTime, endTime);
 
-        for (Task task: overdueTasks) {
-            taskNotificationUtils.createOverdueTaskNotification(task);
-        }
+        overdueTasks.forEach(taskNotificationUtils::createOverdueTaskNotification);
     }
 
     @Scheduled(cron = "${notifications.cron.create-notification-job}")
@@ -119,19 +117,9 @@ public class TaskNotificationUtils {
         LocalDateTime endTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
         LocalDateTime startTime = endTime.minusMinutes(sendingPeriodInMinutes);
 
-        List<Task> overdueTasks = getTasksWithNotificationDeadlineBetween(startTime, endTime);
+        List<Task> overdueTasks = taskService.getTasksWithNotificationDeadlineBetween(startTime, endTime);
 
-        for (Task task: overdueTasks) {
-            taskNotificationUtils.createReminderTaskNotification(task);
-        }
-    }
-
-    private List<Task> getTasksWithDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByDeadlineBetween(startTime, endTime);
-    }
-
-    private List<Task> getTasksWithNotificationDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByNotificationDeadlineBetween(startTime, endTime);
+        overdueTasks.forEach(taskNotificationUtils::createReminderTaskNotification);
     }
 
 }
