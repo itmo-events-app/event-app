@@ -1,5 +1,6 @@
 package org.itmo.eventapp.main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -39,11 +40,13 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
     // TODO: Add privilege validation
+    @Operation(summary = "Создание активности мероприятия")
     @PostMapping(value = "/activity", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Integer> addActivity(@Valid EventRequest eventRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.addEvent(eventRequest).getId());
     }
 
+    @Operation(summary = "Создание мероприятия")
     @PostMapping
     public ResponseEntity<Integer> addEventByOrganizer(@RequestBody @Valid CreateEventRequest eventRequest){
             return ResponseEntity
@@ -52,12 +55,14 @@ public class EventController {
     }
 
     // TODO: Return images in response
+    @Operation(summary = "Обновление мероприятия")
     @PutMapping("/{id}")
     public ResponseEntity<EventResponse> updateEvent(@Min(1) @PathVariable("id") Integer id,
                                                      @Valid EventRequest eventRequest) {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
     }
 
+    @Operation(summary = "Фильрация мероприятий")
     @SuppressWarnings("java:S107")
     @GetMapping
     public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
@@ -72,18 +77,21 @@ public class EventController {
                 eventService.getAllOrFilteredEvents(page, size, parentId, title, startDate, endDate, status, format)));
     }
 
+    @Operation(summary = "Получение мероприятия по id")
     @GetMapping("/{id}")
     public ResponseEntity<EventResponse> getEventById(@Min(1) @PathVariable("id") Integer id) {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.getEventById(id)));
     }
 
     // TODO: Add annotation @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Удаление мероприятия")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEventById(@Min(1) @PathVariable("id") Integer id) {
         eventService.deleteEventById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Получение списка пользователей, имеющих роль в данном мероприятии")
     @GetMapping("/{id}/organizers")
     public ResponseEntity<List<UserRoleResponse>> getUsersHavingRoles(@Min(1) @PathVariable("id") Integer id) {
         List<EventRole> eventRoles = eventService.getUsersHavingRoles(id);
@@ -91,6 +99,7 @@ public class EventController {
     }
 
     // TODO: Add privilege validation
+    @Operation(summary = "Копирование мероприятия")
     @PostMapping("/{id}/copy")
     public ResponseEntity<Integer> copyEvent(
             @Min(1) @PathVariable("id") Integer id,

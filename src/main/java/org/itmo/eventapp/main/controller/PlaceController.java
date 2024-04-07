@@ -1,5 +1,6 @@
 package org.itmo.eventapp.main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -23,6 +24,7 @@ import java.util.List;
 public class PlaceController {
     private final PlaceService placeService;
 
+    @Operation(summary = "Фильтрация списка площадок")
     @GetMapping
     public ResponseEntity<List<PlaceResponse>> getAllOrFilteredPlaces(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
                                                                       @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "5") int size,
@@ -31,6 +33,7 @@ public class PlaceController {
                 placeService.getAllOrFilteredPlaces(page, size, name)));
     }
 
+    @Operation(summary = "Получение площадки по id")
     @GetMapping("/{id}")
     public ResponseEntity<PlaceResponse> placeGet(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                   @PathVariable Integer id) {
@@ -38,6 +41,7 @@ public class PlaceController {
     }
 
     // TODO: Add privilege validation
+    @Operation(summary = "Создание площадки")
     @PostMapping
     public ResponseEntity<Integer> placeAdd(@Valid @RequestBody PlaceRequest placeRequest) {
         Place place = placeService.save(PlaceMapper.placeRequestToPlace(placeRequest));
@@ -45,6 +49,7 @@ public class PlaceController {
     }
 
     // TODO: Add privilege validation
+    @Operation(summary = "Редактирование площадки")
     @PutMapping("/{id}")
     public ResponseEntity<PlaceResponse> placeEdit(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                  @PathVariable Integer id,
@@ -54,6 +59,7 @@ public class PlaceController {
     }
 
     // TODO: Add privilege validation
+    @Operation(summary = "Удаление площадки")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> placeDelete(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                         @PathVariable Integer id) {
