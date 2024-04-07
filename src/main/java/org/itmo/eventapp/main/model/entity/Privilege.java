@@ -10,9 +10,7 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -33,11 +31,6 @@ public class Privilege {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     private PrivilegeType type;
-
-    // add EntityGraph
-    @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER)
-    @Builder.Default
-    private Set<Role> roles = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

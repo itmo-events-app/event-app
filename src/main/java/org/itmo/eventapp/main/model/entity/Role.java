@@ -45,12 +45,9 @@ public class Role {
 
     public void removePrivilege(Privilege privilege) {
         this.privileges.remove(privilege);
-        privilege.getRoles().remove(this);
     }
 
     public void addPrivilege(Privilege privilege) {
         this.privileges.add(privilege);
-        privilege.getRoles().add(this);
     }
-
 }
