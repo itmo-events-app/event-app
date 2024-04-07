@@ -95,14 +95,14 @@ public abstract class AbstractTestContainers {
     }
 
     /**
-     * @param pathToFile full path from project root directory with filename
-     *                   Example: src/test/resources/json/sayHello.json
+     * @param pathToFile full path from resources directory with filename.
+     *                   Example: /json/sayHello.json
      * @return file content as string
      */
     protected String loadAsString(String pathToFile) {
         String everything;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("src/test/resources/" + pathToFile))) {
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
 
@@ -130,6 +130,13 @@ public abstract class AbstractTestContainers {
         resourceDatabasePopulator.execute(dataSource);
     }
 
+    /**
+     * Sends request to /login endpoint and returns Bearer token
+     *
+     * @param login    - login
+     * @param password - unencrypted password
+     * @return token
+     */
     protected String getToken(String login, String password) throws Exception {
         LoginRequest loginRequest = new LoginRequest(login, password);
         String content = objectWriter.writeValueAsString(loginRequest);
