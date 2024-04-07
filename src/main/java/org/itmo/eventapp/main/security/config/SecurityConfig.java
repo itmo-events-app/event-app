@@ -45,7 +45,6 @@ public class SecurityConfig {
                         .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .authenticationManager(authenticationManager)
-
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .build();

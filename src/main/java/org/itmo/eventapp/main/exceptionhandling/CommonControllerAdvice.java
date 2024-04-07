@@ -27,7 +27,7 @@ class CommonControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<Map<String, List<String>>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        List<String> errors = ex.getBindingResult().getFieldErrors()
+        List<String> errors = ex.getBindingResult().getAllErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .toList();
