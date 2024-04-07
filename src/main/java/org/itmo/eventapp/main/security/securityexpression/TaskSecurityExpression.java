@@ -16,15 +16,19 @@ import java.util.stream.Stream;
 @Service
 public class TaskSecurityExpression {
     public boolean canCreateTask(int eventId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserLoginInfo userLoginInfo = (UserLoginInfo) authentication.getPrincipal();
-        Stream<EventRole> eventRoles = userLoginInfo.getUser().getEventRoles().stream()
-            .filter(it -> it.getEvent().getId().equals(eventId));
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserLoginInfo userLoginInfo = (UserLoginInfo) authentication.getPrincipal();
+            Stream<EventRole> eventRoles = userLoginInfo.getUser().getEventRoles().stream()
+                .filter(it -> it.getEvent().getId().equals(eventId));
 
-        Stream<Privilege> eventPrivileges = eventRoles
-            .map(it -> it.getRole().getPrivileges())
-            .flatMap(Collection::stream);
+            Stream<Privilege> eventPrivileges = eventRoles
+                .map(it -> it.getRole().getPrivileges())
+                .flatMap(Collection::stream);
 
-        return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(PrivilegeName.CREATE_TASK));
+            return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(PrivilegeName.CREATE_TASK));
+        } catch (NullPointerException ex) {
+            return false;
+        }
     }
 }
