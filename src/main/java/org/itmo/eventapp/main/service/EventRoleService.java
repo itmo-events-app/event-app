@@ -3,10 +3,7 @@ package org.itmo.eventapp.main.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
-import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.EventRole;
-import org.itmo.eventapp.main.model.entity.Privilege;
-import org.itmo.eventapp.main.model.entity.Role;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.repository.EventRoleRepository;
@@ -26,6 +23,10 @@ public class EventRoleService {
     private final UserService userService;
     private final RoleService roleService;
     private final List<String> notAssignableRoles = Arrays.asList("Администратор", "Читатель", "Организатор");
+
+    public List<EventRole> findByUserIdAndEventId(int userId, int eventId) {
+        return eventRoleRepository.findByUserIdAndEventId(userId, eventId);
+    }
 
     public void assignOrganizationalRole(Integer userId, Integer roleId, Integer eventId) {
         var role = roleService.findRoleById(roleId);
@@ -47,9 +48,9 @@ public class EventRoleService {
             eventRoleRepository.save(eventRole.get());
         } else {
             var newEventRole = EventRole.builder()
-                    .user(user)
-                    .role(role)
-                    .event(event).build();
+                .user(user)
+                .role(role)
+                .event(event).build();
             eventRoleRepository.save(newEventRole);
         }
     }
@@ -71,17 +72,17 @@ public class EventRoleService {
         }
         var userRoleInEvent = eventRoleRepository.findByUserAndRoleAndEvent(user, role, event);
         userRoleInEvent.ifPresentOrElse(eventRoleRepository::delete,
-                () -> {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("У пользователя с id %d нет роли %s в мероприятии с id %d",
-                            userId,
-                            role.getName(),
-                            eventId));
-                });
+            () -> {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("У пользователя с id %d нет роли %s в мероприятии с id %d",
+                    userId,
+                    role.getName(),
+                    eventId));
+            });
     }
 
     public Set<Privilege> getUserEventPrivileges(Integer userId, Integer eventId) {
         EventRole eventRole = eventRoleRepository.findByUserIdAndEventId(userId, eventId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_ROLE_NOT_FOUND_MESSAGE));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_ROLE_NOT_FOUND_MESSAGE));
         return eventRole.getRole().getPrivileges();
     }
 
@@ -96,11 +97,11 @@ public class EventRoleService {
     //TODO временный фикс, надо переделать
     private Event eventFindById(int id) {
         return eventRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
     }
 
     List<EventRole> findAllByEventId(Integer eventId) {
-        return  eventRoleRepository.findAllByEventId(eventId);
+        return eventRoleRepository.findAllByEventId(eventId);
     }
 
     @Transactional
@@ -110,6 +111,6 @@ public class EventRoleService {
 
     EventRole findByUserIdAndEventId(Integer userId, Integer eventId) {
         return eventRoleRepository.findByUserIdAndEventId(userId, eventId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
     }
 }

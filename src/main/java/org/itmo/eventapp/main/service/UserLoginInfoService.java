@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -45,4 +46,12 @@ public class UserLoginInfoService {
         userLoginInfoRepository.save(userLoginInfo);
     }
 
+    public void setLastLoginDate(UserLoginInfo userLoginInfo, LocalDateTime loginDate) {
+        userLoginInfo.setLastLoginDate(loginDate);
+        userLoginInfoRepository.save(userLoginInfo);
+    }
+
+    public void save(UserLoginInfo userLoginInfo) {
+        userLoginInfoRepository.save(userLoginInfo);
+    }
 }
