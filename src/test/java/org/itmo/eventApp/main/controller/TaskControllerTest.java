@@ -24,7 +24,7 @@ class TaskControllerTest extends AbstractTestContainers {
 
     private UserLoginInfo getUserLoginInfo() {
         UserLoginInfo userDetails = new UserLoginInfo();
-        userDetails.setEmail("test_mail@itmo.ru");
+        userDetails.setLogin("test_mail@itmo.ru");
         User dummyUser = new User();
         dummyUser.setId(1);
         userDetails.setUser(dummyUser);

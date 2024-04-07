@@ -6,7 +6,8 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
-import org.itmo.eventapp.main.model.entity.enums.EmailStatus;
+import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
+import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
 import org.itmo.eventapp.main.security.util.JwtTokenUtil;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,6 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public String login(LoginRequest loginRequest) {
-
         try {
             var authentication =
                     new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password());
@@ -53,7 +53,7 @@ public class AuthenticationService {
     public void createRegisterRequest(RegistrationUserRequest registrationUserRequest) {
         String login = registrationUserRequest.email();
 
-        if (registrationRequestService.existsByEmail(login)) {
+        if (registrationRequestService.existsByLogin(login)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.REGISTRATION_REQUEST_EMAIL_EXIST);
         }
         else {
@@ -99,11 +99,12 @@ public class AuthenticationService {
 
         UserLoginInfo loginInfo = UserLoginInfo.builder()
                 .registration(request)
-                .email(request.getEmail())
+                .login(request.getEmail())
+                .loginType(LoginType.EMAIL)
                 .passwordHash(request.getPasswordHash())
                 .lastLoginDate(LocalDateTime.now())
                 .user(user)
-                .emailStatus(EmailStatus.APPROVED)
+                .loginStatus(LoginStatus.APPROVED)
                 .build();
 
         userLoginInfoService.save(loginInfo);

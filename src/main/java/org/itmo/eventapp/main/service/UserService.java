@@ -37,7 +37,7 @@ public class UserService {
     }
 
     public User findByEmail(String email) {
-        return userRepository.findByUserLoginInfo_Email(email)
+        return userRepository.findByUserLoginInfo_Login(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
@@ -53,7 +53,7 @@ public class UserService {
         User user = userLoginInfoService.findByEmail(email).getUser();
 
         // Проверка на уникальность нового email перед обновлением
-        if (userLoginInfoService.existsByEmail(request.email())) {
+        if (userLoginInfoService.existsByLogin(request.email())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.USER_EMAIL_EXIST);
         }
 

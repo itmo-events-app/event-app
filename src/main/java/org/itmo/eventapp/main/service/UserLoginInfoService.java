@@ -2,17 +2,14 @@ package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
-import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.repository.UserLoginInfoRepository;
-import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 /**
  * Класс, отвечающий за обработку операций с данными о пользователя,
@@ -28,16 +25,16 @@ public class UserLoginInfoService {
     private final PasswordEncoder passwordEncoder;
 
     public UserLoginInfo findByEmail(String email){
-        return userLoginInfoRepository.getUserLoginInfoByEmail(email)
+        return userLoginInfoRepository.getUserLoginInfoByLogin(email)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
-    public boolean existsByEmail(String email){
-        return userLoginInfoRepository.existsByEmail(email);
+    public boolean existsByLogin(String email){
+        return userLoginInfoRepository.existsByLogin(email);
     }
 
     public void setEmail(UserLoginInfo userLoginInfo, String email){
-        userLoginInfo.setEmail(email);
+        userLoginInfo.setLogin(email);
         userLoginInfoRepository.save(userLoginInfo);
     }
 

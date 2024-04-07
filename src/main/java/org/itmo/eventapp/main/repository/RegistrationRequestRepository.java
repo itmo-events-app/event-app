@@ -11,5 +11,5 @@ public interface RegistrationRequestRepository extends JpaRepository<Registratio
 
     Optional<RegistrationRequest> findRegistrationRequestById(Integer id);
 
-    boolean existsByEmail(String email);
+    boolean existsByLogin(String login);
 }

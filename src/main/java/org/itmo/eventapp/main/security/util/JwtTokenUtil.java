@@ -38,7 +38,7 @@ public class JwtTokenUtil {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public String extractUserEmail(String token) {
+    public String extractUserLogin(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -47,16 +47,16 @@ public class JwtTokenUtil {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String email = extractUserEmail(token);
+        final String email = extractUserLogin(token);
         return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public String generateToken(String email) {
+    public String generateToken(String login) {
 
         var now = Instant.now();
 
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(login)
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plus(MINUTES, ChronoUnit.MINUTES)))
                 .signWith(SECRET_KEY)
