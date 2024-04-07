@@ -14,6 +14,7 @@ import org.itmo.eventapp.main.service.TaskService;
 import org.itmo.eventapp.main.service.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
@@ -31,6 +32,7 @@ public class TaskController {
     private final TaskService taskService;
     private final UserService userService;
 
+    @PreAuthorize("@taskSecurityExpression.canCreateTask(#taskRequest.eventId)")
     @PostMapping
     public ResponseEntity<Integer> taskAdd(@Valid @RequestBody TaskRequest taskRequest) {
         Task task = taskService.save(taskRequest);
