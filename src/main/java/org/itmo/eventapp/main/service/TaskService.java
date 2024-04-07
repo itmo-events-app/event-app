@@ -46,7 +46,7 @@ public class TaskService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        User assigner = userService.findByEmail(email);
+        User assigner = userService.findByLogin(email);
 
 
         User assignee = null;

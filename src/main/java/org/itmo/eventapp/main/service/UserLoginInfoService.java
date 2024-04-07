@@ -24,8 +24,8 @@ public class UserLoginInfoService {
     private final UserLoginInfoRepository userLoginInfoRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserLoginInfo findByEmail(String email){
-        return userLoginInfoRepository.getUserLoginInfoByLogin(email)
+    public UserLoginInfo findByLogin(String login){
+        return userLoginInfoRepository.getUserLoginInfoByLogin(login)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 

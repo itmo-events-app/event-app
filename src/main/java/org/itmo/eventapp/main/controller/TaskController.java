@@ -86,7 +86,7 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
-        Integer userId = userService.findByEmail(currentPrincipalName).getId();
+        Integer userId = userService.findByLogin(currentPrincipalName).getId();
 
         Task updatedTask = taskService.setAssignee(id, userId);
         return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
@@ -182,7 +182,7 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
-        Integer userId = userService.findByEmail(currentPrincipalName).getId();
+        Integer userId = userService.findByLogin(currentPrincipalName).getId();
 
         List<Task> eventUserTasks =
                 taskService.getEventTasksWithFilter(eventId,
@@ -208,7 +208,7 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
-        Integer userId = userService.findByEmail(currentPrincipalName).getId();
+        Integer userId = userService.findByLogin(currentPrincipalName).getId();
 
         List<Task> userTasks = taskService.getUserTasksWithFilter(eventId,
                 userId,

@@ -20,8 +20,8 @@ public class RegistrationRequestService {
                         ExceptionConst.REGISTRATION_REQUEST_NOT_FOUND_MESSAGE));
     }
 
-    public boolean existsByLogin(String email) {
-        return registrationRequestRepository.existsByLogin(email);
+    public boolean existsByEmail(String email) {
+        return registrationRequestRepository.existsByEmail(email);
     }
 
     public void save(RegistrationRequest registrationRequest) {

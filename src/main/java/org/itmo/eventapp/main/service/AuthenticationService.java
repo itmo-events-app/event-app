@@ -40,7 +40,7 @@ public class AuthenticationService {
                     new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password());
             authenticationManager.authenticate(authentication);
 
-            var userLoginInfo = userLoginInfoService.findByEmail(loginRequest.login());
+            var userLoginInfo = userLoginInfoService.findByLogin(loginRequest.login());
             userLoginInfoService.setLastLoginDate(userLoginInfo, LocalDateTime.now());
 
             return jwtTokenUtil.generateToken(loginRequest.login());
@@ -53,7 +53,7 @@ public class AuthenticationService {
     public void createRegisterRequest(RegistrationUserRequest registrationUserRequest) {
         String login = registrationUserRequest.email();
 
-        if (registrationRequestService.existsByLogin(login)) {
+        if (registrationRequestService.existsByEmail(login)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.REGISTRATION_REQUEST_EMAIL_EXIST);
         }
         else {

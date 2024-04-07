@@ -36,13 +36,13 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByUserLoginInfo_Login(email)
+    public User findByLogin(String login) {
+        return userRepository.findByUserLoginInfo_Login(login)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
     public void changeName(String email, UserChangeNameRequest request) {
-        User user = userLoginInfoService.findByEmail(email).getUser();
+        User user = userLoginInfoService.findByLogin(email).getUser();
         user.setName(request.name());
         user.setSurname(request.surname());
         userRepository.save(user);
@@ -50,7 +50,7 @@ public class UserService {
 
     //TODO добавить нотификацию о смене почты и его подтверждения
     public void changeEmail(String email, UserChangeEmailRequest request) {
-        User user = userLoginInfoService.findByEmail(email).getUser();
+        User user = userLoginInfoService.findByLogin(email).getUser();
 
         // Проверка на уникальность нового email перед обновлением
         if (userLoginInfoService.existsByLogin(request.email())) {
@@ -61,7 +61,7 @@ public class UserService {
     }
 
     public void changePassword(String email, UserChangePasswordRequest request) {
-        User user = userLoginInfoService.findByEmail(email).getUser();
+        User user = userLoginInfoService.findByLogin(email).getUser();
 
         // Проверяем, что новый пароль совпадает с подтверждением
         if (!request.newPassword().equals(request.confirmNewPassword())) {
