@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Table(name = "user_t")
 @NoArgsConstructor
@@ -31,10 +29,6 @@ public class User {
     // add EntityGraph
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private UserLoginInfo userLoginInfo;
-
-    // add EntityGraph
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<EventRole> eventRoles;
 
     private String name;
 
