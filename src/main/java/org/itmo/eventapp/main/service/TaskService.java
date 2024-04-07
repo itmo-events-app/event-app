@@ -115,9 +115,7 @@ public class TaskService {
     }
 
     public void delete(Integer id) {
-
         taskRepository.deleteById(id);
-
     }
 
 
