@@ -1,14 +1,18 @@
 package org.itmo.eventApp.main.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import io.minio.MinioClient;
 import io.minio.RemoveBucketArgs;
 import org.itmo.eventapp.main.Main;
+import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,6 +24,8 @@ import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -35,27 +41,32 @@ public abstract class AbstractTestContainers {
     private final static String POSTGRES_VERSION = "postgres:16.0";
 
     /**
+     * Class for converting java object to json format string
+     */
+    protected ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+
+    /**
      * In tests create bucket only with this name
      * After each test bucket with this name will be deleted
      */
     public final static String MINIO_BUCKET = "test-bucket";
 
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(POSTGRES_VERSION)
-            .withUsername("test_user")
-            .withPassword("test_password")
-            .withDatabaseName("test_db")
-            .withReuse(true);
+        .withUsername("test_user")
+        .withPassword("test_password")
+        .withDatabaseName("test_db")
+        .withReuse(true);
 
     private static final MinIOContainer minioContainer = new MinIOContainer("minio/minio")
-            .withUserName("test_minio_admin")
-            .withPassword("test_minio_admin")
-            .withReuse(true);
+        .withUserName("test_minio_admin")
+        .withPassword("test_minio_admin")
+        .withReuse(true);
 
     MinioClient minioClient = MinioClient
-            .builder()
-            .endpoint(minioContainer.getS3URL())
-            .credentials(minioContainer.getUserName(), minioContainer.getPassword())
-            .build();
+        .builder()
+        .endpoint(minioContainer.getS3URL())
+        .credentials(minioContainer.getUserName(), minioContainer.getPassword())
+        .build();
 
     @BeforeAll
     public static void startPostgres() {
@@ -117,5 +128,19 @@ public abstract class AbstractTestContainers {
         resourceDatabasePopulator.addScript(new ClassPathResource(sqlFileName));
 //        resourceDatabasePopulator.setSeparator("@@");
         resourceDatabasePopulator.execute(dataSource);
+    }
+
+    protected String getToken(String login, String password) throws Exception {
+        LoginRequest loginRequest = new LoginRequest(login, password);
+        String content = objectWriter.writeValueAsString(loginRequest);
+
+        String token = mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        return token;
     }
 }
