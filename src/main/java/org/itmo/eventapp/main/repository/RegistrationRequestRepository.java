@@ -9,5 +9,7 @@ import java.util.Optional;
 @Repository
 public interface RegistrationRequestRepository extends JpaRepository<RegistrationRequest, Integer> {
 
-    Optional<RegistrationRequest> getRegistrationRequestByEmail(String email);
+    Optional<RegistrationRequest> findRegistrationRequestById(Integer id);
+
+    boolean existsByEmail(String email);
 }
