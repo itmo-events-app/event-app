@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.service.NotificationService;
-import org.itmo.eventapp.main.service.TaskService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;

@@ -71,4 +71,39 @@ public class MinioService {
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucket).object(item.objectName()).build());
         }
     }
+
+    @SneakyThrows
+    public void copyImagesWithPrefix(String sourceBucket, String destinationBucket, String sourcePrefix, String destinationPrefix) {
+        try {
+            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(sourceBucket).build())) {
+                throw new MinioException("Source bucket does not exist");
+            }
+
+            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(destinationBucket).build())) {
+                throw new MinioException("Destination bucket does not exist");
+            }
+        } catch (Exception ex) {
+            throw new MinioException(ex.getMessage());
+        }
+
+        try {
+            Iterable<Result<Item>> results = minioClient.listObjects(
+                    ListObjectsArgs.builder().bucket(sourceBucket).prefix(sourcePrefix).build()
+            );
+            for (Result<Item> result : results) {
+                Item item = result.get();
+                String sourceObjectName = item.objectName();
+                String destinationObjectName = destinationPrefix + sourceObjectName.substring(sourcePrefix.length());
+                minioClient.copyObject(
+                        CopyObjectArgs.builder()
+                                .source(CopySource.builder().bucket(sourceBucket).object(sourceObjectName).build())
+                                .bucket(destinationBucket)
+                                .object(destinationObjectName) 
+                                .build()
+                );
+            }
+        } catch (Exception ex) {
+            throw new MinioException("Error copying images: " + ex.getMessage());
+        }
+    }
 }
