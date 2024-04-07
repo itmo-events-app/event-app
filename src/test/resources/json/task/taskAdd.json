@@ -1,18 +1,14 @@
 {
   "eventId": 1,
-  "assigner": {
+  "assignee": {
     "id": 1,
-    "name": "ip",
-    "surname": "13"
+    "name": "test",
+    "surname": "user"
   },
-  "title": "the most difficult task in your life",
-  "description": "just do it",
+  "title": "CREATED",
+  "description": "created",
   "taskStatus": "NEW",
-  "place": {
-    "id": 1,
-    "name:": "mega place",
-    "address": "itmo university"
-  },
-  "deadline": "2024-03-30T21:35:44.799147347",
-  "notificationDeadline": "2024-03-31T21:35:44.799147347"
+  "place": null,
+  "deadline": "2025-04-20T21:00:00",
+  "notificationDeadline": "2025-04-20T21:00:00"
 }
