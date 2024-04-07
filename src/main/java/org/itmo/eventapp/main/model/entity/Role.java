@@ -35,7 +35,8 @@ public class Role {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     private RoleType type;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // add EntityGraph
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     @JoinTable(name = "role_privilege",
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),

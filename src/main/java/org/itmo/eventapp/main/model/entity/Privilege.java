@@ -1,7 +1,10 @@
 package org.itmo.eventapp.main.model.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
@@ -31,7 +34,8 @@ public class Privilege {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     private PrivilegeType type;
 
-    @ManyToMany(mappedBy = "privileges", fetch = FetchType.LAZY)
+    // add EntityGraph
+    @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER)
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
