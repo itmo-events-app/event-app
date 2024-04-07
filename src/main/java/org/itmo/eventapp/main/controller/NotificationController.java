@@ -1,5 +1,6 @@
 package org.itmo.eventapp.main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -24,6 +25,7 @@ import java.util.List;
 public class NotificationController {
     private final NotificationService notificationService;
 
+    @Operation(summary = "Получение списка всех уведомлений")
     @GetMapping
     public ResponseEntity<List<NotificationResponse>> getAllNotifications(
             @AuthenticationPrincipal UserLoginInfo userDetails,
@@ -38,6 +40,7 @@ public class NotificationController {
         return ResponseEntity.ok(responseBody);
     }
 
+    @Operation(summary = "Установка статуса прочитано у всех уведомлений")
     @PutMapping
     public ResponseEntity<List<NotificationResponse>> setAllAsSeenNotifications(
             @AuthenticationPrincipal UserLoginInfo userDetails,
@@ -53,6 +56,7 @@ public class NotificationController {
         return ResponseEntity.ok(responseBody);
     }
 
+    @Operation(summary = "Установка статуса прочитано у одного уведомления")
     @PutMapping(path = "/{notificationId}")
     public ResponseEntity<NotificationResponse> setOneAsSeenNotification(
             @AuthenticationPrincipal UserLoginInfo userDetails,
