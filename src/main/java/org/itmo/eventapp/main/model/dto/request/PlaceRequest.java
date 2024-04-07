@@ -13,7 +13,7 @@ public record PlaceRequest(
         String address,
         @NotNull(message = "Поле format не может быть null!")
         PlaceFormat format,
-        @NotBlank(message = "Поле room не может быть пустым!")
+        @NotNull(message = "Поле room не может быть null!")
         String room,
         @NotNull(message = "Поле description не может быть null!")
         String description,
