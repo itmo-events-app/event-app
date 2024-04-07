@@ -70,7 +70,9 @@ public class TaskService {
 
         newTask = taskRepository.save(newTask);
 
-        taskNotificationUtils.createIncomingTaskNotification(newTask);
+        if (assignee != null) {
+            taskNotificationUtils.createIncomingTaskNotification(newTask);
+        }
 
         return newTask;
     }
