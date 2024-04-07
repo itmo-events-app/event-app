@@ -1,5 +1,6 @@
 package org.itmo.eventapp.main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -24,19 +25,22 @@ public class AuthController {
 
     private final AuthenticationService authenticationService;
 
+    @Operation(summary = "Получение логина пользователя")
     @PostMapping("/login")
     ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest) {
         String token = authenticationService.login(loginRequest);
         return ResponseEntity.ok(token);
     }
 
+    @Operation(summary = "Регистрация пользователя")
     @PostMapping("/register")
     ResponseEntity<Void> register(@Valid @RequestBody RegistrationUserRequest registrationUserRequest) {
         authenticationService.createRegisterRequest(registrationUserRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping(value = "/approveRegister/{requestId}")
+    @Operation(summary = "Одобрение заявки на регистрацию")
+    @PostMapping(value = "/approveRegister/{requestId}")
     ResponseEntity<Void> approveRegister(@PathVariable("requestId") Integer requestId) {
         // TODO: check for administrator
         authenticationService.approveRegistrationRequestCallback(requestId);

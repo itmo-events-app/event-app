@@ -1,5 +1,6 @@
 package org.itmo.eventapp.main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -32,6 +33,7 @@ public class TaskController {
     private final TaskService taskService;
     private final UserService userService;
 
+    @Operation(summary = "Создание задачи")
     @PreAuthorize("@taskSecurityExpression.canCreateTask(#taskRequest.eventId)")
     @PostMapping
     public ResponseEntity<Integer> taskAdd(@Valid @RequestBody TaskRequest taskRequest) {
@@ -39,6 +41,7 @@ public class TaskController {
         return ResponseEntity.status(201).body(task.getId());
     }
 
+    @Operation(summary = "Получение задачи по id")
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> taskGet(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                 @PathVariable Integer id) {
@@ -48,6 +51,7 @@ public class TaskController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @Operation(summary = "Редактирование задачи")
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponse> taskEdit(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                  @PathVariable Integer id,
@@ -56,6 +60,7 @@ public class TaskController {
         return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(edited));
     }
 
+    @Operation(summary = "Удаление задачи")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> taskDelete(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                         @PathVariable Integer id) {
@@ -65,6 +70,7 @@ public class TaskController {
         return ResponseEntity.status(204).build();
     }
 
+    @Operation(summary = "Назначение исполнителя задачи")
     @PutMapping("/{id}/assignee/{userId}")
     public ResponseEntity<TaskResponse> taskSetAssignee(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
@@ -77,6 +83,7 @@ public class TaskController {
     }
 
     /*TODO: TEST*/
+    @Operation(summary = "Назначение себя исполнителем задачи")
     @PutMapping("/{id}/assignee")
     public ResponseEntity<TaskResponse> taskTakeOn(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
@@ -93,6 +100,7 @@ public class TaskController {
     }
 
     // p35 && also delete yourself as privilege 41
+    @Operation(summary = "Удалеине исполнителя задачи")
     @DeleteMapping("/{id}/assignee")
     public ResponseEntity<TaskResponse> taskDeleteAssignee(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
@@ -103,6 +111,7 @@ public class TaskController {
     }
 
     //privilege 32 && privilege 39
+    @Operation(summary = "Установка статуса задачи")
     @PutMapping("/{id}/status")
     public ResponseEntity<TaskResponse> taskSetStatus(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
@@ -118,6 +127,7 @@ public class TaskController {
     /*TODO: TEST*/
 
     //    @PutMapping("/event/{srcEventId}/{dstEventId}")
+    @Operation(summary = "Перемещение списка задач")
     @PutMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListMove(
 //            @Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
@@ -132,6 +142,7 @@ public class TaskController {
     }
 
     //    @PostMapping("/event/{srcEventId}/{dstEventId}")
+    @Operation(summary = "Копирование списка задач")
     @PostMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListCopy(
 //            @Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
@@ -146,6 +157,7 @@ public class TaskController {
         return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(newTasks));
     }
 
+    @Operation(summary = "Получение списка задач мероприятия")
     @GetMapping("/event/{eventId}")
     public ResponseEntity<List<TaskResponse>> taskListShowInEvent(
             @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
@@ -168,6 +180,7 @@ public class TaskController {
         return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(eventTasks));
     }
 
+    @Operation(summary = "Получение списка задач мероприятия где пользователь является исполнителем")
     @GetMapping("/event/{eventId}/where-assignee")
     public ResponseEntity<List<TaskResponse>> taskListShowInEventWhereAssignee(
             @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
@@ -196,6 +209,7 @@ public class TaskController {
         return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(eventUserTasks));
     }
 
+    @Operation(summary = "Получение списка задач где пользователь является исполнителем")
     @GetMapping("/where-assignee")
     public ResponseEntity<List<TaskResponse>> taskListShowWhereAssignee(
             @RequestParam(required = false) Integer eventId,
