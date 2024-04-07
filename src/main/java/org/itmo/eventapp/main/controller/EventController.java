@@ -7,9 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
+import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
+import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
+import org.itmo.eventapp.main.model.mapper.EventRoleMapper;
 import org.itmo.eventapp.main.service.EventService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,18 +58,18 @@ public class EventController {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
     }
 
-    // TODO: Add filtering by fields: title, dates, status, format
-
+    @SuppressWarnings("java:S107")
     @GetMapping
     public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
                                                                       @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") int size,
+                                                                      @RequestParam(required = false) Integer parentId,
                                                                       @RequestParam(required = false) String title,
                                                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
                                                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
                                                                       @RequestParam(required = false) EventStatus status,
                                                                       @RequestParam(required = false) EventFormat format) {
         return ResponseEntity.ok().body(EventMapper.eventsToEventResponseList(
-                eventService.getAllOrFilteredEvents(page, size, title, startDate, endDate, status, format)));
+                eventService.getAllOrFilteredEvents(page, size, parentId, title, startDate, endDate, status, format)));
     }
 
     @GetMapping("/{id}")
@@ -79,5 +82,21 @@ public class EventController {
     public ResponseEntity<Void> deleteEventById(@Min(1) @PathVariable("id") Integer id) {
         eventService.deleteEventById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/organizers")
+    public ResponseEntity<List<UserRoleResponse>> getUsersHavingRoles(@Min(1) @PathVariable("id") Integer id) {
+        List<EventRole> eventRoles = eventService.getUsersHavingRoles(id);
+        return ResponseEntity.ok().body(EventRoleMapper.eventRolesToUserRoleResponses(eventRoles));
+    }
+
+    // TODO: Add privilege validation
+    @PostMapping("/{id}/copy")
+    public ResponseEntity<Integer> copyEvent(
+            @Min(1) @PathVariable("id") Integer id,
+            @RequestParam(value = "deep", defaultValue = "false") boolean deep) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(eventService.copyEvent(id, deep).getId());
     }
 }

@@ -5,18 +5,22 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.dto.request.TaskFilterRequest;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.service.TaskService;
+import org.itmo.eventapp.main.service.UserService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,14 +30,13 @@ import java.util.Optional;
 @RequestMapping(value = "/api/tasks")
 public class TaskController {
     private final TaskService taskService;
+    private final UserService userService;
 
-    // TODO: Add TaskService and move request processing there
-
+    @PreAuthorize("@taskSecurityExpression.canCreateTask(#taskRequest.eventId)")
     @PostMapping
     public ResponseEntity<Integer> taskAdd(@Valid @RequestBody TaskRequest taskRequest) {
-        int taskId = taskService.save(taskRequest).getId();
-        // schedule task deadline notification
-        return ResponseEntity.status(201).body(taskId);
+        Task task = taskService.save(taskRequest);
+        return ResponseEntity.status(201).body(task.getId());
     }
 
     @GetMapping("/{id}")
@@ -46,140 +49,174 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> taskEdit(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
-                                      @PathVariable Integer id,
-                                      @Valid @RequestBody TaskRequest taskRequest) {
-        // edit task
-        // schedule task deadline notification
-        return ResponseEntity.ok().build();
+    public ResponseEntity<TaskResponse> taskEdit(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                                 @PathVariable Integer id,
+                                                 @Valid @RequestBody TaskRequest taskRequest) {
+        Task edited = taskService.edit(id, taskRequest);
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(edited));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> taskDelete(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+    public ResponseEntity<Void> taskDelete(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                         @PathVariable Integer id) {
         // delete task
+        taskService.delete(id);
         // delete task deadline notification
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(204).build();
     }
 
     @PutMapping("/{id}/assignee/{userId}")
-    public ResponseEntity<TaskRequest> taskSetAssignee(
+    public ResponseEntity<TaskResponse> taskSetAssignee(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id,
             @Min(value = 1, message = "Параметр userId не может быть меньше 1!")
             @PathVariable Integer userId
     ) {
-        // set assignee - ORG only
-        // schedule task deadline notification
-        // delete task deadline notification for prev assignee
-        TaskRequest updatedTask = null;
-        return ResponseEntity.ok().body(updatedTask);
+        Task updatedTask = taskService.setAssignee(id, userId);
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
     }
 
+    /*TODO: TEST*/
     @PutMapping("/{id}/assignee")
-    public ResponseEntity<TaskRequest> taskTakeOn(
+    public ResponseEntity<TaskResponse> taskTakeOn(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id
     ) {
-        // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
-        // schedule task deadline notification
-        TaskRequest updatedTask = null;
-        return ResponseEntity.ok().body(updatedTask);
+        /*TODO: TEST*/
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+
+        Integer userId = userService.findByEmail(currentPrincipalName).getId();
+
+        Task updatedTask = taskService.setAssignee(id, userId);
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
     }
 
+    // p35 && also delete yourself as privilege 41
     @DeleteMapping("/{id}/assignee")
-    public ResponseEntity<?> taskDeleteAssignee(
+    public ResponseEntity<TaskResponse> taskDeleteAssignee(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id
     ) {
-        // delete task deadline notification
-        return ResponseEntity.ok().build();
+        Task updatedTask = taskService.setAssignee(id, -1);
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
     }
 
-    //privilege 32
+    //privilege 32 && privilege 39
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> taskSetStatus(
+    public ResponseEntity<TaskResponse> taskSetStatus(
             @Min(value = 1, message = "Параметр id не может быть меньше 1!")
             @PathVariable Integer id,
             @NotNull(message = "Параметр newStatus не может быть null!")
             @RequestBody TaskStatus newStatus
     ) {
-        // set status - ORG only
-        // delete task deadline notification - if done ???
-        return ResponseEntity.ok().build();
-    }
-
-    //privilege 39
-    @PutMapping("/{id}/status/assignee")
-    public ResponseEntity<?> taskMarkDone(
-            @Min(value = 1, message = "Параметр id не может быть меньше 1!")
-            @PathVariable Integer id,
-            @NotNull(message = "Параметр newStatus не может быть null!")
-            @RequestBody TaskStatus newStatus
-    ) {
-        // set status "done"
-        // delete task deadline notification - if done ???
-        return ResponseEntity.ok().build();
+        Task updatedTask = taskService.setStatus(id, newStatus);
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
     }
 
 
-    @PutMapping("/event/{srcEventId}/{dstEventId}")
-    public ResponseEntity<?> taskListMove(
-            @Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
-            @PathVariable Integer srcEventId,
+    /*TODO: TEST*/
+
+    //    @PutMapping("/event/{srcEventId}/{dstEventId}")
+    @PutMapping("/event/{dstEventId}")
+    public ResponseEntity<List<TaskResponse>> taskListMove(
+//            @Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
+//            @PathVariable Integer srcEventId,
             @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
             @PathVariable Integer dstEventId,
             @NotEmpty(message = "Список task id не может быть пустым!")
             @RequestBody List<Integer> taskIds
     ) {
-        // change srcEventId to dstEventId in tasks
-        // src == dst - ?
-        return ResponseEntity.ok().build();
+        List<Task> updTasks = taskService.moveTasks(dstEventId, taskIds);
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(updTasks));
     }
 
-    @PostMapping("/event/{srcEventId}/{dstEventId}")
-    public ResponseEntity<List<TaskRequest>> taskListCopy(
-            @Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
-            @PathVariable Integer srcEventId,
+    //    @PostMapping("/event/{srcEventId}/{dstEventId}")
+    @PostMapping("/event/{dstEventId}")
+    public ResponseEntity<List<TaskResponse>> taskListCopy(
+//            @Min(value = 1, message = "Параметр srcEventId не может быть меньше 1!")
+//            @PathVariable Integer srcEventId,
             @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
             @PathVariable Integer dstEventId,
             @NotEmpty(message = "Список task id не может быть пустым!")
             @RequestBody List<Integer> taskIds
     ) {
-        List<TaskRequest> newTasks = new ArrayList<>();
-        // create new tasks in event with dstEventId
-        // assignee -> null; status -> new
-        // schedule task deadline notification
+        List<Task> newTasks = taskService.copyTasks(dstEventId, taskIds);
         // src == dst - ?
-        return ResponseEntity.ok().body(newTasks);
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(newTasks));
     }
 
     @GetMapping("/event/{eventId}")
-    public ResponseEntity<List<TaskRequest>> taskListShowInEvent(
+    public ResponseEntity<List<TaskResponse>> taskListShowInEvent(
             @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
             @PathVariable Integer eventId,
-            @Valid @RequestBody TaskFilterRequest filter
+            @RequestParam(required = false) Integer assigneeId,
+            @RequestParam(required = false) Integer assignerId,
+            @RequestParam(required = false) TaskStatus taskStatus,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineLowerLimit,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineUpperLimit,
+            @RequestParam(required = false, defaultValue = "false") Boolean subEventTasksGet
     ) {
-        List<TaskRequest> eventTasks = new ArrayList<>();
-        // apply filtering in db - ???
-        return ResponseEntity.ok().body(eventTasks);
+        List<Task> eventTasks =
+                taskService.getEventTasksWithFilter(eventId,
+                        assigneeId,
+                        assignerId,
+                        taskStatus,
+                        deadlineLowerLimit,
+                        deadlineUpperLimit,
+                        subEventTasksGet);
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(eventTasks));
     }
 
     @GetMapping("/event/{eventId}/where-assignee")
-    public ResponseEntity<List<TaskRequest>> taskListShowInEventWhereAssignee(
+    public ResponseEntity<List<TaskResponse>> taskListShowInEventWhereAssignee(
             @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
-            @PathVariable Integer eventId
+            @PathVariable Integer eventId,
+            @RequestParam(required = false) Integer assignerId,
+            @RequestParam(required = false) TaskStatus taskStatus,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineLowerLimit,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineUpperLimit,
+            @RequestParam(required = false, defaultValue = "false") Boolean subEventTasksGet
     ) {
-        List<TaskRequest> eventUserTasks = new ArrayList<>();
-        // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
-        return ResponseEntity.ok().body(eventUserTasks);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+
+        Integer userId = userService.findByEmail(currentPrincipalName).getId();
+
+        List<Task> eventUserTasks =
+                taskService.getEventTasksWithFilter(eventId,
+                        userId,
+                        assignerId,
+                        taskStatus,
+                        deadlineLowerLimit,
+                        deadlineUpperLimit,
+                        subEventTasksGet);
+
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(eventUserTasks));
     }
 
     @GetMapping("/where-assignee")
-    public ResponseEntity<List<TaskRequest>> taskListShowWhereAssignee() {
-        List<TaskRequest> userTasks = new ArrayList<>();
-        // ASSIGNEE (USER) ID SHOULD BE TAKEN FROM CONTEXT???
-        return ResponseEntity.ok().body(userTasks);
+    public ResponseEntity<List<TaskResponse>> taskListShowWhereAssignee(
+            @RequestParam(required = false) Integer eventId,
+            @RequestParam(required = false) Integer assignerId,
+            @RequestParam(required = false) TaskStatus taskStatus,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineLowerLimit,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadlineUpperLimit
+            ) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+
+        Integer userId = userService.findByEmail(currentPrincipalName).getId();
+
+        List<Task> userTasks = taskService.getUserTasksWithFilter(eventId,
+                userId,
+                assignerId,
+                taskStatus,
+                deadlineLowerLimit,
+                deadlineUpperLimit);
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(userTasks));
     }
 
 

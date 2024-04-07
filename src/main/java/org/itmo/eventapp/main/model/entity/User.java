@@ -1,9 +1,10 @@
 package org.itmo.eventapp.main.model.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "user_t")
@@ -20,15 +21,14 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // add EntityGraph
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "notification_info_id")
     private UserNotificationInfo userNotificationInfo;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    // add EntityGraph
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private UserLoginInfo userLoginInfo;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<EventRole> userEvents;
 
     private String name;
 

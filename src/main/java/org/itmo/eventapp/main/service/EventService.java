@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
@@ -29,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -37,7 +39,7 @@ public class EventService {
     private final EventRepository eventRepository;
 
     private final MinioService minioService;
-    private final String bucketName="event-images";
+    private static final String BUCKET_NAME = "event-images";
 
     private final PlaceService placeService;
     private final UserService userService;
@@ -51,11 +53,14 @@ public class EventService {
         this.entityManager = entityManager;
     }
 
-
     public Event addEvent(EventRequest eventRequest) {
         Place place = placeService.findById(eventRequest.placeId());
 
         Event parent = findById(eventRequest.parent());
+        if (parent.getParent() != null) {
+            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, ExceptionConst.ACTIVITY_RECURSION);
+        }
+
         Event e = Event.builder()
                 .place(place)
                 .startDate(eventRequest.startDate())
@@ -76,13 +81,14 @@ public class EventService {
                 .build();
         eventRepository.save(e);
         MultipartFile image = eventRequest.image();
-        if(!Objects.isNull(image)) {
+        if (!Objects.isNull(image)) {
             String modifiedImageName = e.getId().toString() + "." + FilenameUtils.getExtension(image.getOriginalFilename());
-            minioService.uploadWithModifiedFileName(image, bucketName, modifiedImageName);
+            minioService.uploadWithModifiedFileName(image, BUCKET_NAME, modifiedImageName);
         }
         return e;
     }
 
+    @Transactional
     public Event addEventByOrganizer(CreateEventRequest eventRequest) {
         User user = userService.findById(eventRequest.userId());
         Event e = Event.builder()
@@ -90,9 +96,8 @@ public class EventService {
                 .build();
         Event savedEvent = eventRepository.save(e);
 
-
         // TODO: Do not get organizer from DB each time.
-        Role role = roleService.findByName("Организатор");
+        Role role = roleService.getOrganizerRole();
 
         EventRole eventRole = EventRole.builder()
                 .user(user)
@@ -105,7 +110,7 @@ public class EventService {
 
     public Event findById(int id) {
         return eventRepository.findById(id)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
     }
 
     public Event updateEvent(Integer id, EventRequest eventRequest) {
@@ -121,21 +126,29 @@ public class EventService {
         Event updatedEvent = EventMapper.eventRequestToEvent(id, eventRequest, place, parentEvent);
         eventRepository.save(updatedEvent);
         MultipartFile image = eventRequest.image();
-        minioService.deleteImageByEvent(bucketName, updatedEvent.getId().toString());
+        minioService.deleteImageByEvent(BUCKET_NAME, updatedEvent.getId().toString());
         if (!Objects.isNull(image)) {
             String modifiedImageName = updatedEvent.getId().toString() + "." + FilenameUtils.getExtension(image.getOriginalFilename());
-            minioService.uploadWithModifiedFileName(image, bucketName, modifiedImageName);
+            minioService.uploadWithModifiedFileName(image, BUCKET_NAME, modifiedImageName);
         }
         return updatedEvent;
     }
 
-    public List<Event> getAllOrFilteredEvents(int page, int size, String title,
-                                                      LocalDateTime startDate, LocalDateTime endDate,
-                                                      EventStatus status, EventFormat format) {
+    @SuppressWarnings("java:S107")
+    public List<Event> getAllOrFilteredEvents(int page, int size, Integer parentId, String title,
+                                              LocalDateTime startDate, LocalDateTime endDate,
+                                              EventStatus status, EventFormat format) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> query = cb.createQuery(Event.class);
         Root<Event> root = query.from(Event.class);
         List<Predicate> predicates = new ArrayList<>();
+
+        // If parentId is null, we don't want the activities to return
+        if (parentId == null) {
+            predicates.add(cb.isNull(root.get("parent")));
+        } else {
+            predicates.add(cb.equal(root.get("parent").get("id"), parentId));
+        }
 
         if (title != null) {
             predicates.add(cb.equal(root.get("title"), title));
@@ -173,4 +186,68 @@ public class EventService {
     public void deleteEventById(Integer id) {
         eventRepository.deleteById(id);
     }
+
+    public List<Integer> getAllSubEventIds(Integer parentId) {
+        return eventRepository.findAllByParent_Id(parentId).stream().map(Event::getId).toList();
+    }
+
+    /*TODO: TEST*/
+    public boolean checkOneEvent(Event first, Event second) {
+        boolean firstParent = (second.getParent() != null) &&
+                (Objects.equals(second.getParent().getId(), first.getId()));
+        boolean firstChild = (second.getParent() == null) &&
+                (first.getParent() != null) &&
+                (Objects.equals(second.getId(), first.getParent().getId()));
+        boolean bothChildren = (second.getParent() != null) &&
+                (first.getParent() != null) &&
+                (Objects.equals(second.getParent().getId(), first.getParent().getId()));
+
+        return firstParent || firstChild || bothChildren;
+    }
+
+    public List<EventRole> getUsersHavingRoles(Integer id) {
+        return eventRoleService.findAllByEventId(id);
+    }
+
+    @Transactional
+    public Event copyEvent(int id, boolean deep) {
+        Event existingEvent = findById(id);
+        Event savedEvent = copyEventByOne(existingEvent, existingEvent.getParent());
+        if (deep) {
+            List<Event> childEvents = findAllByParentId(existingEvent.getId());
+            childEvents.forEach(childEvent -> copyEventByOne(childEvent, savedEvent));
+        }
+        return savedEvent;
+    }
+
+    List<Event> findAllByParentId(Integer parentId) {
+        return eventRepository.findAllByParent_Id(parentId);
+    }
+
+    @Transactional
+    public void saveAll(List<Event> events) {
+        eventRepository.saveAll(events);
+    }
+
+    @Transactional
+    public Event copyEventByOne(Event existingEvent, Event parentEvent) {
+        Event copiedEvent = EventMapper.eventToEvent(existingEvent, parentEvent);
+        Event savedEvent = eventRepository.save(copiedEvent);
+
+        List<EventRole> eventRoles = eventRoleService.findAllByEventId(existingEvent.getId());
+        List<EventRole> copiedEventRoles = eventRoles.stream()
+                .map(eventRole -> EventRole.builder()
+                        .event(savedEvent)
+                        .user(eventRole.getUser())
+                        .role(eventRole.getRole())
+                        .build())
+                .collect(Collectors.toList());
+        eventRoleService.saveAll(copiedEventRoles);
+        // copy image
+        String imagePrefix = existingEvent.getId().toString();
+        String newImagePrefix = savedEvent.getId().toString();
+        minioService.copyImagesWithPrefix(BUCKET_NAME,BUCKET_NAME,imagePrefix,newImagePrefix);
+        return savedEvent;
+    }
+
 }

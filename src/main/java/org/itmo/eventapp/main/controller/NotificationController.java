@@ -30,7 +30,7 @@ public class NotificationController {
             @RequestParam(name = "page") @Min(0) Integer page,
             @RequestParam(name = "size") @Min(1) @Max(25) Integer size
     ) {
-        List<Notification> notifications = notificationService.getAllByUserId(userDetails.getUser(), page, size);
+        List<Notification> notifications = notificationService.getAllByUserId(userDetails.getUser().getId(), page, size);
         List<NotificationResponse> responseBody = new ArrayList<>();
         for (Notification notification: notifications) {
             responseBody.add(NotificationMapper.notificationToNotificationResponse(notification));
@@ -45,7 +45,7 @@ public class NotificationController {
             @RequestParam(name = "size") @Min(1) @Max(25) Integer size
     ) {
 
-        List<Notification> notifications = notificationService.updateSeenToAllByUserId(userDetails.getUser(), page, size);
+        List<Notification> notifications = notificationService.updateSeenToAllByUserId(userDetails.getUser().getId(), page, size);
         List<NotificationResponse> responseBody = new ArrayList<>();
         for (Notification notification: notifications) {
             responseBody.add(NotificationMapper.notificationToNotificationResponse(notification));
@@ -62,7 +62,7 @@ public class NotificationController {
                 .notificationToNotificationResponse(
                         notificationService.updateToSeen(
                             notificationId,
-                            userDetails.getUser()));
+                            userDetails.getUser().getId()));
         return ResponseEntity.ok(responseBody);
     }
 
