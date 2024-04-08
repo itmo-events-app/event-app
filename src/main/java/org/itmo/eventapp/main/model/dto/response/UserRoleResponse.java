@@ -1,7 +1,13 @@
 package org.itmo.eventapp.main.model.dto.response;
 
-public record UserRoleResponse(Integer id,
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record UserRoleResponse(@Schema(example = "13")
+                               Integer id,
+                               @Schema(example = "Иван")
                                String name,
+                               @Schema(example = "Иванов")
                                String surname,
+                               @Schema(example = "Организатор")
                                String roleName) {
 }

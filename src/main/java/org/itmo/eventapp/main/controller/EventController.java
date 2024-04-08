@@ -1,5 +1,12 @@
 package org.itmo.eventapp.main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -7,27 +14,20 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
+import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
 import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
-import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
 import org.itmo.eventapp.main.model.mapper.EventRoleMapper;
 import org.itmo.eventapp.main.service.EventService;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,62 +39,110 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
     // TODO: Add privilege validation
+
+    @Operation(summary = "Создание активности мероприятия")
     @PostMapping(value = "/activity", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Integer> addActivity(@Valid EventRequest eventRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.addEvent(eventRequest).getId());
     }
 
+    @Operation(summary = "Создание мероприятия")
     @PostMapping
-    public ResponseEntity<Integer> addEventByOrganizer(@RequestBody @Valid CreateEventRequest eventRequest){
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(eventService.addEventByOrganizer(eventRequest).getId());
+    public ResponseEntity<Integer> addEventByOrganizer(@RequestBody @Valid CreateEventRequest eventRequest) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(eventService.addEventByOrganizer(eventRequest).getId());
     }
 
     // TODO: Return images in response
+    @Operation(summary = "Обновление мероприятия")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = EventResponse.class))
+                            })
+            })
     @PutMapping("/{id}")
-    public ResponseEntity<EventResponse> updateEvent(@Min(1) @PathVariable("id") Integer id,
+    public ResponseEntity<EventResponse> updateEvent(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id,
                                                      @Valid EventRequest eventRequest) {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
     }
 
+    @Operation(summary = "Фильрация мероприятий")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            array = @ArraySchema(schema = @Schema(implementation = EventResponse.class)))
+                            })
+            })
     @SuppressWarnings("java:S107")
     @GetMapping
-    public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                      @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") int size,
-                                                                      @RequestParam(required = false) Integer parentId,
-                                                                      @RequestParam(required = false) String title,
-                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-                                                                      @RequestParam(required = false) EventStatus status,
-                                                                      @RequestParam(required = false) EventFormat format) {
+    public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") @Parameter(name = "page", description = "Номер страницы, с которой начать показ мероприятий", example = "0") int page,
+                                                                      @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") @Parameter(name = "size", description = "Число мероприятий на странице", example = "15") int size,
+                                                                      @RequestParam(required = false) @Parameter(name = "parentId", description = "ID родительского мероприятия", example = "12") Integer parentId,
+                                                                      @RequestParam(required = false) @Parameter(name = "title", description = "Название мероприятия", example = "День первокурсника") String title,
+                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(name = "startDate", description = "Дата начала мероприятия", example = "2024-09-01Е12:00:00") LocalDateTime startDate,
+                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(name = "endDate", description = "Дата окончания мероприятия", example = "2024-09-29Е17:00:00") LocalDateTime endDate,
+                                                                      @RequestParam(required = false) @Parameter(name = "status", description = "Статус мероприятия", example = "PUBLISHED") EventStatus status,
+                                                                      @RequestParam(required = false) @Parameter(name = "format", description = "Формат мероприятия", example = "OFFLINE") EventFormat format) {
         return ResponseEntity.ok().body(EventMapper.eventsToEventResponseList(
                 eventService.getAllOrFilteredEvents(page, size, parentId, title, startDate, endDate, status, format)));
     }
 
+    @Operation(summary = "Получение мероприятия по id")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = EventResponse.class))
+                            })
+            })
     @GetMapping("/{id}")
-    public ResponseEntity<EventResponse> getEventById(@Min(1) @PathVariable("id") Integer id) {
+    public ResponseEntity<EventResponse> getEventById(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id) {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.getEventById(id)));
     }
 
     // TODO: Add annotation @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Удаление мероприятия")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEventById(@Min(1) @PathVariable("id") Integer id) {
+    public ResponseEntity<Void> deleteEventById(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id) {
         eventService.deleteEventById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Получение списка пользователей, имеющих роль в данном мероприятии")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            array = @ArraySchema(schema = @Schema(implementation = UserRoleResponse.class)))
+                            })
+            })
     @GetMapping("/{id}/organizers")
-    public ResponseEntity<List<UserRoleResponse>> getUsersHavingRoles(@Min(1) @PathVariable("id") Integer id) {
+    public ResponseEntity<List<UserRoleResponse>> getUsersHavingRoles(@Min(1) @PathVariable("id")@Parameter(name = "id", description = "ID мероприятия", example = "1")  Integer id) {
         List<EventRole> eventRoles = eventService.getUsersHavingRoles(id);
         return ResponseEntity.ok().body(EventRoleMapper.eventRolesToUserRoleResponses(eventRoles));
     }
 
     // TODO: Add privilege validation
+    @Operation(summary = "Копирование мероприятия")
     @PostMapping("/{id}/copy")
     public ResponseEntity<Integer> copyEvent(
-            @Min(1) @PathVariable("id") Integer id,
-            @RequestParam(value = "deep", defaultValue = "false") boolean deep) {
+            @Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id,
+            @RequestParam(value = "deep", defaultValue = "false") @Parameter(name = "deep", description = "Включить копирование активностей", example = "false") boolean deep) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(eventService.copyEvent(id, deep).getId());
