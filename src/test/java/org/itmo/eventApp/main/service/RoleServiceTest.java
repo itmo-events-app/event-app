@@ -114,9 +114,11 @@ public class RoleServiceTest extends AbstractTestContainers {
         for (String basicRolesName : basicRolesNames) {
             Role basicRole = roleService.findByName(basicRolesName);
 
+            int basicRoleId = basicRole.getId();
+
             ResponseStatusException exception = assertThrows(
                     ResponseStatusException.class,
-                    () -> roleService.editRole(basicRole.getId(), roleRequest),
+                    () -> roleService.editRole(basicRoleId, roleRequest),
                     "It is forbidden to modify the basic roles");
 
             assertEquals(ExceptionConst.ROLE_EDITING_FORBIDDEN_MESSAGE,
@@ -227,10 +229,11 @@ public class RoleServiceTest extends AbstractTestContainers {
 
         for (String basicRolesName : basicRolesNames) {
             Role basicRole = roleService.findByName(basicRolesName);
+            int basicRoleId = basicRole.getId();
 
             ResponseStatusException exception = assertThrows(
                     ResponseStatusException.class,
-                    () -> roleService.deleteRole(basicRole.getId()),
+                    () -> roleService.deleteRole(basicRoleId),
                     "It is forbidden to delete the basic roles");
 
             assertEquals(ExceptionConst.ROLE_DELETING_FORBIDDEN_MESSAGE,
