@@ -1,11 +1,13 @@
 package org.itmo.eventApp.main.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.itmo.eventapp.main.model.dto.request.UserChangeEmailRequest;
+import org.itmo.eventapp.main.model.dto.request.NotificationSettingsRequest;
+import org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -61,7 +63,7 @@ class ProfileControllerTest extends AbstractTestContainers {
     void testChangePassword() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
-        UserChangePasswordRequest request = new UserChangePasswordRequest("oldPassword", "newPassword", "newPassword");
+        UserChangePasswordRequest request = new UserChangePasswordRequest("oldPassword", "123passwordNEW!", "123passwordNEW!");
         mockMvc.perform(put("/api/profile/change-password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -73,7 +75,7 @@ class ProfileControllerTest extends AbstractTestContainers {
     void testChangeMismatchPassword() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
-        UserChangePasswordRequest request = new UserChangePasswordRequest("oldPassword", "test123123", "qwerty123");
+        UserChangePasswordRequest request = new UserChangePasswordRequest("oldPassword", "123passwordNEW123!", "123passwordNEW321!");
         mockMvc.perform(put("/api/profile/change-password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -85,8 +87,8 @@ class ProfileControllerTest extends AbstractTestContainers {
     void testChangeEmail() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
-        UserChangeEmailRequest request = new UserChangeEmailRequest("newEmail@itmo.ru");
-        mockMvc.perform(put("/api/profile/change-email")
+        UserChangeLoginRequest request = new UserChangeLoginRequest("newEmail@itmo.ru", LoginType.EMAIL);
+        mockMvc.perform(put("/api/profile/change-login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -104,11 +106,46 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_user_3.sql");
 
-        UserChangeEmailRequest request = new UserChangeEmailRequest("test_mail3@itmo.ru");
-        mockMvc.perform(put("/api/profile/change-email")
+        UserChangeLoginRequest request = new UserChangeLoginRequest("test_mail3@itmo.ru", LoginType.EMAIL);
+        mockMvc.perform(put("/api/profile/change-login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isConflict());
+    }
+
+    @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
+    void testGetUserInfo() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+
+        mockMvc.perform(get("/api/profile/me"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.surname").value("user"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userInfo[0].login").value("test_mail@itmo.ru"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userInfo[0].type").value("EMAIL"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastLoginDate").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enablePushNotifications").value(false))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.enableEmailNotifications").value(false))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.devices").isArray());
+    }
+
+    @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
+    void testUpdateNotifications() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+
+        NotificationSettingsRequest request = new NotificationSettingsRequest(false, true);
+        mockMvc.perform(put("/api/profile/notifications")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        User updatedUser = userRepository.findById(1).orElse(null);
+        Assertions.assertNotNull(updatedUser);
+        Assertions.assertFalse(updatedUser.getUserNotificationInfo().isEnableEmailNotifications());
+        Assertions.assertTrue(updatedUser.getUserNotificationInfo().isEnablePushNotifications());
     }
 
     @Test
