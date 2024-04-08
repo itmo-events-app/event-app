@@ -1,4 +1,18 @@
 #!/bin/bash
-cd ..
-gradle build -x test
-docker compose -f docker-compose-docker.yml up
+# -d option starts docker compose in detached mode
+
+if [ -n "$1" ]
+then
+  case "$1" in
+    -d) echo "starting event-app in detached mode"
+        cd ..
+        gradle build -x test
+        docker compose -f docker-compose-docker.yml up -d;;
+    *) echo "unknown option $1"
+  esac
+else
+  echo "starting event-app"
+  cd ..
+  gradle build -x test
+  docker compose -f docker-compose-docker.yml up
+fi

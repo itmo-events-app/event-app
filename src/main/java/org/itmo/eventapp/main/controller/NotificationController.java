@@ -1,9 +1,17 @@
 package org.itmo.eventapp.main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.dto.response.NotificationResponse;
 import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
@@ -24,11 +32,22 @@ import java.util.List;
 public class NotificationController {
     private final NotificationService notificationService;
 
+    @Operation(summary = "Получение списка всех уведомлений")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            array = @ArraySchema(schema = @Schema(implementation = NotificationResponse.class)))
+                            })
+            })
     @GetMapping
     public ResponseEntity<List<NotificationResponse>> getAllNotifications(
             @AuthenticationPrincipal UserLoginInfo userDetails,
-            @RequestParam(name = "page") @Min(0) Integer page,
-            @RequestParam(name = "size") @Min(1) @Max(25) Integer size
+            @RequestParam(name = "page") @Min(0) @Parameter(name = "page", description = "Номер страницы, с которой начать показ уведомлений", example = "0") Integer page,
+            @RequestParam(name = "size") @Min(1) @Max(25) @Parameter(name = "size", description = "Число мероприятий на странице", example = "15") Integer size
     ) {
         List<Notification> notifications = notificationService.getAllByUserId(userDetails.getUser().getId(), page, size);
         List<NotificationResponse> responseBody = new ArrayList<>();
@@ -38,11 +57,12 @@ public class NotificationController {
         return ResponseEntity.ok(responseBody);
     }
 
+    @Operation(summary = "Установка статуса прочитано у всех уведомлений")
     @PutMapping
     public ResponseEntity<List<NotificationResponse>> setAllAsSeenNotifications(
             @AuthenticationPrincipal UserLoginInfo userDetails,
-            @RequestParam(name = "page") @Min(0) Integer page,
-            @RequestParam(name = "size") @Min(1) @Max(25) Integer size
+            @RequestParam(name = "page") @Min(0) @Parameter(name = "page", description = "Номер страницы, с которой начать показ уведомлений", example = "0") Integer page,
+            @RequestParam(name = "size") @Min(1) @Max(25) @Parameter(name = "size", description = "Число мероприятий на странице", example = "15") Integer size
     ) {
 
         List<Notification> notifications = notificationService.updateSeenToAllByUserId(userDetails.getUser().getId(), page, size);
@@ -53,10 +73,11 @@ public class NotificationController {
         return ResponseEntity.ok(responseBody);
     }
 
+    @Operation(summary = "Установка статуса прочитано у одного уведомления")
     @PutMapping(path = "/{notificationId}")
     public ResponseEntity<NotificationResponse> setOneAsSeenNotification(
             @AuthenticationPrincipal UserLoginInfo userDetails,
-            @Valid @PathVariable Integer notificationId
+            @Valid @PathVariable @Parameter(name = "notificationId", description = "ID уведомления", example = "15") Integer notificationId
     ) {
         NotificationResponse responseBody = NotificationMapper
                 .notificationToNotificationResponse(
