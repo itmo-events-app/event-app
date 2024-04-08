@@ -51,33 +51,30 @@ public class TaskSecurityExpression {
                 .flatMap(Collection::stream);
     }
 
+
+    private boolean checkEventPrivilege(int eventId, PrivilegeName privilegeName) {
+        Stream<Privilege> eventPrivileges = getUserEventPrivileges(eventId, getCurrentUserId());
+        return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(privilegeName));
+    }
+
     public boolean canCreateTask(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!") int eventId) {
 
         eventId = getParentEventOrSelfId(eventId);
-
-        Stream<Privilege> eventPrivileges = getUserEventPrivileges(eventId, getCurrentUserId());
-
-        return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(PrivilegeName.CREATE_TASK));
+        return checkEventPrivilege(eventId, PrivilegeName.CREATE_TASK);
 
     }
 
     public boolean canEditTask(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!") int eventId) {
 
         eventId = getParentEventOrSelfId(eventId);
-
-        Stream<Privilege> eventPrivileges = getUserEventPrivileges(eventId, getCurrentUserId());
-
-        return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(PrivilegeName.EDIT_TASK));
+        return checkEventPrivilege(eventId, PrivilegeName.EDIT_TASK);
 
     }
 
     public boolean canDeleteTask(@Min(value = 1, message = "Параметр taskId не может быть меньше 1!") int taskId) {
 
         int eventId = getTaskParentEventId(taskId);
-
-        Stream<Privilege> eventPrivileges = getUserEventPrivileges(eventId, getCurrentUserId());
-
-        return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(PrivilegeName.DELETE_TASK));
+        return checkEventPrivilege(eventId, PrivilegeName.DELETE_TASK);
 
     }
 
@@ -103,7 +100,6 @@ public class TaskSecurityExpression {
     public boolean canEditTaskAssignee(@Min(value = 1, message = "Параметр taskId не может быть меньше 1!") int taskId) {
 
         int eventId = getTaskParentEventId(taskId);
-
         Stream<Privilege> eventPrivileges = getUserEventPrivileges(eventId, getCurrentUserId());
         return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(PrivilegeName.ASSIGN_TASK_EXECUTOR)
                 || it.equals(PrivilegeName.REPLACE_TASK_EXECUTOR));
@@ -129,24 +125,18 @@ public class TaskSecurityExpression {
     public boolean canTakeOnTask(@Min(value = 1, message = "Параметр taskId не может быть меньше 1!") int taskId) {
 
         int eventId = getTaskParentEventId(taskId);
-
-        Stream<Privilege> eventPrivileges = getUserEventPrivileges(eventId, getCurrentUserId());
-        return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(PrivilegeName.ASSIGN_SELF_AS_TASK_EXECUTOR));
+        return checkEventPrivilege(eventId, PrivilegeName.ASSIGN_SELF_AS_TASK_EXECUTOR);
     }
 
     public boolean canGetEventTasks(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!") int eventId) {
 
         eventId = getParentEventOrSelfId(eventId);
-        Stream<Privilege> eventPrivileges = getUserEventPrivileges(eventId, getCurrentUserId());
-
-        return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(PrivilegeName.VIEW_ALL_EVENT_TASKS));
+        return checkEventPrivilege(eventId, PrivilegeName.VIEW_ALL_EVENT_TASKS);
     }
 
     public boolean canGetTask(@Min(value = 1, message = "Параметр taskId не может быть меньше 1!") int taskId) {
 
         int eventId = getTaskParentEventId(taskId);
-
-        Stream<Privilege> eventPrivileges = getUserEventPrivileges(eventId, getCurrentUserId());
-        return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(PrivilegeName.VIEW_ALL_EVENT_TASKS));
+        return checkEventPrivilege(eventId, PrivilegeName.VIEW_ALL_EVENT_TASKS);
     }
 }
