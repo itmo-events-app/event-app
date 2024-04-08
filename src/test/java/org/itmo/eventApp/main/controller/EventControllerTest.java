@@ -5,6 +5,8 @@ import io.minio.BucketExistsArgs;
 import io.minio.StatObjectArgs;
 import io.minio.errors.ErrorResponseException;
 import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.AfterEach;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -50,6 +53,17 @@ class EventControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_event_role.sql");
+    }
+
+    private UserLoginInfo getUserLoginInfo() {
+        UserLoginInfo userDetails = new UserLoginInfo();
+        userDetails.setLogin("test_mail@itmo.ru");
+        User dummyUser = new User();
+        dummyUser.setId(1);
+        userDetails.setUser(dummyUser);
+        return userDetails;
     }
 
     private void setUpActivityData() {
@@ -91,7 +105,8 @@ class EventControllerTest extends AbstractTestContainers {
         mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/activity")
                         .file(image)
                         .params(params)
-                        .contentType("multipart/form-data"))
+                        .contentType("multipart/form-data")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isCreated())
                 .andExpect(content().string("3"));
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
@@ -127,7 +142,8 @@ class EventControllerTest extends AbstractTestContainers {
         mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/activity")
                         .file(image)
                         .params(params)
-                        .contentType("multipart/form-data"))
+                        .contentType("multipart/form-data")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().is(404))
                 .andExpect(content().string(containsString("Place not found")));;
         assertThat(eventRepository.findById(3).isEmpty()).isTrue();
@@ -159,7 +175,8 @@ class EventControllerTest extends AbstractTestContainers {
         mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/activity")
                         .file(image)
                         .params(params)
-                        .contentType("multipart/form-data"))
+                        .contentType("multipart/form-data")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().is(400));
         assertThat(eventRepository.findById(3).isEmpty()).isTrue();
     }
@@ -170,7 +187,8 @@ class EventControllerTest extends AbstractTestContainers {
         mockMvc.perform(get("/api/events")
                         .param("title", "party")
                         .param("format", "OFFLINE")
-                        .param("status", "PUBLISHED"))
+                        .param("status", "PUBLISHED")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())
@@ -186,7 +204,8 @@ class EventControllerTest extends AbstractTestContainers {
         setUpActivityData();
         mockMvc.perform(get("/api/events")
                         .param("parentId", "1")
-                        .param("format", "OFFLINE"))
+                        .param("format", "OFFLINE")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())
@@ -201,7 +220,8 @@ class EventControllerTest extends AbstractTestContainers {
         setUpEventData();
         setUpActivityData();
         mockMvc.perform(get("/api/events")
-                        .param("format", "OFFLINE"))
+                        .param("format", "OFFLINE")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())
@@ -215,7 +235,8 @@ class EventControllerTest extends AbstractTestContainers {
         setUpEventData();
         mockMvc.perform(get("/api/events")
                         .param("page", "0")
-                        .param("size", "15"))
+                        .param("size", "15")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray());
@@ -233,6 +254,7 @@ class EventControllerTest extends AbstractTestContainers {
                         post("/api/events")
                                 .content(eventJson)
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .with(user(getUserLoginInfo()))
                 )
                 .andExpect(status().is(201));
         assertThat(eventRepository.findById(1).isPresent()).isTrue();
@@ -251,6 +273,7 @@ class EventControllerTest extends AbstractTestContainers {
                         post("/api/events")
                                 .content(eventJson)
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .with(user(getUserLoginInfo()))
                 )
                 .andExpect(status().is(404))
                 .andExpect(content().string(containsString("User not found")));
@@ -267,6 +290,7 @@ class EventControllerTest extends AbstractTestContainers {
                         post("/api/events")
                                 .content(eventJson)
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .with(user(getUserLoginInfo()))
                 )
                 .andExpect(status().is(400));
 
@@ -278,6 +302,7 @@ class EventControllerTest extends AbstractTestContainers {
                         post("/api/events")
                                 .content(eventJson)
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .with(user(getUserLoginInfo()))
                 )
                 .andExpect(status().is(400));
         assertThat(eventRepository.findById(1).isEmpty()).isTrue();
@@ -306,7 +331,8 @@ class EventControllerTest extends AbstractTestContainers {
                   "preparingEnd": "2024-03-30T21:32:23.536819"
                 }""";
 
-        mockMvc.perform(get("/api/events/1"))
+        mockMvc.perform(get("/api/events/1")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedEventJson));
     }
@@ -314,6 +340,7 @@ class EventControllerTest extends AbstractTestContainers {
     @Test
     void updateEventTest() throws Exception {
         setUpEventData();
+        UserLoginInfo userLoginInfo = getUserLoginInfo();
         // add one event for updating later
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "1");
@@ -338,7 +365,8 @@ class EventControllerTest extends AbstractTestContainers {
         mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/activity")
                         .file(image)
                         .params(params)
-                        .contentType("multipart/form-data"))
+                        .contentType("multipart/form-data")
+                        .with(user(userLoginInfo)))
                 .andExpect(status().isCreated())
                 .andExpect(content().string("3"));
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
@@ -389,7 +417,8 @@ class EventControllerTest extends AbstractTestContainers {
         mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/api/events/3")
                         .file(updatedImage)
                         .params(updatedParams)
-                        .contentType("multipart/form-data"))
+                        .contentType("multipart/form-data")
+                        .with(user(userLoginInfo)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedEventJson));
         boolean isNewImageExists = isImageExist("3.png");
@@ -402,7 +431,8 @@ class EventControllerTest extends AbstractTestContainers {
     @Test
     void deleteEventByIdTest() throws Exception {
         setUpEventData();
-        mockMvc.perform(delete("/api/events/1"))
+        mockMvc.perform(delete("/api/events/1")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isNoContent());
 
         Optional<Event> deletedEvent = eventRepository.findById(1);
@@ -413,7 +443,8 @@ class EventControllerTest extends AbstractTestContainers {
     void getUsersHavingRolesByEventSimple() throws Exception {
         setUpEventData();
         mockMvc.perform(
-                        get("/api/events/1/organizers"))
+                        get("/api/events/1/organizers")
+                                .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
@@ -430,13 +461,15 @@ class EventControllerTest extends AbstractTestContainers {
                         post("/api/events")
                                 .content(eventJson)
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .with(user(getUserLoginInfo()))
                 );
 
         String expectedJson = """
                         [{"id":1,"name":"test","surname":"user","roleName":"Организатор"}]
                         """;
         mockMvc.perform(
-                        get("/api/events/1/organizers"))
+                        get("/api/events/1/organizers")
+                                .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(content().json(expectedJson));
@@ -444,6 +477,7 @@ class EventControllerTest extends AbstractTestContainers {
     @Test
     void copyEventTest() throws Exception {
         setUpEventData();
+        UserLoginInfo userLoginInfo = getUserLoginInfo();
         // add one event for updating later
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "1");
@@ -468,7 +502,8 @@ class EventControllerTest extends AbstractTestContainers {
         mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/activity")
                         .file(image)
                         .params(params)
-                        .contentType("multipart/form-data"))
+                        .contentType("multipart/form-data")
+                        .with(user(userLoginInfo)))
                 .andExpect(status().isCreated())
                 .andExpect(content().string("3"));
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
@@ -476,7 +511,8 @@ class EventControllerTest extends AbstractTestContainers {
         assertThat(isBucketExists).isTrue();
         assertThat(isObjectExists).isTrue();
         // copy
-        mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/3/copy"))
+        mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/3/copy")
+                        .with(user(userLoginInfo)))
             .andExpect(status().isCreated())
             .andExpect(content().string("4"));
         boolean isNewImageExists = isImageExist("4.jpeg");

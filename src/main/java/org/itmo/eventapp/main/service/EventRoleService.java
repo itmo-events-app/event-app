@@ -109,6 +109,10 @@ public class EventRoleService {
         eventRoleRepository.saveAll(eventRoles);
     }
 
+    public void deleteByEventId(int eventId) {
+        eventRoleRepository.deleteByEventId(eventId);
+    }
+
     EventRole findByUserIdAndEventId(Integer userId, Integer eventId) {
         return eventRoleRepository.findByUserIdAndEventId(userId, eventId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));

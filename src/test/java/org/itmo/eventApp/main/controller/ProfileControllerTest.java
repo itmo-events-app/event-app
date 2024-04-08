@@ -117,6 +117,8 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        // Do not include insert_event_role here, because request will fail with 403
+//        executeSqlScript("/sql/insert_event_role.sql");
 
         mockMvc.perform(get("/api/profile/event-privileges/1")
                         .with(user(getUserLoginInfo())))
@@ -124,9 +126,9 @@ class ProfileControllerTest extends AbstractTestContainers {
     }
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
     void testGetUserEventPrivileges() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
+        UserLoginInfo userLoginInfo = getUserLoginInfo();
         String eventJson = """
                 {
                     "userId": 1,
@@ -136,10 +138,11 @@ class ProfileControllerTest extends AbstractTestContainers {
                 post("/api/events")
                         .content(eventJson)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(userLoginInfo))
         );
 
         MvcResult result = mockMvc.perform(get("/api/profile/event-privileges/1")
-                        .with(user(getUserLoginInfo())))
+                        .with(user(userLoginInfo)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
