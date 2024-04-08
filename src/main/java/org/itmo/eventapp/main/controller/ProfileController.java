@@ -10,6 +10,7 @@ import org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
+import org.itmo.eventapp.main.model.dto.response.ProfileResponse;
 import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
@@ -32,6 +33,13 @@ public class ProfileController {
     private final UserService userService;
 
     private final EventRoleService eventRoleService;
+
+    @GetMapping("/me")
+    public ResponseEntity<ProfileResponse> getUserInfo(Authentication authentication) {
+        String login = authentication.getName();
+        ProfileResponse profileResponse = userService.getUserInfo(login);
+        return ResponseEntity.ok(profileResponse);
+    }
 
     @Operation(summary = "Обновление настроек уведомлений")
     @PutMapping("/notifications")
