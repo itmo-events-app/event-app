@@ -13,9 +13,10 @@ public final class EventMapper {
 
     public static EventResponse eventToEventResponse(Event event) {
         Integer parent = (event.getParent() != null) ? event.getParent().getId() : null;
+        Integer placeId = event.getPlace() != null ? event.getPlace().getId() : null;
         return new EventResponse(
                 event.getId(),
-                event.getPlace().getId(),
+                placeId,
                 event.getStartDate(),
                 event.getEndDate(),
                 event.getTitle(),
