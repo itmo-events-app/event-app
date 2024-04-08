@@ -153,11 +153,11 @@ public class RoleController {
     }
 
     @Operation(summary = "Назначение пользователю системной роли")
-    @PutMapping("/system/{userId}")
+    @PutMapping("/system/{userId}/{roleId}")
     public ResponseEntity<Void> assignSystemRole(
             Authentication authentication,
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
-            @Positive(message = "Параметр eventId не может быть меньше 1!") @RequestBody Integer roleId) {
+            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer roleId) {
         roleService.assignSystemRole(authentication.getName(), userId, roleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
