@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface StrongPassword {
-    String message() default "Пароль должен содержать 1 символ верхнего и нижнего регистра. Минимальная длина пароля - 8 символов";
+    String message() default "Пароль должен содержать минимум по 1 символу верхнего и нижнего регистра, а также хотя бы 1 специальный символ. Минимальная длина пароля - 8 символов";
 
     Class<?>[] groups() default {};
 
