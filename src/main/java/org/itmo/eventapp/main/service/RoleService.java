@@ -92,9 +92,9 @@ public class RoleService {
         return roleRepository.findByNameContainingIgnoreCase(name);
     }
 
-    public void assignSystemRole(String email, Integer userId, Integer roleId) {
+    public void assignSystemRole(String login, Integer userId, Integer roleId) {
         var user = userService.findById(userId);
-        var userWithEmail = userLoginInfoService.findByEmail(email);
+        var userWithEmail = userLoginInfoService.findByLogin(login);
         if (userWithEmail.getUser().getId().equals(userId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ASSIGN_SELF_ROLE_FORBIDDEN_MESSAGE);
         var role = findRoleById(roleId);
@@ -104,9 +104,9 @@ public class RoleService {
         userService.save(user);
     }
 
-    public void revokeSystemRole(String email, Integer userId) {
+    public void revokeSystemRole(String login, Integer userId) {
         var user = userService.findById(userId);
-        var userWithEmail = userLoginInfoService.findByEmail(email);
+        var userWithEmail = userLoginInfoService.findByLogin(login);
         if (userWithEmail.getUser().getId().equals(userId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.REVOKE_SELF_ROLE_FORBIDDEN_MESSAGE);
         user.setRole(getReaderRole());
