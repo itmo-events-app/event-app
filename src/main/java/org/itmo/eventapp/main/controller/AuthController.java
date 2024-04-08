@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
@@ -35,7 +36,7 @@ public class AuthController {
 
     @Operation(summary = "Одобрение заявки на регистрацию")
     @PostMapping(value = "/approveRegister/{requestId}")
-    ResponseEntity<Void> approveRegister(@PathVariable("requestId") Integer requestId) {
+    ResponseEntity<Void> approveRegister(@PathVariable("requestId") @Parameter(name = "requestId", description = "ID заявки на регистрацию", example = "1") Integer requestId) {
         authenticationService.approveRegistrationRequestCallback(requestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

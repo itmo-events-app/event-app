@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
@@ -34,7 +35,7 @@ public class RoleController {
     @Operation(summary = "Получение роли по id")
     @GetMapping("/{id}")
     public ResponseEntity<RoleResponse> getRoleById(@Positive(message = "Параметр roleId не может быть меньше 1!")
-                                                    @PathVariable Integer id) {
+                                                    @PathVariable @Parameter(name = "id", description = "ID роли", example = "1") Integer id) {
         return ResponseEntity.ok().body(RoleMapper.roleToRoleResponse(roleService.findRoleById(id)));
     }
 
@@ -52,7 +53,7 @@ public class RoleController {
 
     @Operation(summary = "Поиск ролей по совпадению в названии")
     @GetMapping("/search")
-    public ResponseEntity<List<RoleResponse>> searchByName(@RequestParam String name) {
+    public ResponseEntity<List<RoleResponse>> searchByName(@RequestParam @PathVariable @Parameter(name = "name", description = "Имя роли", example = "1") String name) {
         return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.searchByName(name)));
     }
 
@@ -65,7 +66,7 @@ public class RoleController {
     @Operation(summary = "Удаление роли")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRole(@Positive(message = "Параметр roleId не может быть меньше 1!")
-                                           @PathVariable Integer id) {
+                                           @PathVariable @Parameter(name = "id", description = "ID роли", example = "1") Integer id) {
         roleService.deleteRole(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -73,7 +74,7 @@ public class RoleController {
     @Operation(summary = "Редактирование роли")
     @PutMapping("/{id}")
     public ResponseEntity<RoleResponse> editRole(@Positive(message = "Параметр roleId не может быть меньше 1!")
-                                                 @PathVariable Integer id,
+                                                 @PathVariable @Parameter(name = "id", description = "ID роли", example = "1") Integer id,
                                                  @Valid @RequestBody RoleRequest roleRequest) {
         return ResponseEntity.ok(RoleMapper.roleToRoleResponse(roleService.editRole(id, roleRequest)));
     }
@@ -99,8 +100,8 @@ public class RoleController {
     @Operation(summary = "Назначение пользователю организационной роли")
     @PostMapping("/organizational/{userId}/{eventId}")
     public ResponseEntity<Void> assignOrganizationalRole(
-            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
-            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer eventId,
+            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
+            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId,
             @RequestBody Integer roleId) {
         eventRoleService.assignOrganizationalRole(userId, roleId, eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -109,8 +110,8 @@ public class RoleController {
     @Operation(summary = "Назначение пользователю роли Организатор")
     @PostMapping("/organizer/{userId}/{eventId}")
     public ResponseEntity<Void> assignOrganizerRole(
-            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
-            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer eventId) {
+            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
+            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId) {
         eventRoleService.assignOrganizationalRole(userId, roleService.getOrganizerRole().getId(), eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -118,8 +119,8 @@ public class RoleController {
     @Operation(summary = "Назначение пользователю роли Помощник")
     @PostMapping("assistant/{userId}/{eventId}")
     public ResponseEntity<Void> assignAssistantRole(
-            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
-            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer eventId) {
+            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
+            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId) {
         eventRoleService.assignOrganizationalRole(userId, roleService.getAssistantRole().getId(), eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -127,8 +128,8 @@ public class RoleController {
     @Operation(summary = "Лишение пользователя организационной роли")
     @DeleteMapping("/organizational/{userId}/{eventId}")
     public ResponseEntity<Void> revokeOrganizationalRole(
-            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
-            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer eventId,
+            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
+            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId,
             @RequestBody Integer roleId) {
         eventRoleService.revokeOrganizationalRole(userId, roleId, eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -137,8 +138,8 @@ public class RoleController {
     @Operation(summary = "Лишение пользователя роли Организатор")
     @DeleteMapping("/organizer/{userId}/{eventId}")
     public ResponseEntity<Void> revokeOrganizerRole(
-            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
-            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer eventId) {
+            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
+            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId) {
         eventRoleService.revokeOrganizationalRole(userId, roleService.getOrganizerRole().getId(), eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -146,8 +147,8 @@ public class RoleController {
     @Operation(summary = "Лишение пользователя роли Помощник")
     @DeleteMapping("/assistant/{userId}/{eventId}")
     public ResponseEntity<Void> revokeAssistantRole(
-            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
-            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable Integer eventId) {
+            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
+            @Positive(message = "Параметр eventId не может быть меньше 1!") @PathVariable @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId) {
         eventRoleService.revokeOrganizationalRole(userId, roleService.getAssistantRole().getId(), eventId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -155,8 +156,8 @@ public class RoleController {
     @Operation(summary = "Назначение пользователю системной роли")
     @PutMapping("/system/{userId}")
     public ResponseEntity<Void> assignSystemRole(
-            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId,
-            @Positive(message = "Параметр eventId не может быть меньше 1!") @RequestBody Integer roleId) {
+            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
+            @Positive(message = "Параметр roleId не может быть меньше 1!") @RequestBody @Parameter(name = "roleId", description = "ID роли", example = "1") Integer roleId) {
         roleService.assignSystemRole(userId, roleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -164,7 +165,7 @@ public class RoleController {
     @Operation(summary = "Лишение пользователя системной роли")
     @PutMapping("/system-revoke/{userId}")
     public ResponseEntity<Void> revokeSystemRole(
-            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable Integer userId) {
+            @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId) {
         roleService.revokeSystemRole(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
