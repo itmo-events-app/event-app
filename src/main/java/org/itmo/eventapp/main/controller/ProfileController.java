@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.dto.request.UserChangeEmailRequest;
+import org.itmo.eventapp.main.model.dto.request.NotificationSettingsRequest;
+import org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
@@ -32,6 +33,13 @@ public class ProfileController {
 
     private final EventRoleService eventRoleService;
 
+    @Operation(summary = "Обновление настроек уведомлений")
+    @PutMapping("/notifications")
+    public ResponseEntity<Void> updateNotifications(Authentication authentication, @RequestBody NotificationSettingsRequest request) {
+        userService.updateNotifications(authentication.getName(), request);
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(summary = "Смена имени пользователя")
     @PutMapping("/change-name")
     public ResponseEntity<Void> changeName(Authentication authentication, @Valid @RequestBody UserChangeNameRequest request) {
@@ -39,10 +47,10 @@ public class ProfileController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Смена email пользователя")
-    @PutMapping("/change-email")
-    public ResponseEntity<Void> changeEmail(Authentication authentication, @Valid @RequestBody UserChangeEmailRequest request) {
-        userService.changeEmail(authentication.getName(), request);
+    @Operation(summary = "Смена логина пользователя")
+    @PutMapping("/change-login")
+    public ResponseEntity<Void> changeLogin(Authentication authentication, @Valid @RequestBody UserChangeLoginRequest request) {
+        userService.changeLogin(authentication.getName(), request);
         return ResponseEntity.ok().build();
     }
 

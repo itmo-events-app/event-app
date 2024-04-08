@@ -21,6 +21,8 @@ public class ExceptionConst {
 
     public static final String REGISTRATION_REQUEST_NOT_APPROVED = "Registration request not approved";
 
+    public static final String INVALID_TYPE = "Invalid type";
+
 
     private ExceptionConst() {
     }
