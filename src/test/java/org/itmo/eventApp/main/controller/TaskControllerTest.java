@@ -36,6 +36,7 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         String expectedTaskJson = """
@@ -71,7 +72,7 @@ class TaskControllerTest extends AbstractTestContainers {
         mockMvc.perform(get("/api/tasks/-1")
                 .with(user(getUserLoginInfo())))
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("taskGet.id: Параметр id не может быть меньше 1!")));
+            .andExpect(content().string(containsString("canGetTask.taskId: Параметр taskId не может быть меньше 1!")));
     }
 
     @Test
@@ -151,6 +152,7 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role.sql");
 
         String taskJson = """
             {
@@ -190,6 +192,7 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         String newTitle = "UPDATED";
@@ -249,6 +252,7 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         String title = "VERY DIFFICULT TASK";
@@ -289,6 +293,7 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         Assertions.assertTrue(taskRepository.findById(1).isPresent());
@@ -306,6 +311,7 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         String expectedTaskJson = """
@@ -348,6 +354,7 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         mockMvc.perform(put("/api/tasks/1/assignee/5")
@@ -366,6 +373,7 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         String expectedTaskJson = """
@@ -404,6 +412,7 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
         executeSqlScript("/sql/insert_task.sql");
 
 
@@ -449,6 +458,7 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
         executeSqlScript("/sql/insert_task.sql");
 
 
@@ -472,6 +482,8 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_event_2.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
+        //executeSqlScript("/sql/insert_event_role_2.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         Task task = taskRepository.findById(1).orElseThrow();
@@ -519,6 +531,8 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_event_3.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
+        executeSqlScript("/sql/insert_event_role_2.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         Task task = taskRepository.findById(1).orElseThrow();
@@ -543,6 +557,8 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_event_2.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
+        //executeSqlScript("/sql/insert_event_role_2.sql");
         executeSqlScript("/sql/insert_task.sql");
 
         Task task = taskRepository.findById(1).orElseThrow();
@@ -568,6 +584,8 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_event_2.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
+        //executeSqlScript("/sql/insert_event_role_2.sql");
         executeSqlScript("/sql/insert_task.sql");
         executeSqlScript("/sql/insert_task_2.sql");
         executeSqlScript("/sql/insert_task_3.sql");
@@ -667,6 +685,8 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_event_2.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
+        //executeSqlScript("/sql/insert_event_role_2.sql");
         executeSqlScript("/sql/insert_task.sql");
         executeSqlScript("/sql/insert_task_2.sql");
         executeSqlScript("/sql/insert_task_3.sql");
@@ -728,6 +748,8 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_event_2.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
+        //executeSqlScript("/sql/insert_event_role_2.sql");
         executeSqlScript("/sql/insert_task.sql");
         executeSqlScript("/sql/insert_task_2.sql");
         executeSqlScript("/sql/insert_task_3.sql");
