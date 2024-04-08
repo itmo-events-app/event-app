@@ -6,6 +6,8 @@ import org.itmo.eventapp.main.model.dto.request.CommonLoginRequest;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.validation.annotation.ValidLogin;
 
+import java.util.Objects;
+
 public class ValidLoginValidator implements ConstraintValidator<ValidLogin, CommonLoginRequest> {
 
     @Override
@@ -13,17 +15,10 @@ public class ValidLoginValidator implements ConstraintValidator<ValidLogin, Comm
         String login = commonLoginRequest.login();
         LoginType type = commonLoginRequest.type();
 
-        switch (type) {
-            case EMAIL -> {
-                // Проверяем, является ли логин действительным адресом электронной почты
-                if (!isValidEmail(login)) {
-                    context.disableDefaultConstraintViolation(); // Отключаем стандартное сообщение
-                    context.buildConstraintViolationWithTemplate("Некорректный email. Поддерживаемые домены: @itmo.ru, @idu.itmo.ru и @niuitmo.ru").addConstraintViolation();
-                    return false;
-                }
-            }
-            default -> {
-                // Если тип неизвестен, считаем невалидным
+        if (type == LoginType.EMAIL) {// Проверяем, является ли логин действительным адресом электронной почты
+            if (!isValidEmail(login)) {
+                context.disableDefaultConstraintViolation(); // Отключаем стандартное сообщение
+                context.buildConstraintViolationWithTemplate("Некорректный email. Поддерживаемые домены: @itmo.ru, @idu.itmo.ru и @niuitmo.ru").addConstraintViolation();
                 return false;
             }
         }

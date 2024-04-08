@@ -12,6 +12,7 @@ import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserNotificationInfo;
+import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -85,13 +87,10 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.USER_EMAIL_EXIST);
         }
 
-        switch (request.type()) {
-            case EMAIL -> {
-                userLoginInfoService.setEmail(user.getUserLoginInfo(), request.login());
-            }
-            default -> {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TYPE);
-            }
+        if (request.type() == LoginType.EMAIL) {
+            userLoginInfoService.setEmail(user.getUserLoginInfo(), request.login());
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TYPE);
         }
     }
 
