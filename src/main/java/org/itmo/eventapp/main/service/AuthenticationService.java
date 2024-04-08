@@ -51,14 +51,14 @@ public class AuthenticationService {
     }
 
     public void createRegisterRequest(RegistrationUserRequest registrationUserRequest) {
-        String login = registrationUserRequest.email();
+        String login = registrationUserRequest.login();
 
         if (registrationRequestService.existsByEmail(login)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.REGISTRATION_REQUEST_EMAIL_EXIST);
         }
         else {
             RegistrationRequest registrationRequest = RegistrationRequest.builder()
-                    .email(registrationUserRequest.email())
+                    .email(registrationUserRequest.login())
                     .passwordHash(passwordEncoder.encode(registrationUserRequest.password()))
                     .name(registrationUserRequest.name())
                     .surname(registrationUserRequest.surname())
