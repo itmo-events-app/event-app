@@ -45,8 +45,9 @@ create table if not exists user_t
 create table if not exists user_login_info(
     id int generated always as identity primary key not null,
     user_id int not null references user_t(id),
-    email varchar(256) not null unique,
-    email_status email_status not null,
+    login varchar(256) not null unique,
+    login_status login_status not null,
+    login_type login_type not null,
     password_hash varchar(512) not null,
     reset_token varchar(512),
     last_login_date date,
@@ -62,7 +63,7 @@ create table if not exists notification(
 );
 create table if not exists place
 (
-    id int generated always as identity primary key not null,
+    id int generated always as identity primary key not null ,
     address varchar(512) not null,
     name varchar(256) not null,
     format place_format not null,
