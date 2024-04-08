@@ -213,7 +213,7 @@ public class TaskController {
     @Operation(summary = "Получение списка задач где пользователь является исполнителем")
     @GetMapping("/where-assignee")
     public ResponseEntity<List<TaskResponse>> taskListShowWhereAssignee(
-            @PathVariable @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId,
+            @PathVariable(required = false) @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId,
             @RequestParam(required = false) @Parameter(name = "assignerId", description = "ID Создателя задачи", example = "13") Integer assignerId,
             @RequestParam(required = false) @Parameter(name = "taskStatus", description = "Статус задачи") TaskStatus taskStatus,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(name = "deadlineLowerLimit", description = "Мягкий дедлайн задачи") LocalDateTime deadlineLowerLimit,
