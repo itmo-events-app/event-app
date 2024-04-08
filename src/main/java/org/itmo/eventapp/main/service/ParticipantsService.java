@@ -30,4 +30,10 @@ public class ParticipantsService {
         return participants;
     }
 
+    //ToDo Method
+    public List<Participant> getParticipantsXlsx(Integer eventId){
+        List<Participant> participants = new ArrayList<>();
+        return participants;
+    }
+
 }

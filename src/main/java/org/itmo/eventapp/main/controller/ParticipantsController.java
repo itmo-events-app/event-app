@@ -35,10 +35,15 @@ public class ParticipantsController {
         return ResponseEntity.ok().body(ParticipantMapper.participantToResponse(participant));
     }
 
-    @PostMapping
+    @PostMapping("/{id}/participants/newlist")
     public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@RequestBody @Valid ParticipantsListRequest participantsListRequest){
         List<Participant> participants = participantsService.setParticipants(participantsListRequest);
         return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
     }
 
+    @GetMapping("/{id}/participants/list/xlsx")
+    public ResponseEntity<List<ParticipantResponse>> getParticipantsXlsxFile(@Min(1) @PathVariable("id") Integer id) {
+        List<Participant> participants = participantsService.getParticipantsXlsx(id);
+        return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
+    }
 }
