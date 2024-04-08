@@ -31,13 +31,14 @@ public class EventRoleService {
         var role = roleService.findRoleById(roleId);
         if (isDefaultOrganizationalRole) {
             if (!defaultOrganizationalRoles.contains(role.getName()))
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нельзя назначить эту роль");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ROLE_ASSIGNMENT_FORBIDDEN_MESSAGE);
         } else {
             if (defaultOrganizationalRoles.contains(role.getName())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нельзя назначить эту роль");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ROLE_ASSIGNMENT_FORBIDDEN_MESSAGE);
             }
             if (!role.getType().equals(RoleType.EVENT))
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Неверный тип роли: ожидалась организационная роль");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(ExceptionConst.INVALID_ROLE_TYPE,
+                        "организационная"));
         }
         var user = userService.findById(userId);
         var event = eventFindById(eventId);
@@ -53,25 +54,26 @@ public class EventRoleService {
         var role = roleService.findRoleById(roleId);
         if (isDefaultOrganizationalRole) {
             if (!defaultOrganizationalRoles.contains(role.getName()))
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нельзя лишить этой роли");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ROLE_REVOKING_FORBIDDEN_MESSAGE);
         } else {
             if (defaultOrganizationalRoles.contains(role.getName())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нельзя лишить этой роли");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ROLE_REVOKING_FORBIDDEN_MESSAGE);
             }
             if (!role.getType().equals(RoleType.EVENT))
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Неверный тип роли: ожидалась организационная роль");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(ExceptionConst.INVALID_ROLE_TYPE,
+                        "организационная"));
         }
         var user = userService.findById(userId);
         var event = eventFindById(eventId);
         if (roleId.equals(roleService.getOrganizerRole().getId())) {
             var eventRole = eventRoleRepository.findAllByRoleAndEvent(role, event);
             if (eventRole.size() == 1)
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Мероприятие должно содержать не менее одного пользователя с ролью Организатор");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.AT_LEAST_ONE_ORGANIZER_MESSAGE);
         }
         var userRoleInEvent = eventRoleRepository.findByUserAndRoleAndEvent(user, role, event);
         userRoleInEvent.ifPresentOrElse(eventRoleRepository::delete,
                 () -> {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("У пользователя с id %d нет роли %s в мероприятии с id %d",
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(ExceptionConst.USER_ROLE_NOT_FOUND_IN_EVENT_MESSAGE,
                             userId,
                             role.getName(),
                             eventId));
@@ -101,10 +103,5 @@ public class EventRoleService {
     @Transactional
     public void saveAll(List<EventRole> eventRoles) {
         eventRoleRepository.saveAll(eventRoles);
-    }
-
-    EventRole findByUserIdAndEventId(Integer userId, Integer eventId) {
-        return eventRoleRepository.findByUserIdAndEventId(userId, eventId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
     }
 }

@@ -138,8 +138,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
                 () -> roleService.editRole(1, roleRequest),
-                "It is not possible to edit a non existent role");
-        assertTrue(exception.getMessage().contains("не существует"),
+                "It is not possible to edit a non existent role"); assertTrue(exception.getMessage().contains("не найдена"),
                 exception.getReason()); // to refactor
     }
 
@@ -265,7 +264,7 @@ public class RoleServiceTest extends AbstractTestContainers {
                 ResponseStatusException.class,
                 () -> roleService.findRoleById(1),
                 "Deleted role can not be accessed");
-        assertTrue(exception.getMessage().contains("не существует"),
+        assertTrue(exception.getMessage().contains("не найдена"),
                 exception.getReason()); // to refactor
     }
 
@@ -312,7 +311,7 @@ public class RoleServiceTest extends AbstractTestContainers {
                 ResponseStatusException.class,
                 () -> roleService.findRoleById(1),
                 "Non existing role can not be accessed");
-        assertTrue(exception.getMessage().contains("не существует"),
+        assertTrue(exception.getMessage().contains("не найдена"),
                 exception.getReason()); // to refactor
     }
 
