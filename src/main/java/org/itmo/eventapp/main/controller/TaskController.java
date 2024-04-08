@@ -133,7 +133,7 @@ public class TaskController {
     /*TODO: TEST*/
 
     @Operation(summary = "Перемещение списка задач")
-    @PreAuthorize("@taskSecurityExpression.canCreateTask(#dstEventId)")
+    @PreAuthorize("@taskSecurityExpression.canEditTask(#dstEventId)")
     @PutMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListMove(
             @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
