@@ -53,7 +53,7 @@ public class RoleController {
 
     @Operation(summary = "Поиск ролей по совпадению в названии")
     @GetMapping("/search")
-    public ResponseEntity<List<RoleResponse>> searchByName(@RequestParam @PathVariable @Parameter(name = "name", description = "Имя роли", example = "1") String name) {
+    public ResponseEntity<List<RoleResponse>> searchByName(@RequestParam @Parameter(name = "name", description = "Имя роли", example = "1") String name) {
         return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.searchByName(name)));
     }
 
