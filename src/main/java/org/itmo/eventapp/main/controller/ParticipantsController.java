@@ -24,7 +24,7 @@ public class ParticipantsController {
     private ParticipantsService participantsService;
 
     @GetMapping("/{id}/participants/list")
-    public ResponseEntity<List<ParticipantResponse>> getUsersHavingRoles(@Min(1) @PathVariable("id") Integer id) {
+    public ResponseEntity<List<ParticipantResponse>> getParticipants(@Min(1) @PathVariable("id") Integer id) {
         List<Participant> participants = participantsService.getParticipants(id);
         return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
     }
@@ -36,7 +36,7 @@ public class ParticipantsController {
     }
 
     @PostMapping
-    public ResponseEntity<List<ParticipantResponse>> addEventByOrganizer(@RequestBody @Valid ParticipantsListRequest participantsListRequest){
+    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@RequestBody @Valid ParticipantsListRequest participantsListRequest){
         List<Participant> participants = participantsService.setParticipants(participantsListRequest);
         return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
     }
