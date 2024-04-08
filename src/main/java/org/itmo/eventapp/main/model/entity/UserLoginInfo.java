@@ -4,14 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-import org.itmo.eventapp.main.model.entity.enums.EmailStatus;
+import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
+import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
 @SuppressWarnings("java:S1948")
 @Entity
@@ -28,11 +28,15 @@ public class UserLoginInfo implements UserDetails {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String email;
+    private String login;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    private EmailStatus emailStatus;
+    private LoginType loginType;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private LoginStatus loginStatus;
 
     private String passwordHash;
 
@@ -56,7 +60,7 @@ public class UserLoginInfo implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return login;
     }
 
     @Override

@@ -20,9 +20,12 @@ CREATE TYPE event_status AS ENUM (
     'COMPLETED',
     'CANCELED'
 );
-CREATE TYPE email_status AS ENUM (
+CREATE TYPE login_status AS ENUM (
     'UNAPPROVED',
     'APPROVED'
+);
+CREATE TYPE login_type AS ENUM (
+    'EMAIL'
 );
 CREATE TYPE registration_request_status AS ENUM (
     'NEW',
@@ -87,7 +90,8 @@ create cast (character varying as event_format) with inout as implicit;
 create cast (character varying as place_format) with inout as implicit;
 create cast (character varying as task_status) with inout as implicit;
 create cast (character varying as event_status) with inout as implicit;
-create cast (character varying as email_status) with inout as implicit;
+create cast (character varying as login_status) with inout as implicit;
+create cast (character varying as login_type) with inout as implicit;
 create cast (character varying as registration_request_status) with inout as implicit;
 create cast (character varying as role_type) with inout as implicit;
 create cast (character varying as privilege_name) with inout as implicit;
