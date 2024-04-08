@@ -1,0 +1,16 @@
+package org.itmo.eventapp.main.repository;
+
+import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.EventRole;
+import org.itmo.eventapp.main.model.entity.Participant;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ParticipantsRepository extends JpaRepository<EventRole, Integer> {
+    List<Participant> findAllByEvent(Event event);
+    Participant findByNameAndEvent(String name, Event event);
+    Participant findByName(String name);
+}
