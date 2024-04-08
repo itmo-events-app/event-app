@@ -3,8 +3,6 @@ package org.itmo.eventApp.main.service;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.itmo.eventApp.main.controller.AbstractTestContainers;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.repository.NotificationRepository;
@@ -14,7 +12,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,9 +39,9 @@ public class TaskNotificationUtilsTest extends AbstractTestContainers {
                 .title("TestTask")
                 .event(Event.builder().title("EventTitle").build())
                 .assignee(User.builder().id(1).name("HelperName")
-                        .userLoginInfo(UserLoginInfo.builder().email("test_mail@itmo.ru").build()).build())
+                        .userLoginInfo(UserLoginInfo.builder().login("test_mail@itmo.ru").build()).build())
                 .assigner(User.builder().id(2).name("OrganizerName")
-                        .userLoginInfo(UserLoginInfo.builder().email("test_mail1@itmo.ru").build()).build())
+                        .userLoginInfo(UserLoginInfo.builder().login("test_mail1@itmo.ru").build()).build())
                 .build();
     }
 

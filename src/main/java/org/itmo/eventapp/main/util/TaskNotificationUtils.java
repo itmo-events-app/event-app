@@ -34,7 +34,7 @@ public class TaskNotificationUtils {
                 task.getAssignee().getId());
 
         mailSenderService.sendIncomingTaskMessage(
-                task.getAssignee().getUserLoginInfo().getEmail(),
+                task.getAssignee().getUserLoginInfo().getLogin(),
                 task.getAssignee().getName(),
                 task.getEvent().getTitle(),
                 task.getTitle(),
@@ -56,14 +56,14 @@ public class TaskNotificationUtils {
                 task.getAssigner().getId());
 
         mailSenderService.sendOverdueTaskMessage(
-                task.getAssignee().getUserLoginInfo().getEmail(),
+                task.getAssignee().getUserLoginInfo().getLogin(),
                 task.getAssignee().getName(),
                 task.getEvent().getTitle(),
                 task.getTitle(),
                 taskFullUrl + task.getId().toString());
 
         mailSenderService.sendOverdueTaskMessage(
-                task.getAssigner().getUserLoginInfo().getEmail(),
+                task.getAssigner().getUserLoginInfo().getLogin(),
                 task.getAssigner().getName(),
                 task.getEvent().getTitle(),
                 task.getTitle(),
@@ -82,7 +82,7 @@ public class TaskNotificationUtils {
                 task.getAssignee().getId());
 
         mailSenderService.sendReminderTaskMessage(
-                task.getAssignee().getUserLoginInfo().getEmail(),
+                task.getAssignee().getUserLoginInfo().getLogin(),
                 task.getAssignee().getName(),
                 task.getEvent().getTitle(),
                 task.getTitle(),

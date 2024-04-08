@@ -1,7 +1,6 @@
 package org.itmo.eventApp.main.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 import org.itmo.eventapp.main.model.dto.request.UserChangeEmailRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
@@ -94,7 +93,7 @@ class ProfileControllerTest extends AbstractTestContainers {
 
         User updatedUser = userRepository.findById(1).orElse(null);
         Assertions.assertNotNull(updatedUser);
-        Assertions.assertEquals("newEmail@itmo.ru", updatedUser.getUserLoginInfo().getEmail());
+        Assertions.assertEquals("newEmail@itmo.ru", updatedUser.getUserLoginInfo().getLogin());
     }
 
 
