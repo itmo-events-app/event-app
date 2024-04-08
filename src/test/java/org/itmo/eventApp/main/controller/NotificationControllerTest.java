@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NotificationControllerTest extends AbstractTestContainers{
+class NotificationControllerTest extends AbstractTestContainers{
     @Autowired
     private NotificationRepository notificationRepository;
 
@@ -28,7 +28,7 @@ public class NotificationControllerTest extends AbstractTestContainers{
         executeSqlScript("/sql/insert_notifications.sql");
     }
 
-    private UserLoginInfo getUserLoginInfo(){
+    private UserLoginInfo getUserLoginInfo() {
         UserLoginInfo userDetails = new UserLoginInfo();
         User dummyUser = new User();
         dummyUser.setId(1);

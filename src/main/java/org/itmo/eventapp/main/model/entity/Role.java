@@ -35,7 +35,8 @@ public class Role {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     private RoleType type;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // add EntityGraph
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     @JoinTable(name = "role_privilege",
             joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
@@ -44,12 +45,9 @@ public class Role {
 
     public void removePrivilege(Privilege privilege) {
         this.privileges.remove(privilege);
-        privilege.getRoles().remove(this);
     }
 
     public void addPrivilege(Privilege privilege) {
         this.privileges.add(privilege);
-        privilege.getRoles().add(this);
     }
-
 }

@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
-
 import java.util.Set;
 
 @Service
@@ -26,6 +25,10 @@ public class EventRoleService {
     private final UserService userService;
     private final RoleService roleService;
     private final List<String> defaultOrganizationalRoles = Arrays.asList("Помощник", "Организатор");
+
+    public List<EventRole> findByUserIdAndEventId(int userId, int eventId) {
+        return eventRoleRepository.findByUserIdAndEventId(userId, eventId);
+    }
 
     public void assignOrganizationalRole(Integer userId, Integer roleId, Integer eventId, boolean isDefaultOrganizationalRole) {
         var role = roleService.findRoleById(roleId);
@@ -103,5 +106,10 @@ public class EventRoleService {
     @Transactional
     public void saveAll(List<EventRole> eventRoles) {
         eventRoleRepository.saveAll(eventRoles);
+    }
+
+    EventRole findByUserIdAndEventId(Integer userId, Integer eventId) {
+        return eventRoleRepository.findByUserIdAndEventId(userId, eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
     }
 }

@@ -13,14 +13,12 @@ import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
-import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
-import org.itmo.eventapp.main.model.mapper.EventRoleMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.springframework.http.HttpStatus;
@@ -41,13 +39,12 @@ public class EventService {
     private final EventRepository eventRepository;
 
     private final MinioService minioService;
-    private final String bucketName="event-images";
+    private static final String BUCKET_NAME = "event-images";
 
     private final PlaceService placeService;
     private final UserService userService;
     private final RoleService roleService;
     private final EventRoleService eventRoleService;
-    private final TaskService taskService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -84,9 +81,9 @@ public class EventService {
                 .build();
         eventRepository.save(e);
         MultipartFile image = eventRequest.image();
-        if(!Objects.isNull(image)) {
+        if (!Objects.isNull(image)) {
             String modifiedImageName = e.getId().toString() + "." + FilenameUtils.getExtension(image.getOriginalFilename());
-            minioService.uploadWithModifiedFileName(image, bucketName, modifiedImageName);
+            minioService.uploadWithModifiedFileName(image, BUCKET_NAME, modifiedImageName);
         }
         return e;
     }
@@ -113,7 +110,7 @@ public class EventService {
 
     public Event findById(int id) {
         return eventRepository.findById(id)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
     }
 
     public Event updateEvent(Integer id, EventRequest eventRequest) {
@@ -129,18 +126,18 @@ public class EventService {
         Event updatedEvent = EventMapper.eventRequestToEvent(id, eventRequest, place, parentEvent);
         eventRepository.save(updatedEvent);
         MultipartFile image = eventRequest.image();
-        minioService.deleteImageByEvent(bucketName, updatedEvent.getId().toString());
+        minioService.deleteImageByEvent(BUCKET_NAME, updatedEvent.getId().toString());
         if (!Objects.isNull(image)) {
             String modifiedImageName = updatedEvent.getId().toString() + "." + FilenameUtils.getExtension(image.getOriginalFilename());
-            minioService.uploadWithModifiedFileName(image, bucketName, modifiedImageName);
+            minioService.uploadWithModifiedFileName(image, BUCKET_NAME, modifiedImageName);
         }
         return updatedEvent;
     }
 
     @SuppressWarnings("java:S107")
     public List<Event> getAllOrFilteredEvents(int page, int size, Integer parentId, String title,
-                                                      LocalDateTime startDate, LocalDateTime endDate,
-                                                      EventStatus status, EventFormat format) {
+                                              LocalDateTime startDate, LocalDateTime endDate,
+                                              EventStatus status, EventFormat format) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> query = cb.createQuery(Event.class);
         Root<Event> root = query.from(Event.class);
@@ -224,7 +221,7 @@ public class EventService {
     }
 
     List<Event> findAllByParentId(Integer parentId) {
-        return  eventRepository.findAllByParent_Id(parentId);
+        return eventRepository.findAllByParent_Id(parentId);
     }
 
     @Transactional
@@ -246,6 +243,10 @@ public class EventService {
                         .build())
                 .collect(Collectors.toList());
         eventRoleService.saveAll(copiedEventRoles);
+        // copy image
+        String imagePrefix = existingEvent.getId().toString();
+        String newImagePrefix = savedEvent.getId().toString();
+        minioService.copyImagesWithPrefix(BUCKET_NAME,BUCKET_NAME,imagePrefix,newImagePrefix);
         return savedEvent;
     }
 

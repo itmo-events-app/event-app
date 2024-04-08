@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class EventControllerTest extends AbstractTestContainers {
+class EventControllerTest extends AbstractTestContainers {
     private boolean isImageExist(String imageName) {
         try {
             minioClient.statObject(StatObjectArgs.builder()
@@ -441,5 +441,47 @@ public class EventControllerTest extends AbstractTestContainers {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(content().json(expectedJson));
+    }
+    @Test
+    void copyEventTest() throws Exception {
+        setUpEventData();
+        // add one event for updating later
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("placeId", "1");
+        params.add("startDate", "2024-03-28T09:00:00");
+        params.add("endDate", "2024-03-28T18:00:00");
+        params.add("title", "itmo-event");
+        params.add("shortDescription", "This is a short description.");
+        params.add("fullDescription", "This is a full description of the event.");
+        params.add("format", "OFFLINE");
+        params.add("status", "PUBLISHED");
+        params.add("registrationStart", "2024-03-01T00:00:00");
+        params.add("registrationEnd", "2024-03-25T23:59:59");
+        params.add("parent", "1");
+        params.add("participantLimit", "50");
+        params.add("participantAgeLowest", "18");
+        params.add("participantAgeHighest", "50");
+        params.add("preparingStart", "2024-03-20T00:00:00");
+        params.add("preparingEnd", "2024-03-27T23:59:59");
+        ClassPathResource imageResource = new ClassPathResource("/images/itmo.jpeg");
+        byte[] content = imageResource.getInputStream().readAllBytes();
+        MockMultipartFile image = new MockMultipartFile("image", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
+        mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/activity")
+                        .file(image)
+                        .params(params)
+                        .contentType("multipart/form-data"))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("3"));
+        boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
+        boolean isObjectExists = isImageExist("3.jpeg");
+        assertThat(isBucketExists).isTrue();
+        assertThat(isObjectExists).isTrue();
+        // copy
+        mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/3/copy"))
+            .andExpect(status().isCreated())
+            .andExpect(content().string("4"));
+        boolean isNewImageExists = isImageExist("4.jpeg");
+        assertThat(isNewImageExists).isTrue();
+        assertThat(eventRepository.findById(4).isPresent()).isTrue();
     }
 }
