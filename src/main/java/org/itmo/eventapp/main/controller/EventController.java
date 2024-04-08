@@ -42,7 +42,7 @@ public class EventController {
 
     @Operation(summary = "Создание активности мероприятия")
     @PostMapping(value = "/activity", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Integer> addActivity(@RequestBody @Valid EventRequest eventRequest) {
+    public ResponseEntity<Integer> addActivity(@Valid EventRequest eventRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.addEvent(eventRequest).getId());
     }
 
@@ -67,7 +67,7 @@ public class EventController {
             })
     @PutMapping("/{id}")
     public ResponseEntity<EventResponse> updateEvent(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id,
-                                                     @RequestBody @Valid EventRequest eventRequest) {
+                                                     @Valid EventRequest eventRequest) {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
     }
 
@@ -83,8 +83,8 @@ public class EventController {
                             })
             })
     @SuppressWarnings("java:S107")
-    @GetMapping@Parameter(name = "page", description = "Номер страницы, с которой начать показ мероприятий", example = "0")
-    public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0")  int page,
+    @GetMapping
+    public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(@Min(0) @RequestParam(value = "page", defaultValue = "0") @Parameter(name = "page", description = "Номер страницы, с которой начать показ мероприятий", example = "0") int page,
                                                                       @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "15") @Parameter(name = "size", description = "Число мероприятий на странице", example = "15") int size,
                                                                       @RequestParam(required = false) @Parameter(name = "parentId", description = "ID родительского мероприятия", example = "12") Integer parentId,
                                                                       @RequestParam(required = false) @Parameter(name = "title", description = "Название мероприятия", example = "День первокурсника") String title,
