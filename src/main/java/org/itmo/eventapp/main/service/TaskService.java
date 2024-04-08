@@ -36,8 +36,8 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskNotificationUtils taskNotificationUtils;
 
-    public Optional<Task> findById(int id) {
-        return taskRepository.findById(id);
+    public Task findById(int id) {
+        return taskRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
     }
 
     public Task save(TaskRequest taskRequest) {
