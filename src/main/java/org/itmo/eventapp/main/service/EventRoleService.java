@@ -27,7 +27,7 @@ public class EventRoleService {
     private final RoleService roleService;
     private final List<String> defaultOrganizationalRoles = Arrays.asList("Помощник", "Организатор");
 
-    public void assignOrganizationalRole(Integer userId, Integer roleId, Integer eventId, Boolean isDefaultOrganizationalRole) {
+    public void assignOrganizationalRole(Integer userId, Integer roleId, Integer eventId, boolean isDefaultOrganizationalRole) {
         var role = roleService.findRoleById(roleId);
         if (isDefaultOrganizationalRole) {
             if (!defaultOrganizationalRoles.contains(role.getName()))
@@ -50,7 +50,7 @@ public class EventRoleService {
     }
 
     @Transactional
-    public void revokeOrganizationalRole(Integer userId, Integer roleId, Integer eventId, Boolean isDefaultOrganizationalRole) {
+    public void revokeOrganizationalRole(Integer userId, Integer roleId, Integer eventId, boolean isDefaultOrganizationalRole) {
         var role = roleService.findRoleById(roleId);
         if (isDefaultOrganizationalRole) {
             if (!defaultOrganizationalRoles.contains(role.getName()))

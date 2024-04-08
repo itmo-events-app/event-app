@@ -30,7 +30,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[createRole]-(Neg) Creating a new role using a non-unique name")
-    public void createRoleNonUniNameTest() {
+    void createRoleNonUniNameTest() {
         insertFilling();
 
         List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4);
@@ -50,7 +50,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[createRole]-(Pos) Creating a new role using unique name")
-    public void createRoleUniNameTest() {
+    void createRoleUniNameTest() {
         insertFilling();
 
         List<Integer> privileges = new ArrayList<>();
@@ -80,7 +80,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[findByName]-(Pos) Getting basic roles")
-    public void findBasicRolesTest() {
+    void findBasicRolesTest() {
         insertBasicFilling();
 
         Role adminRole = roleService.getAdminRole();
@@ -102,7 +102,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[editRole]-(Neg) Editing basic role")
-    public void editBasicRoleTest() {
+    void editBasicRoleTest() {
         insertBasicFilling();
 
         List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4);
@@ -125,7 +125,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[editRole]-(Neg) Editing a non existent role")
-    public void editNonExistRoleTest() {
+    void editNonExistRoleTest() {
         List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4);
 //        List<Integer> privileges = new LinkedList<>();
 
@@ -144,7 +144,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[editRole]-(Neg) Editing role using non unique name")
-    public void editRoleUsingNonUniqueNameTest() {
+    void editRoleUsingNonUniqueNameTest() {
         insertBasicFilling();
         insertFilling();
 
@@ -168,7 +168,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[editRole]-(Pos) Editing role")
-    public void editRoleDoNotKeepNameTest() {
+    void editRoleDoNotKeepNameTest() {
         insertFilling();
 
         List<Integer> privileges = new ArrayList<>();
@@ -196,7 +196,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[editRole]-(Pos) Editing role but keeping previous name")
-    public void editRoleKeepNameTest() {
+    void editRoleKeepNameTest() {
         insertFilling();
 
         List<Integer> privileges = new ArrayList<>();
@@ -223,7 +223,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[deleteRole]-(Neg) Deleting basic role")
-    public void deleteBasicRoleTest() {
+    void deleteBasicRoleTest() {
         insertBasicFilling();
 
         basicRolesNames.stream()
@@ -239,7 +239,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[deleteRole]-(Neg) Deleting role assigned to user")
-    public void deleteRoleAssignedTest() {
+    void deleteRoleAssignedTest() {
         insertFilling();
         insertUsersFilling();
 
@@ -255,7 +255,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[deleteRole]-(Neg) Deleting unnecessary role")
-    public void deleteRole() {
+    void deleteRole() {
         insertFilling();
 
         roleService.deleteRole(1);
@@ -270,7 +270,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[getAll] (Pos) Getting all roles")
-    public void getAllRoles() {
+    void getAllRoles() {
         insertBasicFilling();   // 4
         insertFilling();        // 4
 
@@ -283,7 +283,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName(("[findRoleById] (Pos) Getting roles by Id"))
-    public void findRoleById() {
+    void findRoleById() {
         insertBasicFilling();
 
         Role adminRole = roleService.findRoleById(1);
@@ -305,7 +305,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName(("[findRoleById] (Neg) Getting non existing roles by Id"))
-    public void findNonExistRoleById() {
+    void findNonExistRoleById() {
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
@@ -317,16 +317,16 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[getOrganizational] (Neg) Getting not created organizational roles")
-    public void getOrganizationalNotCreatedRolesTest() {
+    void getOrganizationalNotCreatedRolesTest() {
         List<Role> roles = roleService.getOrganizational();
 
         roles.forEach(role ->
-                assertNotEquals(role.getType(), RoleType.EVENT));
+                assertNotEquals(RoleType.EVENT, role.getType()));
     }
 
     @Test
     @DisplayName("[getOrganizational] (Pos) Getting all organizational roles")
-    public void getOrganizationalRolesTest() {
+    void getOrganizationalRolesTest() {
         insertBasicFilling();
 
         List<Role> roles = roleService.getOrganizational();
@@ -340,7 +340,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[searchByName]-(Pos) Getting basic roles by name")
-    public void searchByNameTest() {
+    void searchByNameTest() {
         insertBasicFilling();
 
         List<Role> adminRoles = roleService.searchByName(basicRolesNames.get(0));
@@ -386,7 +386,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
     @Test
     @DisplayName("[findByName]-(Pos) Getting basic roles by name")
-    public void findRoleByNameTest() {
+    void findRoleByNameTest() {
         insertBasicFilling();
 
         Role adminRole = roleService.findByName(basicRolesNames.get(0));
