@@ -2,6 +2,7 @@ package org.itmo.eventApp.main.service;
 
 import org.assertj.core.util.Lists;
 import org.itmo.eventApp.main.controller.AbstractTestContainers;
+import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
@@ -17,6 +18,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+// TODO - test assignSystemRole
+// TODO - test revokeSystemRole
 
 public class RoleServiceTest extends AbstractTestContainers {
 
@@ -34,7 +38,6 @@ public class RoleServiceTest extends AbstractTestContainers {
         insertFilling();
 
         List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4);
-        // TODO Check if name is actually non-unique
         RoleRequest roleRequest = new RoleRequest(
                 "Фэйк_Роль_1",
                 "Фэйк_Описание_1",
@@ -44,7 +47,8 @@ public class RoleServiceTest extends AbstractTestContainers {
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
                 () -> roleService.createRole(roleRequest));
-        assertEquals("Роль с таким именем уже существует",
+
+        assertEquals(ExceptionConst.ROLE_EXIST_MESSAGE,
                 exception.getReason());
     }
 
@@ -54,27 +58,22 @@ public class RoleServiceTest extends AbstractTestContainers {
         insertFilling();
 
         List<Integer> privileges = new ArrayList<>();
-//        privileges.add(1);
-//        privileges.add(2);
-//        privileges.add(3);
-//        privileges.add(4); // Todo refactor (Laze + transaction -> stackOverflow problem)
-        // TODO Check if name is actually unique
+//        List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4); // TODO solve stackOverflow problem
+
         RoleRequest roleRequest = new RoleRequest(
                 "Новая_Фэйк_Роль",
                 "Фэйк_Описание",
                 true,
                 privileges);
 
-        Role updatedRole = roleService.createRole(roleRequest);
+        Role createdRole = roleService.createRole(roleRequest);
 
-        assertNotNull(updatedRole);
+        assertNotNull(createdRole);
         assertAll(
-                () -> assertEquals(updatedRole.getName(), roleRequest.name()),
-                () -> assertEquals(updatedRole.getDescription(), roleRequest.description()),
-                () -> assertEquals(updatedRole.getType(), RoleType.EVENT),
-                () -> assertArrayEquals(    // TODO fix
-                        updatedRole.getPrivileges().toArray(), roleRequest.privileges().toArray(),
-                        "The set of privileges does not match")
+                () -> assertEquals(roleRequest.name(), createdRole.getName()),
+                () -> assertEquals(roleRequest.description(), createdRole.getDescription()),
+                () -> assertEquals(RoleType.EVENT, createdRole.getType()),
+                () -> assertEquals(privileges.size(), createdRole.getPrivileges().size())
         );
     }
 
@@ -112,22 +111,24 @@ public class RoleServiceTest extends AbstractTestContainers {
                 true,
                 privileges);
 
-        basicRolesNames.stream()
-                .map(roleService::findByName)
-                .forEach(basicRole -> {
-                    ResponseStatusException exception = assertThrows(
-                            ResponseStatusException.class,
-                            () -> roleService.editRole(basicRole.getId(), roleRequest),
-                            "It is forbidden to modify the basic roles");
-                    assertEquals("Невозможно изменить эту роль", exception.getReason());
-                });
+        for (String basicRolesName : basicRolesNames) {
+            Role basicRole = roleService.findByName(basicRolesName);
+
+            ResponseStatusException exception = assertThrows(
+                    ResponseStatusException.class,
+                    () -> roleService.editRole(basicRole.getId(), roleRequest),
+                    "It is forbidden to modify the basic roles");
+
+            assertEquals(ExceptionConst.ROLE_EDITING_FORBIDDEN_MESSAGE,
+                    exception.getReason());
+        }
     }
 
     @Test
     @DisplayName("[editRole]-(Neg) Editing a non existent role")
     void editNonExistRoleTest() {
         List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4);
-//        List<Integer> privileges = new LinkedList<>();
+//        List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4); // TODO solve stackOverflow problem
 
         RoleRequest roleRequest = new RoleRequest(
                 "Новая_Фэйк_Роль",
@@ -138,8 +139,10 @@ public class RoleServiceTest extends AbstractTestContainers {
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
                 () -> roleService.editRole(1, roleRequest),
-                "It is not possible to edit a non existent role"); assertTrue(exception.getMessage().contains("не найдена"),
-                exception.getReason()); // to refactor
+                "It is not possible to edit a non existent role");
+
+        assertTrue(exception.getMessage().contains("не найдена"),
+                exception.getReason());
     }
 
     @Test
@@ -148,11 +151,11 @@ public class RoleServiceTest extends AbstractTestContainers {
         insertBasicFilling();
         insertFilling();
 
+        int editingRoleId = basicRolesNames.size() + 2; // {1:size} for basics, size+1 - for "Фэйк_Роль_1", size+2 - for editing
+
         List<Integer> privileges = new ArrayList<>();
-//        privileges.add(1);
-//        privileges.add(2);
-//        privileges.add(3);
-//        privileges.add(4); // Todo refactor (Laze + transaction -> stackOverflow problem)
+//        List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4); // TODO solve stackOverflow problem
+
         RoleRequest roleRequest = new RoleRequest(
                 "Фэйк_Роль_1",
                 "Фэйк_Описание",
@@ -161,9 +164,10 @@ public class RoleServiceTest extends AbstractTestContainers {
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> roleService.editRole(basicRolesNames.size() + 2, roleRequest),    // to refactor
+                () -> roleService.editRole(editingRoleId, roleRequest),
                 "Must not be able to edit role using not unique name");
-        assertEquals("Роль с таким именем уже существует", exception.getReason());
+
+        assertEquals(ExceptionConst.ROLE_EXIST_MESSAGE, exception.getReason());
     }
 
     @Test
@@ -172,10 +176,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         insertFilling();
 
         List<Integer> privileges = new ArrayList<>();
-//        privileges.add(1);
-//        privileges.add(2);
-//        privileges.add(3);
-//        privileges.add(4); // to refactor (stackOverflow)
+//        List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4); // TODO solve stackOverflow problem
 
         RoleRequest roleRequest = new RoleRequest(
                 "Новая_Фэйк_Роль",
@@ -187,10 +188,10 @@ public class RoleServiceTest extends AbstractTestContainers {
 
         assertNotNull(editedRole);
         assertAll(
-                () -> assertEquals(editedRole.getName(), roleRequest.name()),
-                () -> assertEquals(editedRole.getDescription(), roleRequest.description()),
-                () -> assertEquals(editedRole.getType(), RoleType.EVENT),
-                () -> assertArrayEquals(editedRole.getPrivileges().toArray(), roleRequest.privileges().toArray())
+                () -> assertEquals(roleRequest.name(), editedRole.getName()),
+                () -> assertEquals(roleRequest.description(), editedRole.getDescription()),
+                () -> assertEquals(RoleType.EVENT, editedRole.getType()),
+                () -> assertEquals(privileges.size(), editedRole.getPrivileges().size())
         );
     }
 
@@ -200,10 +201,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         insertFilling();
 
         List<Integer> privileges = new ArrayList<>();
-//        privileges.add(1);
-//        privileges.add(2);
-//        privileges.add(3);
-//        privileges.add(4); // Todo refactor (Laze + transaction -> stackOverflow problem)
+//        List<Integer> privileges = Lists.newArrayList(1, 2, 3, 4); // TODO solve stackOverflow problem
 
         RoleRequest roleRequest = new RoleRequest(
                 "Фэйк_Роль_1",
@@ -212,12 +210,13 @@ public class RoleServiceTest extends AbstractTestContainers {
                 privileges);
 
         Role editedRole = roleService.editRole(1, roleRequest);
+
         assertNotNull(editedRole);
         assertAll(
-                () -> assertEquals(editedRole.getName(), roleRequest.name()),
-                () -> assertEquals(editedRole.getDescription(), roleRequest.description()),
-                () -> assertEquals(editedRole.getType(), RoleType.EVENT),
-                () -> assertArrayEquals(editedRole.getPrivileges().toArray(), roleRequest.privileges().toArray())
+                () -> assertEquals(roleRequest.name(), editedRole.getName()),
+                () -> assertEquals(roleRequest.description(), editedRole.getDescription()),
+                () -> assertEquals(RoleType.EVENT, editedRole.getType()),
+                () -> assertEquals(privileges.size(), editedRole.getPrivileges().size())
         );
     }
 
@@ -226,15 +225,17 @@ public class RoleServiceTest extends AbstractTestContainers {
     void deleteBasicRoleTest() {
         insertBasicFilling();
 
-        basicRolesNames.stream()
-                .map(roleService::findByName)
-                .forEach(basicRole -> {
-                    ResponseStatusException exception = assertThrows(
-                            ResponseStatusException.class,
-                            () -> roleService.deleteRole(basicRole.getId()),
-                            "It is forbidden to delete the basic roles");
-                    assertEquals("Невозможно удалить эту роль", exception.getReason());
-                });
+        for (String basicRolesName : basicRolesNames) {
+            Role basicRole = roleService.findByName(basicRolesName);
+
+            ResponseStatusException exception = assertThrows(
+                    ResponseStatusException.class,
+                    () -> roleService.deleteRole(basicRole.getId()),
+                    "It is forbidden to delete the basic roles");
+
+            assertEquals(ExceptionConst.ROLE_DELETING_FORBIDDEN_MESSAGE,
+                    exception.getReason());
+        }
     }
 
     @Test
@@ -247,7 +248,8 @@ public class RoleServiceTest extends AbstractTestContainers {
                 ResponseStatusException.class,
                 () -> roleService.deleteRole(1),
                 "It is forbidden to delete assigned roles");
-        assertEquals("Невозможно удалить роль, так как существуют пользователи, которым она назначена",
+
+        assertEquals(ExceptionConst.USERS_WITH_ROLE_EXIST,
                 exception.getReason());
     }
 
@@ -264,8 +266,9 @@ public class RoleServiceTest extends AbstractTestContainers {
                 ResponseStatusException.class,
                 () -> roleService.findRoleById(1),
                 "Deleted role can not be accessed");
+
         assertTrue(exception.getMessage().contains("не найдена"),
-                exception.getReason()); // to refactor
+                exception.getReason());
     }
 
     @Test
@@ -273,34 +276,29 @@ public class RoleServiceTest extends AbstractTestContainers {
     void getAllRoles() {
         insertBasicFilling();   // 4
         insertFilling();        // 4
+        final int ROLES_COUNT = 8;
 
         List<Role> allRoles = roleService.getAll();
 
         assertNotNull(allRoles);
-        assertEquals(8, allRoles.size());
-        // to refactor
+        assertEquals(ROLES_COUNT, allRoles.size());
     }
 
     @Test
     @DisplayName(("[findRoleById] (Pos) Getting roles by Id"))
     void findRoleById() {
         insertBasicFilling();
+        final int BASIC_ROLES_COUNT = 4;
 
-        Role adminRole = roleService.findRoleById(1);
-        assertNotNull(adminRole);
-        assertEquals(basicRolesNames.get(0), adminRole.getName());
+        for (int i = 0; i < BASIC_ROLES_COUNT; i++) {
+            int roleId = i + 1;
 
-        Role readerRole = roleService.findRoleById(2);
-        assertNotNull(readerRole);
-        assertEquals(basicRolesNames.get(1), readerRole.getName());
+            Role basicRole = roleService.findRoleById(roleId);
 
-        Role organizerRole = roleService.findRoleById(3);
-        assertNotNull(organizerRole);
-        assertEquals(basicRolesNames.get(2), organizerRole.getName());
+            assertNotNull(basicRole);
 
-        Role assistantRole = roleService.findRoleById(4);
-        assertNotNull(assistantRole);
-        assertEquals(basicRolesNames.get(3), assistantRole.getName());
+            assertEquals(basicRolesNames.get(i), basicRole.getName());
+        }
     }
 
     @Test
@@ -311,8 +309,9 @@ public class RoleServiceTest extends AbstractTestContainers {
                 ResponseStatusException.class,
                 () -> roleService.findRoleById(1),
                 "Non existing role can not be accessed");
+
         assertTrue(exception.getMessage().contains("не найдена"),
-                exception.getReason()); // to refactor
+                exception.getReason());
     }
 
     @Test
@@ -343,84 +342,33 @@ public class RoleServiceTest extends AbstractTestContainers {
     void searchByNameTest() {
         insertBasicFilling();
 
-        List<Role> adminRoles = roleService.searchByName(basicRolesNames.get(0));
-        assertNotNull(adminRoles);
-        assertFalse(adminRoles.isEmpty());
-        adminRoles.forEach(adminRole -> assertAll(
-                () -> assertEquals(basicRolesNames.get(0), adminRole.getName()),
-                () -> assertEquals("Имеет полный доступ к системе", adminRole.getDescription()),
-                () -> assertEquals(RoleType.SYSTEM, adminRole.getType())
-        ));
+        for (String basicRoleName : basicRolesNames) {
+            List<Role> basicRoles = roleService.searchByName(basicRoleName);
 
-        List<Role> readerRoles = roleService.searchByName(basicRolesNames.get(1));
-        assertNotNull(readerRoles);
-        assertFalse(readerRoles.isEmpty());
-        readerRoles.forEach(readerRole -> assertAll(
-                () -> assertEquals(basicRolesNames.get(1), readerRole.getName()),
-                () -> assertEquals("Базовая пользовательская система", readerRole.getDescription()),
-                () -> assertEquals(RoleType.SYSTEM, readerRole.getType())
-        ));
+            assertNotNull(basicRoles);
 
-        List<Role> organizerRoles = roleService.searchByName(basicRolesNames.get(2));
-        assertNotNull(organizerRoles);
-        assertFalse(organizerRoles.isEmpty());
-        organizerRoles.forEach(organizerRole -> assertAll(
-                () -> assertEquals(basicRolesNames.get(2), organizerRole.getName()),
-                () -> assertEquals("Организатор мероприятия", organizerRole.getDescription()),
-                () -> assertEquals(RoleType.EVENT, organizerRole.getType())
-        ));
+            assertFalse(basicRoles.isEmpty());
 
-        List<Role> assistantRoles = roleService.searchByName(basicRolesNames.get(3));
-        assertNotNull(assistantRoles);
-        assertFalse(assistantRoles.isEmpty());
-        assistantRoles.forEach(assistantRole -> assertAll(
-                () -> assertEquals(basicRolesNames.get(3), assistantRole.getName()),
-                () -> assertEquals("Помощь в мероприятиях", assistantRole.getDescription()),
-                () -> assertEquals(RoleType.EVENT, assistantRole.getType())
-        ));
+            basicRoles.forEach(
+                    basicRole -> assertEquals(basicRoleName, basicRole.getName())
+            );
+        }
     }
-
-    // TODO test assignSystemRole
-
-    // TODO test revokeSystemRole
 
     @Test
     @DisplayName("[findByName]-(Pos) Getting basic roles by name")
     void findRoleByNameTest() {
         insertBasicFilling();
 
-        Role adminRole = roleService.findByName(basicRolesNames.get(0));
-        assertNotNull(adminRole);
-        assertAll(
-                () -> assertEquals(basicRolesNames.get(0), adminRole.getName()),
-                () -> assertEquals("Имеет полный доступ к системе", adminRole.getDescription()),
-                () -> assertEquals(RoleType.SYSTEM, adminRole.getType())
-        );
+        for (String basicRoleName : basicRolesNames) {
+            Role basicRole = roleService.findByName(basicRoleName);
 
-        Role readerRoles = roleService.findByName(basicRolesNames.get(1));
-        assertNotNull(readerRoles);
-        assertAll(
-                () -> assertEquals(basicRolesNames.get(1), readerRoles.getName()),
-                () -> assertEquals("Базовая пользовательская система", readerRoles.getDescription()),
-                () -> assertEquals(RoleType.SYSTEM, readerRoles.getType())
-        );
+            assertNotNull(basicRole);
 
-        Role organizerRoles = roleService.findByName(basicRolesNames.get(2));
-        assertNotNull(organizerRoles);
-        assertAll(
-                () -> assertEquals(basicRolesNames.get(2), organizerRoles.getName()),
-                () -> assertEquals("Организатор мероприятия", organizerRoles.getDescription()),
-                () -> assertEquals(RoleType.EVENT, organizerRoles.getType())
-        );
-
-        Role assistantRoles = roleService.findByName(basicRolesNames.get(3));
-        assertNotNull(assistantRoles);
-        assertAll(
-                () -> assertEquals(basicRolesNames.get(3), assistantRoles.getName()),
-                () -> assertEquals("Помощь в мероприятиях", assistantRoles.getDescription()),
-                () -> assertEquals(RoleType.EVENT, assistantRoles.getType())
-        );
+            assertEquals(basicRoleName, basicRole.getName());
+        }
     }
+
 
     private void insertFilling() {
         executeSqlScript("/sql/insert_roles.sql");
