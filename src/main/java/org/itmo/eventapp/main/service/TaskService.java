@@ -62,6 +62,7 @@ public class TaskService {
         TaskStatus status = TaskStatus.NEW;
         if (LocalDateTime.now().isAfter(newTask.getDeadline())) {
             status = TaskStatus.EXPIRED;
+            taskNotificationUtils.createOverdueTaskNotification(newTask);
         }
 
         newTask.setStatus(status);
@@ -100,6 +101,7 @@ public class TaskService {
         newTaskData.setCreationTime(task.getCreationTime());
         if (LocalDateTime.now().isAfter(newTaskData.getDeadline())) {
             newTaskData.setStatus(TaskStatus.EXPIRED);
+            taskNotificationUtils.createOverdueTaskNotification(newTaskData);
         }
 
         newTaskData = taskRepository.save(newTaskData);

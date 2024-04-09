@@ -19,6 +19,6 @@ public record TaskResponse(
         PlaceShortDataResponse place,
         LocalDateTime creationTime,
         LocalDateTime deadline,
-        LocalDateTime notificationDeadline
+        LocalDateTime reminder
 ) {
 }

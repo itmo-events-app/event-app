@@ -10,5 +10,5 @@
   "taskStatus": "EXPIRED",
   "place": null,
   "deadline": "2023-04-20T21:00:00",
-  "notificationDeadline": "2023-04-20T21:00:00"
+  "reminder": "2023-04-20T21:00:00"
 }

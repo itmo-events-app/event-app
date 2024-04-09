@@ -57,7 +57,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
 
@@ -98,7 +98,7 @@ class TaskControllerTest extends AbstractTestContainers {
         String newDescription = "created";
         TaskStatus newStatus = TaskStatus.NEW;
         LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+        LocalDateTime newreminder = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
         Integer assigneeId = 1;
         Integer assignerId = 1;
 
@@ -108,7 +108,7 @@ class TaskControllerTest extends AbstractTestContainers {
             () -> Assertions.assertEquals(newStatus, task.getStatus()),
             () -> Assertions.assertNull(task.getPlace()),
             () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
-            () -> Assertions.assertEquals(newNotificationDeadline, task.getReminder()),
+            () -> Assertions.assertEquals(newreminder, task.getReminder()),
             () -> Assertions.assertEquals(assigneeId, task.getAssignee().getId()),
             () -> Assertions.assertEquals(assignerId, task.getAssigner().getId())
         );
@@ -135,11 +135,11 @@ class TaskControllerTest extends AbstractTestContainers {
         Task task = taskRepository.findById(1).orElseThrow();
 
         LocalDateTime newDeadline = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
+        LocalDateTime newreminder = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
 
         Assertions.assertAll(
             () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
-            () -> Assertions.assertEquals(newNotificationDeadline, task.getReminder()),
+            () -> Assertions.assertEquals(newreminder, task.getReminder()),
             () -> Assertions.assertEquals(TaskStatus.EXPIRED, task.getStatus())
         );
     }
@@ -199,7 +199,7 @@ class TaskControllerTest extends AbstractTestContainers {
         String newDescription = "upd";
         TaskStatus newStatus = TaskStatus.IN_PROGRESS;
         LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+        LocalDateTime newreminder = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
         Integer assigneeId = 2;
         Integer placeId = 1;
 
@@ -220,7 +220,7 @@ class TaskControllerTest extends AbstractTestContainers {
                 "address": "itmo university"
               },
               "deadline": "2025-04-20T21:00:00",
-              "notificationDeadline": "2025-04-20T21:00:00"
+              "reminder": "2025-04-20T21:00:00"
             }
             """;
 
@@ -236,7 +236,7 @@ class TaskControllerTest extends AbstractTestContainers {
             () -> Assertions.assertEquals(newDescription, edited.getDescription()),
             () -> Assertions.assertEquals(newStatus, edited.getStatus()),
             () -> Assertions.assertEquals(newDeadline, edited.getDeadline()),
-            () -> Assertions.assertEquals(newNotificationDeadline, edited.getReminder()),
+            () -> Assertions.assertEquals(newreminder, edited.getReminder()),
             () -> Assertions.assertEquals(assigneeId, edited.getAssignee().getId()),
             () -> {
                 Assertions.assertNotNull(edited.getPlace());
@@ -332,7 +332,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
 
@@ -390,7 +390,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
 
@@ -434,7 +434,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
 
@@ -507,7 +507,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }]
             """;
 
@@ -609,7 +609,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2024-03-10T21:32:23.536819",
               "deadline": "2024-03-30T21:32:23.536819",
-              "notificationDeadline": "2024-03-30T21:32:23.536819"
+              "reminder": "2024-03-30T21:32:23.536819"
             }]
             """;
 
@@ -711,7 +711,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }]
             """;
 
@@ -774,7 +774,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }]
             """;
 
