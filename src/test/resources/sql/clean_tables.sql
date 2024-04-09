@@ -1,3 +1,7 @@
+delete from role_privilege where id > 62;   -- Number of roles-privilege relations = 62
+                                            -- Admin (22) ; Reader (6) ; Organizer (25) ; Assistant (9) ;
+delete from role where id > 4;              -- Number of basic roles = 4
+delete from privilege where id > 44;        -- Number of basic privilege = 44
 truncate table task cascade;
 truncate table event_role cascade;
 truncate table participant cascade;
@@ -8,23 +12,19 @@ truncate table user_login_info cascade;
 truncate table user_t cascade;
 truncate table user_notification_info cascade;
 truncate table registration_request cascade;
-truncate table role cascade;
-truncate table privilege cascade;
-
-
 
 -- reset id sequences
-select setval('task_id_seq', 1, false);
-select setval('event_role_id_seq', 1, false);
-select setval('participant_id_seq', 1, false);
-select setval('event_id_seq', 1, false);
-select setval('place_id_seq', 1, false);
+alter sequence task_id_seq restart with 1;
+alter sequence event_role_id_seq restart with 1;
+alter sequence participant_id_seq restart with 1;
+alter sequence event_id_seq restart with 1;
+alter sequence place_id_seq restart with 1;
 alter sequence notification_id_seq restart with 1;
-select setval('user_login_info_id_seq', 1, false);
-select setval('user_t_id_seq', 1, false);
--- select setval('user_notification_info_id_seq', 1, false); на этом варианте валилось
-alter sequence user_notification_info_id_seq restart with 1; -- Для остальных мб тоже лучше так
-select setval('registration_request_id_seq', 1, false);
-
-alter sequence role_id_seq restart with 1;
-alter sequence privilege_id_seq restart with 1;
+alter sequence user_login_info_id_seq restart with 1;
+alter sequence user_t_id_seq restart with 1;
+alter sequence user_notification_info_id_seq restart with 1;
+alter sequence registration_request_id_seq restart with 1;
+alter sequence role_privilege_id_seq restart with 63;   -- Number of roles-privilege relations = 62
+                                                        -- Admin (22) ; Reader (6) ; Organizer (25) ; Assistant (9) ;
+alter sequence role_id_seq restart with 5;              -- Number of basic roles = 4
+alter sequence privilege_id_seq restart with 45;        -- Number of basic privilege = 44
