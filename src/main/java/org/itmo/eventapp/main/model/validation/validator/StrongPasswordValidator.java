@@ -26,6 +26,27 @@ public class StrongPasswordValidator implements ConstraintValidator<StrongPasswo
         Pattern pattern = Pattern.compile("[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~]+");
         Matcher matcher = pattern.matcher(s);
 
-        return isAtLeastOneUpperAndLowerCase(s) && s.length() >= 8 && matcher.find();
+        if(s.length() <= 8){
+            constraintValidatorContext.disableDefaultConstraintViolation(); // Отключаем стандартное сообщение
+            constraintValidatorContext.buildConstraintViolationWithTemplate("Минимальная длина пароля - 8 символов").addConstraintViolation();
+
+            return false;
+        }
+
+        if (!isAtLeastOneUpperAndLowerCase(s)){
+            constraintValidatorContext.disableDefaultConstraintViolation(); // Отключаем стандартное сообщение
+            constraintValidatorContext.buildConstraintViolationWithTemplate("Пароль должен содержать минимум один символ верхнего и нижнего регистра").addConstraintViolation();
+
+            return false;
+        }
+
+        if(!matcher.find()){
+            constraintValidatorContext.disableDefaultConstraintViolation(); // Отключаем стандартное сообщение
+            constraintValidatorContext.buildConstraintViolationWithTemplate("Пароль должен содержать минимум один специальный символ").addConstraintViolation();
+
+            return false;
+        }
+
+        return true;
     }
 }

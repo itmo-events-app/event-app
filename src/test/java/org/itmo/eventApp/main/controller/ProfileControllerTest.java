@@ -15,11 +15,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class ProfileControllerTest extends AbstractTestContainers {
@@ -168,6 +165,6 @@ class ProfileControllerTest extends AbstractTestContainers {
         Assertions.assertTrue(resultString.contains("CREATE_EVENT_VENUE"));
         Assertions.assertTrue(resultString.contains("VIEW_EVENT_ACTIVITIES"));
         Assertions.assertTrue(resultString.contains("MODIFY_PROFILE_DATA"));
-        Assertions.assertTrue(resultString.contains("VIEW_ALL_EVENTS_AND_ACTIVITIES"));
+        Assertions.assertTrue(resultString.contains("VIEW_ALL_EVENTS"));
     }
 }
