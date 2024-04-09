@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping(value = "/api/events/")
 @Validated
 public class ParticipantsController {
-    private ParticipantsService participantsService;
+    private final ParticipantsService participantsService;
 
     @GetMapping("/{id}/participants/list")
     public ResponseEntity<List<ParticipantResponse>> getParticipants(@Min(1) @PathVariable("id") Integer id) {
