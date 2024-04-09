@@ -42,6 +42,9 @@ class TaskControllerTest extends AbstractTestContainers {
         String expectedTaskJson = """
             {
               "id": 1,
+              "event": {
+                "eventId":1
+              },
               "assignee": {
                 "id": 1,
                 "name": "test",
@@ -675,27 +678,13 @@ class TaskControllerTest extends AbstractTestContainers {
             .andExpect(content().json(expectedTaskJson));
 
 
-    }
-
-
-    @Test
-    void taskGetAllWhereAssigneeInEventTest() throws Exception {
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
-        executeSqlScript("/sql/insert_place.sql");
-        executeSqlScript("/sql/insert_event.sql");
-        executeSqlScript("/sql/insert_event_2.sql");
-        executeSqlScript("/sql/insert_event_role_1.sql");
-        //executeSqlScript("/sql/insert_event_role_2.sql");
-        executeSqlScript("/sql/insert_task.sql");
-        executeSqlScript("/sql/insert_task_2.sql");
-        executeSqlScript("/sql/insert_task_3.sql");
-        executeSqlScript("/sql/insert_task_4.sql");
-
-        String expectedTaskJson = """
+        expectedTaskJson = """
             [{
               "id": 4,
-              "eventId": 2,
+              "event": {
+                "eventId":1,
+                "activityId":2
+              },
               "assignee": {
                 "id": 1,
                 "name": "test",
@@ -715,13 +704,24 @@ class TaskControllerTest extends AbstractTestContainers {
             }]
             """;
 
-        String testUrl =
-            "/api/tasks/event/1/where-assignee?subEventTasksGet=true&assignerId=2";
+        testUrl =
+            "/api/tasks/event/1?subEventTasksGet=true&assignerId=2&personalTasksGet=true";
 
         mockMvc.perform(get(testUrl)
                 .with(user(getUserLoginInfo())))
             .andExpect(status().isOk())
             .andExpect(content().json(expectedTaskJson));
+
+
+        // assigneeId less important than personalTasksGet param
+
+        testUrl =
+                "/api/tasks/event/1?subEventTasksGet=true&assignerId=2&personalTasksGet=true&assigneeId=2";
+
+        mockMvc.perform(get(testUrl)
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedTaskJson));
 
 
         expectedTaskJson = """
@@ -731,12 +731,13 @@ class TaskControllerTest extends AbstractTestContainers {
         /*no subtasks*/
 
         testUrl =
-            "/api/tasks/event/1/where-assignee?assignerId=2";
+            "/api/tasks/event/1?assignerId=2&personalTasksGet=true";
 
         mockMvc.perform(get(testUrl)
                 .with(user(getUserLoginInfo())))
             .andExpect(status().isOk())
             .andExpect(content().json(expectedTaskJson));
+
 
     }
 
@@ -758,7 +759,10 @@ class TaskControllerTest extends AbstractTestContainers {
         String expectedTaskJson = """
             [{
               "id": 4,
-              "eventId": 2,
+              "event": {
+                "eventId":1,
+                "activityId":2
+              },
               "assignee": {
                 "id": 1,
                 "name": "test",
