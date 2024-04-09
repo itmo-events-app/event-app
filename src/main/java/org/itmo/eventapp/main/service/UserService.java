@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -28,8 +27,8 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
-    public List<User> findAllByRole(Role role) {
-        return userRepository.findAllByRole(role);
+    public boolean existsByRole(Role role) {
+        return userRepository.existsByRole(role);
     }
 
     public void save(User user) {
