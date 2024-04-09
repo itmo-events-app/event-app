@@ -336,6 +336,22 @@ public class RoleServiceTest extends AbstractTestContainers {
                 "Returned roles list size [%d] does not match expected [%d]".formatted(allRoles.size(), ROLES_COUNT));
     }
 
+    @Test
+    @DisplayName("[getAll] (Neg) Getting ALL roles which are NOT created")
+    void getAllRolesNotCreatTest() {
+        // ====---- Setting up precondition ----====
+        cleanRolesPrivileges();
+
+        // ==========----  Execution  ----==========
+        List<Role> allRoles = roleService.getAll();
+
+        // ==========---- Assertions  ----==========
+        assertNotNull(allRoles,
+                "Got NULL after calling getAll()");
+        assertTrue(allRoles.isEmpty(),
+                "Returned roles list size is [%d] but expected to be empty".formatted(allRoles.size()));
+    }
+
 
     @Test
     @DisplayName("[deleteRole]-(Pos) Deleting role")
