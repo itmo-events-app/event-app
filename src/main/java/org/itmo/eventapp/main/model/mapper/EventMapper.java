@@ -6,7 +6,6 @@ import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Place;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class EventMapper {
@@ -90,32 +89,26 @@ public final class EventMapper {
     }
 
     public static List<Event> eventRolesToEvents(List<EventRole> eventRoles) {
-        List<Event> events = new ArrayList<>();
-
-        for (EventRole eventRole : eventRoles) {
-            Event event = Event.builder()
-                    .id(eventRole.getEvent().getId())
-                    .place(eventRole.getEvent().getPlace())
-                    .startDate(eventRole.getEvent().getStartDate())
-                    .endDate(eventRole.getEvent().getEndDate())
-                    .title(eventRole.getEvent().getTitle())
-                    .shortDescription(eventRole.getEvent().getShortDescription())
-                    .fullDescription(eventRole.getEvent().getFullDescription())
-                    .format(eventRole.getEvent().getFormat())
-                    .status(eventRole.getEvent().getStatus())
-                    .registrationStart(eventRole.getEvent().getRegistrationStart())
-                    .registrationEnd(eventRole.getEvent().getRegistrationEnd())
-                    .parent(eventRole.getEvent().getParent())
-                    .participantLimit(eventRole.getEvent().getParticipantLimit())
-                    .participantAgeLowest(eventRole.getEvent().getParticipantAgeLowest())
-                    .participantAgeHighest(eventRole.getEvent().getParticipantAgeHighest())
-                    .preparingStart(eventRole.getEvent().getPreparingStart())
-                    .preparingEnd(eventRole.getEvent().getPreparingEnd())
-                    .build();
-
-            events.add(event);
-        }
-
-        return events;
+        return eventRoles.stream()
+                .map(eventRole -> Event.builder()
+                        .id(eventRole.getEvent().getId())
+                        .place(eventRole.getEvent().getPlace())
+                        .startDate(eventRole.getEvent().getStartDate())
+                        .endDate(eventRole.getEvent().getEndDate())
+                        .title(eventRole.getEvent().getTitle())
+                        .shortDescription(eventRole.getEvent().getShortDescription())
+                        .fullDescription(eventRole.getEvent().getFullDescription())
+                        .format(eventRole.getEvent().getFormat())
+                        .status(eventRole.getEvent().getStatus())
+                        .registrationStart(eventRole.getEvent().getRegistrationStart())
+                        .registrationEnd(eventRole.getEvent().getRegistrationEnd())
+                        .parent(eventRole.getEvent().getParent())
+                        .participantLimit(eventRole.getEvent().getParticipantLimit())
+                        .participantAgeLowest(eventRole.getEvent().getParticipantAgeLowest())
+                        .participantAgeHighest(eventRole.getEvent().getParticipantAgeHighest())
+                        .preparingStart(eventRole.getEvent().getPreparingStart())
+                        .preparingEnd(eventRole.getEvent().getPreparingEnd())
+                        .build())
+                .toList();
     }
 }
