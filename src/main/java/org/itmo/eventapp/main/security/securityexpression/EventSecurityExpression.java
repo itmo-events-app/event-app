@@ -57,7 +57,7 @@ public class EventSecurityExpression {
         return miscSecurityExpression.checkSystemPrivileges(
                 Arrays.asList(
                         PrivilegeName.SEARCH_EVENTS_AND_ACTIVITIES,
-                        PrivilegeName.VIEW_ALL_EVENTS_AND_ACTIVITIES));
+                        PrivilegeName.VIEW_ALL_EVENTS));
     }
 
     public boolean canGetUsersHavingRoles(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!") int eventId) {
