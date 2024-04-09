@@ -49,7 +49,7 @@ class ProfileControllerTest extends AbstractTestContainers {
         mockMvc.perform(put("/api/profile/change-name")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
 
         User updatedUser = userRepository.findById(1).orElse(null);
@@ -67,7 +67,7 @@ class ProfileControllerTest extends AbstractTestContainers {
         mockMvc.perform(put("/api/profile/change-password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test
@@ -91,7 +91,7 @@ class ProfileControllerTest extends AbstractTestContainers {
         mockMvc.perform(put("/api/profile/change-login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         User updatedUser = userRepository.findById(1).orElse(null);
         Assertions.assertNotNull(updatedUser);
@@ -140,7 +140,7 @@ class ProfileControllerTest extends AbstractTestContainers {
         mockMvc.perform(put("/api/profile/notifications")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         User updatedUser = userRepository.findById(1).orElse(null);
         Assertions.assertNotNull(updatedUser);
