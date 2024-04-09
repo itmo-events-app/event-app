@@ -23,10 +23,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class RoleServiceTest extends AbstractTestContainers {
-    private static final List<String> basicRolesNames
-            = Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
-    private static final List<String> fakeRolesNames
-            = Arrays.asList("Фэйк_Роль_1", "Фэйк_Роль_2", "Фэйк_Роль_3", "Фэйк_Роль_4", "Фэйк_Роль_5");
+    private static final List<String> basicRolesNames =
+            Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
+    private static final List<String> fakeRolesNames =
+            Arrays.asList("Фэйк_Роль_1", "Фэйк_Роль_2", "Фэйк_Роль_3", "Фэйк_Роль_4", "Фэйк_Роль_5");
     private static final int BASIC_ROLES_COUNT = 4;
     private static final int FAKE_ROLES_COUNT = 5;
     private static final int EVENT_ROLES_COUNT = 2 + 3;
@@ -315,7 +315,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
 
     @Test
-    @DisplayName("[getAll] (Pos) Getting ALL roles")
+    @DisplayName("[getAll]-(Pos) Getting ALL roles")
     void getAllRolesTest() {
         // ====---- Setting up precondition ----====
         cleanRolesPrivileges();
@@ -337,7 +337,7 @@ public class RoleServiceTest extends AbstractTestContainers {
     }
 
     @Test
-    @DisplayName("[getAll] (Neg) Getting ALL roles which are NOT created")
+    @DisplayName("[getAll]-(Neg) Getting ALL roles which are NOT created")
     void getAllRolesNotCreatTest() {
         // ====---- Setting up precondition ----====
         cleanRolesPrivileges();
@@ -424,7 +424,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
 
     @Test
-    @DisplayName(("[findRoleById] (Pos) Getting BASIC roles by Id"))
+    @DisplayName(("[findRoleById]-(Pos) Getting BASIC roles by Id"))
     void findBasicRoleByIdTest() {
         // ====---- Setting up precondition ----====
         cleanRolesPrivileges();
@@ -446,7 +446,7 @@ public class RoleServiceTest extends AbstractTestContainers {
     }
 
     @Test
-    @DisplayName(("[findRoleById] (Pos) Getting FAKE roles by Id"))
+    @DisplayName(("[findRoleById]-(Pos) Getting FAKE roles by Id"))
     void findFakeRoleByIdTest() {
         // ====---- Setting up precondition ----====
         cleanRolesPrivileges();
@@ -468,7 +468,7 @@ public class RoleServiceTest extends AbstractTestContainers {
     }
 
     @Test
-    @DisplayName(("[findRoleById] (Neg) Getting NON-existing roles by Id"))
+    @DisplayName(("[findRoleById]-(Neg) Getting NON-existing roles by Id"))
     void findNonExistRoleByIdTest() {
         // ====---- Setting up precondition ----====
         cleanRolesPrivileges();
@@ -488,7 +488,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
 
     @Test
-    @DisplayName("[getOrganizational] (Pos) Getting all event roles")
+    @DisplayName("[getOrganizational]-(Pos) Getting all event roles")
     void getEventRolesTest() {
         // ====---- Setting up precondition ----====
         cleanRolesPrivileges();
@@ -501,13 +501,12 @@ public class RoleServiceTest extends AbstractTestContainers {
         // ==========---- Assertions  ----==========
         assertNotNull(allEventRoles,
                 "Got NULL after calling getOrganizational()");
-
         assertEquals(EVENT_ROLES_COUNT, allEventRoles.size(),
                 "Returned event roles list size [%d] in NOT equal expected [%d]".formatted(allEventRoles.size(), EVENT_ROLES_COUNT));
     }
 
     @Test
-    @DisplayName("[getOrganizational] (Neg) Getting event roles")
+    @DisplayName("[getOrganizational]-(Neg) Getting event roles which are NOT created")
     void getNotCreatedEventRolesTest() {
         // ====---- Setting up precondition ----====
         cleanRolesPrivileges();
