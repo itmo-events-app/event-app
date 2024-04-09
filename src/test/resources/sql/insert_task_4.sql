@@ -8,7 +8,7 @@ insert into task (
     creation_time,
     deadline,
     place_id,
-    notification_deadline
+    reminder
 ) values (
              2,
              1,

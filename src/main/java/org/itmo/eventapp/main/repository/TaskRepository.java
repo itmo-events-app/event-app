@@ -13,6 +13,6 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Integer>, JpaSpecificationExecutor<Task> {
     List<Task> findAllByEventId(Integer eventId);
-    List<Task> findAllByNotificationDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime);
+    List<Task> findAllByReminderBetween(LocalDateTime startTime, LocalDateTime endTime);
     List<Task> findAllByDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime);
 }

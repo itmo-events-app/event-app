@@ -24,7 +24,7 @@ public record TaskRequest(
         PlaceShortDataRequest place,
         @NotNull(message = "Поле deadline не может быть null!")
         LocalDateTime deadline,
-        @NotNull(message = "Поле notificationDeadline не может быть null!")
-        LocalDateTime notificationDeadline
+        @NotNull(message = "Поле reminder не может быть null!")
+        LocalDateTime reminder
 ) {
 }

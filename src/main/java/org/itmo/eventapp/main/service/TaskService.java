@@ -187,7 +187,7 @@ public class TaskService {
             newTask.setAssigner(task.getAssigner());
             newTask.setAssignee(null);
             newTask.setDeadline(task.getDeadline());
-            newTask.setNotificationDeadline(task.getNotificationDeadline());
+            newTask.setReminder(task.getReminder());
 
             newTask.setCreationTime(LocalDateTime.now());
             TaskStatus status = TaskStatus.NEW;
@@ -274,8 +274,8 @@ public class TaskService {
         return taskRepository.findAllByDeadlineBetween(startTime, endTime);
     }
 
-    public List<Task> getTasksWithNotificationDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByNotificationDeadlineBetween(startTime, endTime);
+    public List<Task> getTasksWithReminderBetween(LocalDateTime startTime, LocalDateTime endTime){
+        return taskRepository.findAllByReminderBetween(startTime, endTime);
     }
 
 }

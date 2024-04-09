@@ -41,11 +41,11 @@ public class ScheduledJobsUtil {
     }
 
     @Scheduled(cron = "${notifications.cron.create-notification-job}")
-    public void sendNotificationsOnNotificationDeadline(){
+    public void sendNotificationsOnReminder(){
         LocalDateTime endTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
         LocalDateTime startTime = endTime.minusMinutes(sendingPeriodInMinutes);
 
-        List<Task> overdueTasks = taskService.getTasksWithNotificationDeadlineBetween(startTime, endTime);
+        List<Task> overdueTasks = taskService.getTasksWithReminderBetween(startTime, endTime);
 
         overdueTasks.forEach(taskNotificationUtils::createReminderTaskNotification);
     }

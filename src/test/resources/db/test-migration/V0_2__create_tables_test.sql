@@ -119,5 +119,5 @@ create table if not exists task
     creation_time timestamp not null,
     deadline timestamp not null,
     place_id int references place(id),
-    notification_deadline timestamp not null
+    reminder timestamp not null
 );

@@ -46,5 +46,5 @@ public class Task {
 
     private LocalDateTime deadline;
 
-    private LocalDateTime notificationDeadline;
+    private LocalDateTime reminder;
 }
