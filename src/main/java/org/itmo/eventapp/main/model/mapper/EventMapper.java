@@ -4,6 +4,7 @@ import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.dto.response.EventShortDataResponse;
 import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Place;
 
 import java.util.List;
@@ -103,6 +104,34 @@ public final class EventMapper {
                 .participantAgeHighest(source.getParticipantAgeHighest())
                 .preparingStart(source.getPreparingStart())
                 .preparingEnd(source.getPreparingEnd())
+                .build();
+    }
+
+    public static List<Event> eventRolesToEvents(List<EventRole> eventRoles) {
+        return eventRoles.stream()
+                .map(EventMapper::eventRoleToEvent)
+                .toList();
+    }
+
+    public static Event eventRoleToEvent(EventRole eventRole) {
+        return Event.builder()
+                .id(eventRole.getEvent().getId())
+                .place(eventRole.getEvent().getPlace())
+                .startDate(eventRole.getEvent().getStartDate())
+                .endDate(eventRole.getEvent().getEndDate())
+                .title(eventRole.getEvent().getTitle())
+                .shortDescription(eventRole.getEvent().getShortDescription())
+                .fullDescription(eventRole.getEvent().getFullDescription())
+                .format(eventRole.getEvent().getFormat())
+                .status(eventRole.getEvent().getStatus())
+                .registrationStart(eventRole.getEvent().getRegistrationStart())
+                .registrationEnd(eventRole.getEvent().getRegistrationEnd())
+                .parent(eventRole.getEvent().getParent())
+                .participantLimit(eventRole.getEvent().getParticipantLimit())
+                .participantAgeLowest(eventRole.getEvent().getParticipantAgeLowest())
+                .participantAgeHighest(eventRole.getEvent().getParticipantAgeHighest())
+                .preparingStart(eventRole.getEvent().getPreparingStart())
+                .preparingEnd(eventRole.getEvent().getPreparingEnd())
                 .build();
     }
 }
