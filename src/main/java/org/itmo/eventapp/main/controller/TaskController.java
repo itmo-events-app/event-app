@@ -14,7 +14,12 @@ import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.service.TaskService;
 import org.itmo.eventapp.main.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -164,53 +169,67 @@ public class TaskController {
     @GetMapping("/event/{eventId}")
     public ResponseEntity<List<TaskResponse>> taskListShowInEvent(
             @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
-            @PathVariable @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId,
-            @RequestParam(required = false) @Parameter(name = "assigneeId", description = "ID Исполнителя задачи", example = "123") Integer assigneeId,
-            @RequestParam(required = false) @Parameter(name = "assignerId", description = "ID Создателя задачи", example = "13") Integer assignerId,
-            @RequestParam(required = false) @Parameter(name = "taskStatus", description = "Статус задачи") TaskStatus taskStatus,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(name = "deadlineLowerLimit", description = "Мягкий дедлайн задачи") LocalDateTime deadlineLowerLimit,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(name = "deadlineUpperLimit", description = "Жесткий дедлайн задачи") LocalDateTime deadlineUpperLimit,
-            @RequestParam(required = false, defaultValue = "false") @Parameter(name = "subEventTasksGet", description = "Включить получение подзадач") Boolean subEventTasksGet
+            @PathVariable
+            @Parameter(name = "eventId", description = "ID мероприятия", example = "1")
+            Integer eventId,
+            @Min(value = 1, message = "Параметр assigneeId не может быть меньше 1!")
+            @RequestParam(required = false)
+            @Parameter(name = "assigneeId", description = "ID Исполнителя задачи", example = "123")
+            Integer assigneeId,
+            @Min(value = 1, message = "Параметр assignerId не может быть меньше 1!")
+            @RequestParam(required = false)
+            @Parameter(name = "assignerId", description = "ID Создателя задачи", example = "13")
+            Integer assignerId,
+            @Valid @RequestParam(required = false)
+            @Parameter(name = "taskStatus", description = "Статус задачи")
+            TaskStatus taskStatus,
+            @RequestParam(required = false)
+            @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            @Parameter(name = "deadlineLowerLimit", description = "Мягкий дедлайн задачи")
+            LocalDateTime deadlineLowerLimit,
+            @RequestParam(required = false)
+            @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            @Parameter(name = "deadlineUpperLimit", description = "Жесткий дедлайн задачи")
+            LocalDateTime deadlineUpperLimit,
+            @RequestParam(required = false, defaultValue = "false")
+            @Parameter(name = "subEventTasksGet", description = "Включить получение задач активностей мероприятия")
+            Boolean subEventTasksGet,
+            @RequestParam(required = false, defaultValue = "false")
+            @Parameter(name = "personalTasksGet", description = "Получить свои задачи в мероприятии. Более приоритетный параметр, чем assigneeId")
+            Boolean personalTasksGet,
+            @Min(value = 0, message = "Параметр page не может быть меньше 0!")
+            @RequestParam(required = false, defaultValue = "0")
+            @Parameter(name = "page", description = "Номер страницы")
+            Integer page,
+            @Min(value = 1, message = "Параметр pageSize не может быть меньше 1!")
+            @RequestParam(required = false, defaultValue = "50")
+            @Parameter(name = "pageSize", description = "Размер страницы")
+            Integer pageSize
     ) {
-        List<Task> eventTasks =
-                taskService.getEventTasksWithFilter(eventId,
-                        assigneeId,
-                        assignerId,
-                        taskStatus,
-                        deadlineLowerLimit,
-                        deadlineUpperLimit,
-                        subEventTasksGet);
-        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(eventTasks));
-    }
+        Integer userId = assigneeId;
+        if (personalTasksGet) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String currentPrincipalName = authentication.getName();
+            userId = userService.findByLogin(currentPrincipalName).getId();
+        }
 
-    @Operation(summary = "Получение списка задач мероприятия где пользователь является исполнителем")
-    @PreAuthorize("@taskSecurityExpression.canGetEventTasks(#eventId)")
-    @GetMapping("/event/{eventId}/where-assignee")
-    public ResponseEntity<List<TaskResponse>> taskListShowInEventWhereAssignee(
-            @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
-            @PathVariable @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId,
-            @RequestParam(required = false) @Parameter(name = "assignerId", description = "ID Создателя задачи", example = "13") Integer assignerId,
-            @RequestParam(required = false) @Parameter(name = "taskStatus", description = "Статус задачи") TaskStatus taskStatus,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(name = "deadlineLowerLimit", description = "Мягкий дедлайн задачи") LocalDateTime deadlineLowerLimit,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(name = "deadlineUpperLimit", description = "Жесткий дедлайн задачи") LocalDateTime deadlineUpperLimit,
-            @RequestParam(required = false, defaultValue = "false") @Parameter(name = "subEventTasksGet", description = "Включить получение подзадач") Boolean subEventTasksGet
-    ) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalName = authentication.getName();
-
-        Integer userId = userService.findByLogin(currentPrincipalName).getId();
-
-        List<Task> eventUserTasks =
+        Pageable pageRequest = PageRequest.of(page, pageSize, Sort.by("deadline"));
+        Page<Task> eventTasks =
                 taskService.getEventTasksWithFilter(eventId,
                         userId,
                         assignerId,
                         taskStatus,
                         deadlineLowerLimit,
                         deadlineUpperLimit,
-                        subEventTasksGet);
+                        subEventTasksGet,
+                        pageRequest);
 
-        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(eventUserTasks));
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("totalElements", String.valueOf(eventTasks.getTotalElements()));
+
+        return ResponseEntity.ok()
+                .headers(responseHeaders)
+                .body(TaskMapper.tasksToTaskResponseList(eventTasks.toList()));
     }
 
     @Operation(summary = "Получение списка задач где пользователь является исполнителем")
