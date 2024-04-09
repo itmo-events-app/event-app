@@ -4,7 +4,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
+import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.Role;
+import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
+import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.model.mapper.RoleMapper;
 import org.itmo.eventapp.main.repository.EventRoleRepository;
@@ -33,9 +36,15 @@ public class RoleService {
         if (roleRepository.findByName(roleRequest.name()).isPresent())
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.ROLE_EXIST_MESSAGE);
         Role role = RoleMapper.roleRequestToRole(roleRequest);
+        var privilegeType = roleRequest.isEvent() ? PrivilegeType.EVENT : PrivilegeType.SYSTEM;
         roleRequest.privileges().stream()
                 .map(privilegeService::findById)
-                .forEach(role::addPrivilege);
+                .forEach(privilege -> {
+                    if (checkInvalidPrivilegeType(privilege, privilegeType)) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_PRIVILEGE_TYPE);
+                    }
+                    role.addPrivilege(privilege);
+                });
         return roleRepository.save(role);
     }
 
@@ -52,9 +61,15 @@ public class RoleService {
         editedRole.setDescription(roleRequest.description());
         editedRole.setType(roleRequest.isEvent() ? RoleType.EVENT : RoleType.SYSTEM);
         editedRole.setPrivileges(new HashSet<>());
+        var privilegeType = roleRequest.isEvent() ? PrivilegeType.EVENT : PrivilegeType.SYSTEM;
         roleRequest.privileges().stream()
                 .map(privilegeService::findById)
-                .forEach(editedRole::addPrivilege);
+                .forEach(privilege -> {
+                    if (checkInvalidPrivilegeType(privilege, privilegeType)) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_PRIVILEGE_TYPE);
+                    }
+                    editedRole.addPrivilege(privilege);
+                });
         return roleRepository.save(editedRole);
     }
 
@@ -75,6 +90,13 @@ public class RoleService {
         roleRepository.deleteById(id);
     }
 
+    private boolean checkInvalidPrivilegeType(Privilege privilege, PrivilegeType type) {
+        if (!privilege.getName().equals(PrivilegeName.ASSIGN_ORGANIZER_ROLE)) {
+            return !privilege.getType().equals(type);
+        }
+        return false;
+    }
+
     public List<Role> getAll() {
         return roleRepository.findAll();
     }
@@ -88,7 +110,7 @@ public class RoleService {
     public Role findOrganizationalRoleById(Integer id) {
         var role = findRoleById(id);
         if (role.getType().equals(RoleType.SYSTEM))
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
         return role;
     }
@@ -108,7 +130,7 @@ public class RoleService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ASSIGN_SELF_ROLE_FORBIDDEN_MESSAGE);
         var role = findRoleById(roleId);
         if (role.getType().equals(RoleType.EVENT))
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.INVALID_ROLE_TYPE.formatted("системная"));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_ROLE_TYPE.formatted("системная"));
         user.setRole(role);
         userService.save(user);
     }

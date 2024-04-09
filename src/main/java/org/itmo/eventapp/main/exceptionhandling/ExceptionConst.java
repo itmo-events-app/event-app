@@ -20,6 +20,7 @@ public class ExceptionConst {
     public static final String ASSIGN_SELF_ROLE_FORBIDDEN_MESSAGE = "Невозможно назначить роль себе";
 
     public static final String PRIVILEGE_ID_NOT_FOUND_MESSAGE = "Привилегия с id %d не найдена";
+    public static final String INVALID_PRIVILEGE_TYPE = "Неверный тип привилегии";
 
     public static final String USER_ROLE_NOT_FOUND_IN_EVENT_MESSAGE = "У пользователя с id %d нет роли %s в мероприятии с id %d";
     public static final String AT_LEAST_ONE_ORGANIZER_MESSAGE = "Мероприятие должно содержать не менее одного пользователя с ролью Организатор";

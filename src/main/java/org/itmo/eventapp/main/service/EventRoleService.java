@@ -40,7 +40,7 @@ public class EventRoleService {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ROLE_ASSIGNMENT_FORBIDDEN_MESSAGE);
             }
             if (!role.getType().equals(RoleType.EVENT))
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
         }
         var user = userService.findById(userId);
@@ -66,7 +66,7 @@ public class EventRoleService {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ROLE_REVOKING_FORBIDDEN_MESSAGE);
             }
             if (!role.getType().equals(RoleType.EVENT))
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
         }
         userService.findById(userId);
