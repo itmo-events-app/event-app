@@ -23,6 +23,7 @@ public class ExceptionConst {
 
     public static final String USER_ROLE_NOT_FOUND_IN_EVENT_MESSAGE = "У пользователя с id %d нет роли %s в мероприятии с id %d";
     public static final String AT_LEAST_ONE_ORGANIZER_MESSAGE = "Мероприятие должно содержать не менее одного пользователя с ролью Организатор";
+    public static final String USER_ROLE_ALREADY_EXISTS_IN_EVENT_MESSAGE = "У пользователя с id %d уже есть роль %s в мероприятии с id %d";
 
     public static final String USER_NOT_FOUND_MESSAGE = "User not found";
     public static final String USER_EMAIL_EXIST = "User with this email exists";

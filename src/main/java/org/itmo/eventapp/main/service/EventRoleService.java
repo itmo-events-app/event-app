@@ -45,6 +45,9 @@ public class EventRoleService {
         }
         var user = userService.findById(userId);
         var event = eventFindById(eventId);
+        if (eventRoleRepository.existsByUserIdAndRoleIdAndEventId(userId, roleId, eventId))
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    ExceptionConst.USER_ROLE_ALREADY_EXISTS_IN_EVENT_MESSAGE.formatted(userId, role.getName(), eventId));
         var newEventRole = EventRole.builder()
                 .user(user)
                 .role(role)
