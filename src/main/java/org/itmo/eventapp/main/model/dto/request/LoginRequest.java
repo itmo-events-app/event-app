@@ -1,17 +1,15 @@
 package org.itmo.eventapp.main.model.dto.request;
 
-import jakarta.validation.constraints.Email;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 
 public record LoginRequest(
     @NotBlank(message = "Поле обязательно для заполнения")
-    // TODO make custom
-    @Email()
+    @Schema(example = "333666@niuitmo.ru", requiredMode = Schema.RequiredMode.REQUIRED)
     String login,
 
     @NotBlank(message = "Поле обязательно для заполнения")
-    @Size(min = 8, message = "Минимальная длина пароля - 8 символов")
+    @Schema(example = "PaSsWoRd1!", requiredMode = Schema.RequiredMode.REQUIRED)
     String password
 ) {}

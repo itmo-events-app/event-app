@@ -10,6 +10,7 @@ import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.repository.TaskRepository;
+import org.itmo.eventapp.main.util.TaskNotificationUtils;
 import org.springframework.context.annotation.Lazy;
 import org.itmo.eventapp.main.service.specification.TaskSpecification;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
@@ -32,21 +34,19 @@ public class TaskService {
     private final UserService userService;
     private final PlaceService placeService;
     private final TaskRepository taskRepository;
+    private final TaskNotificationUtils taskNotificationUtils;
 
-    public Optional<Task> findById(int id) {
-        return taskRepository.findById(id);
+    public Task findById(int id) {
+        return taskRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
     }
 
     public Task save(TaskRequest taskRequest) {
 
-        // task assigner from principal.name -> findByUsername
         Event event = eventService.findById(taskRequest.eventId());
-
-        /*TODO: TEST GETTING ASSIGNER FROM PRINCIPAL*/
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        User assigner = userService.findByEmail(email);
+        User assigner = userService.findByLogin(email);
 
 
         User assignee = null;
@@ -70,7 +70,9 @@ public class TaskService {
 
         newTask = taskRepository.save(newTask);
 
-        /*TODO: schedule task deadline notification for assigner & assignee */
+        if (assignee != null) {
+            taskNotificationUtils.createIncomingTaskNotification(newTask);
+        }
 
         return newTask;
     }
@@ -87,6 +89,7 @@ public class TaskService {
         User assignee = null;
         if (taskRequest.assignee() != null) {
             assignee = userService.findById(taskRequest.assignee().id());
+
         }
         Place place = null;
         if (taskRequest.place() != null) {
@@ -102,18 +105,17 @@ public class TaskService {
 
         newTaskData = taskRepository.save(newTaskData);
 
-        /*TODO: schedule task deadline notification for new assignee */
-        if (prevAssignee != null) {
-            /*TODO: unset task deadline notification for prev assignee */
+        if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
+
+            taskNotificationUtils.createIncomingTaskNotification(newTaskData);
+
         }
 
         return newTaskData;
     }
 
     public void delete(Integer id) {
-
         taskRepository.deleteById(id);
-
     }
 
 
@@ -131,11 +133,10 @@ public class TaskService {
 
         task = taskRepository.save(task);
 
-        if (assignee != null) {
-            /*TODO: schedule task deadline notification for new assignee */
-        }
-        if (prevAssignee != null) {
-            /*TODO: unset task deadline notification for prev assignee */
+        if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
+
+            taskNotificationUtils.createIncomingTaskNotification(task);
+
         }
 
         return task;
@@ -199,10 +200,6 @@ public class TaskService {
         }
 
         newTasks = taskRepository.saveAll(newTasks);
-
-        for (Task newTask : newTasks) {
-            /*TODO: schedule task deadline notification for assigner */
-        }
 
         return newTasks;
     }

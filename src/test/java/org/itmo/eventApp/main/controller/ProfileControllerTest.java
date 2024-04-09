@@ -1,7 +1,6 @@
 package org.itmo.eventApp.main.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 import org.itmo.eventapp.main.model.dto.request.UserChangeEmailRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
@@ -16,11 +15,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class ProfileControllerTest extends AbstractTestContainers {
@@ -94,7 +90,7 @@ class ProfileControllerTest extends AbstractTestContainers {
 
         User updatedUser = userRepository.findById(1).orElse(null);
         Assertions.assertNotNull(updatedUser);
-        Assertions.assertEquals("newEmail@itmo.ru", updatedUser.getUserLoginInfo().getEmail());
+        Assertions.assertEquals("newEmail@itmo.ru", updatedUser.getUserLoginInfo().getLogin());
     }
 
 
@@ -118,6 +114,8 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_event.sql");
+        // Do not include insert_event_role here, because request will fail with 403
+//        executeSqlScript("/sql/insert_event_role.sql");
 
         mockMvc.perform(get("/api/profile/event-privileges/1")
                         .with(user(getUserLoginInfo())))
@@ -125,9 +123,9 @@ class ProfileControllerTest extends AbstractTestContainers {
     }
 
     @Test
-    @WithMockUser(username = "test_mail@test_mail.com")
     void testGetUserEventPrivileges() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
+        UserLoginInfo userLoginInfo = getUserLoginInfo();
         String eventJson = """
                 {
                     "userId": 1,
@@ -137,10 +135,11 @@ class ProfileControllerTest extends AbstractTestContainers {
                 post("/api/events")
                         .content(eventJson)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(userLoginInfo))
         );
 
         MvcResult result = mockMvc.perform(get("/api/profile/event-privileges/1")
-                        .with(user(getUserLoginInfo())))
+                        .with(user(userLoginInfo)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
@@ -166,6 +165,6 @@ class ProfileControllerTest extends AbstractTestContainers {
         Assertions.assertTrue(resultString.contains("CREATE_EVENT_VENUE"));
         Assertions.assertTrue(resultString.contains("VIEW_EVENT_ACTIVITIES"));
         Assertions.assertTrue(resultString.contains("MODIFY_PROFILE_DATA"));
-        Assertions.assertTrue(resultString.contains("VIEW_ALL_EVENTS_AND_ACTIVITIES"));
+        Assertions.assertTrue(resultString.contains("VIEW_ALL_EVENTS"));
     }
 }
