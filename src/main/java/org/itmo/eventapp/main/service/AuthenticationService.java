@@ -8,7 +8,6 @@ import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
-import org.itmo.eventapp.main.model.entity.enums.EmailStatus;
 import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
