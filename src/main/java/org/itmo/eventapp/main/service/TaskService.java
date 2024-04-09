@@ -24,7 +24,6 @@ import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
 
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @Service
@@ -268,14 +267,6 @@ public class TaskService {
                         deadlineLowerLimit,
                         deadlineUpperLimit);
         return taskRepository.findAll(taskSpecification);
-    }
-
-    public List<Task> getTasksWithDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByDeadlineBetween(startTime, endTime);
-    }
-
-    public List<Task> getTasksWithReminderBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByReminderBetween(startTime, endTime);
     }
 
 }

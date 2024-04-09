@@ -3,7 +3,11 @@ package org.itmo.eventapp.main.util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.itmo.eventapp.main.model.entity.Task;
+import org.itmo.eventapp.main.model.entity.TaskDeadlineTrigger;
+import org.itmo.eventapp.main.model.entity.TaskReminderTrigger;
 import org.itmo.eventapp.main.service.NotificationService;
+import org.itmo.eventapp.main.service.TaskDeadlineTriggerService;
+import org.itmo.eventapp.main.service.TaskReminderTriggerService;
 import org.itmo.eventapp.main.service.TaskService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,37 +20,26 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ScheduledJobsUtil {
-    private final TaskService taskService;
+public class ScheduledJobsUtils {
+    private final TaskDeadlineTriggerService taskDeadlineTriggerService;
+    private final TaskReminderTriggerService taskReminderTriggerService;
     private final TaskNotificationUtils taskNotificationUtils;
     private final NotificationService notificationService;
-
-    @Value(value = "${notifications.taskUrl}")
-    private String taskFullUrl;
-
-    @Value(value = "${notifications.cron.sending-period-in-minutes}")
-    private Integer sendingPeriodInMinutes;
 
     @Value(value = "${notifications.cron.delete-period-in-days}")
     private Integer deletePeriodInDays;
 
     @Scheduled(cron = "${notifications.cron.create-notification-job}")
-    public void sendNotificationsOnDeadline(){
-        LocalDateTime endTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        LocalDateTime startTime = endTime.minusMinutes(sendingPeriodInMinutes);
-
-        List<Task> overdueTasks = taskService.getTasksWithDeadlineBetween(startTime, endTime);
-
+    public void handleTaskDeadline(){
+        LocalDateTime deadline = LocalDateTime.now();
+        List<Task> overdueTasks = taskDeadlineTriggerService.updateAndRetrieveTaskOnDeadline(deadline);
         overdueTasks.forEach(taskNotificationUtils::createOverdueTaskNotification);
     }
 
     @Scheduled(cron = "${notifications.cron.create-notification-job}")
-    public void sendNotificationsOnReminder(){
-        LocalDateTime endTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        LocalDateTime startTime = endTime.minusMinutes(sendingPeriodInMinutes);
-
-        List<Task> overdueTasks = taskService.getTasksWithReminderBetween(startTime, endTime);
-
+    public void handleTaskReminder(){
+        LocalDateTime deadline = LocalDateTime.now();
+        List<Task> overdueTasks = taskReminderTriggerService.retrieveTasksOnReminder(deadline);
         overdueTasks.forEach(taskNotificationUtils::createReminderTaskNotification);
     }
 

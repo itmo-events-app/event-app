@@ -108,7 +108,7 @@ class TaskControllerTest extends AbstractTestContainers {
             () -> Assertions.assertEquals(newStatus, task.getStatus()),
             () -> Assertions.assertNull(task.getPlace()),
             () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
-            () -> Assertions.assertEquals(newNotificationDeadline, task.getNotificationDeadline()),
+            () -> Assertions.assertEquals(newNotificationDeadline, task.getReminder()),
             () -> Assertions.assertEquals(assigneeId, task.getAssignee().getId()),
             () -> Assertions.assertEquals(assignerId, task.getAssigner().getId())
         );
@@ -139,7 +139,7 @@ class TaskControllerTest extends AbstractTestContainers {
 
         Assertions.assertAll(
             () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
-            () -> Assertions.assertEquals(newNotificationDeadline, task.getNotificationDeadline()),
+            () -> Assertions.assertEquals(newNotificationDeadline, task.getReminder()),
             () -> Assertions.assertEquals(TaskStatus.EXPIRED, task.getStatus())
         );
     }
@@ -236,7 +236,7 @@ class TaskControllerTest extends AbstractTestContainers {
             () -> Assertions.assertEquals(newDescription, edited.getDescription()),
             () -> Assertions.assertEquals(newStatus, edited.getStatus()),
             () -> Assertions.assertEquals(newDeadline, edited.getDeadline()),
-            () -> Assertions.assertEquals(newNotificationDeadline, edited.getNotificationDeadline()),
+            () -> Assertions.assertEquals(newNotificationDeadline, edited.getReminder()),
             () -> Assertions.assertEquals(assigneeId, edited.getAssignee().getId()),
             () -> {
                 Assertions.assertNotNull(edited.getPlace());
