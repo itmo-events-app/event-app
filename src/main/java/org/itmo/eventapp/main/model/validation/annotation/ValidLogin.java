@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  * Для того, чтобы использовать этот валидатор
  * нужно чтобы у класса обязательно присутствавали
  * поля "login" и "type"
- * Пример: @see org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest
+ * Пример: @see org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest
  */
 
 @Constraint(validatedBy = ValidLoginValidator.class)
