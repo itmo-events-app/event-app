@@ -10,6 +10,6 @@ import java.io.File;
 public record ParticipantsListRequest (
 
         @NotEmpty(message = "Файл не может быть пустым")
-        File jsonListFile
+        File participantsListFile
        ) {
 }
