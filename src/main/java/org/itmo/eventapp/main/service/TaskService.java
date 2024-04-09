@@ -74,7 +74,6 @@ public class TaskService {
         newTask = taskRepository.save(newTask);
 
         if (assignee != null) {
-            System.out.println("TASK ID IS " + newTask.getId());
             taskNotificationUtils.createIncomingTaskNotification(newTask);
             taskDeadlineTriggerService.createNewDeadlineTrigger(newTask);
             taskReminderTriggerService.createNewReminderTrigger(newTask);
