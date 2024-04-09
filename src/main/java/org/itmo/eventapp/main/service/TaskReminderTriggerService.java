@@ -22,9 +22,9 @@ public class TaskReminderTriggerService {
         return tasks;
     }
 
-    public void createNewReminderTrigger(Integer taskId, LocalDateTime triggerTime){
+    public void createNewReminderTrigger(Task task){
         TaskReminderTrigger taskReminderTrigger = TaskReminderTrigger.builder()
-                .taskId(taskId).triggerTime(triggerTime).build();
+                .task(task).taskId(task.getId()).triggerTime(task.getReminder()).build();
         taskReminderTriggerRepository.save(taskReminderTrigger);
     }
 }

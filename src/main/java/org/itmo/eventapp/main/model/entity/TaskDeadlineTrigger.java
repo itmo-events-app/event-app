@@ -17,7 +17,7 @@ public class TaskDeadlineTrigger {
     @Id
     private Integer taskId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER , cascade = CascadeType.ALL)
     @MapsId
     @PrimaryKeyJoinColumn(name = "task_id")
     private Task task;

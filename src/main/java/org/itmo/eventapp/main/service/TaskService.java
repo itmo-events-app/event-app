@@ -74,9 +74,10 @@ public class TaskService {
         newTask = taskRepository.save(newTask);
 
         if (assignee != null) {
+            System.out.println("TASK ID IS " + newTask.getId());
             taskNotificationUtils.createIncomingTaskNotification(newTask);
-            taskDeadlineTriggerService.createNewDeadlineTrigger(newTask.getId(), newTask.getDeadline());
-            taskReminderTriggerService.createNewReminderTrigger(newTask.getId(), newTask.getReminder());
+            taskDeadlineTriggerService.createNewDeadlineTrigger(newTask);
+            taskReminderTriggerService.createNewReminderTrigger(newTask);
         }
 
         return newTask;
@@ -114,8 +115,8 @@ public class TaskService {
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(newTaskData);
-            taskDeadlineTriggerService.createNewDeadlineTrigger(newTaskData.getId(), newTaskData.getDeadline());
-            taskReminderTriggerService.createNewReminderTrigger(newTaskData.getId(), newTaskData.getReminder());
+            taskDeadlineTriggerService.createNewDeadlineTrigger(newTaskData);
+            taskReminderTriggerService.createNewReminderTrigger(newTaskData);
 
         }
 
@@ -144,8 +145,8 @@ public class TaskService {
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(task);
-            taskDeadlineTriggerService.createNewDeadlineTrigger(task.getId(), task.getDeadline());
-            taskReminderTriggerService.createNewReminderTrigger(task.getId(), task.getReminder());
+            taskDeadlineTriggerService.createNewDeadlineTrigger(task);
+            taskReminderTriggerService.createNewReminderTrigger(task);
 
         }
 
