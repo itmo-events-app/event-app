@@ -48,6 +48,10 @@ dependencies {
     // minio
     implementation("io.minio:minio:8.5.9")
 
+    //xlsx parser
+    implementation("org.apache.poi:poi:3.12")
+    implementation("org.apache.poi:poi-ooxml:3.12")
+
     // tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")

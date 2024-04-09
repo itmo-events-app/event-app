@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
+import org.itmo.eventapp.main.model.dto.request.ParticipantPresenceRequest;
 import org.itmo.eventapp.main.model.dto.request.ParticipantsListRequest;
 import org.itmo.eventapp.main.model.dto.response.ParticipantResponse;
 import org.itmo.eventapp.main.model.entity.Participant;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -30,19 +32,19 @@ public class ParticipantsController {
     }
 
     @PutMapping("/{id}/participants")
-    public ResponseEntity<ParticipantResponse> changePresence(@Min(1) @PathVariable("id") Integer id, @Min(1) @RequestParam(value = "idParticipant") Integer idParticipant, @RequestParam(value = "isVisited", defaultValue = "false") boolean isVisited) {
-        Participant participant = participantsService.changePresence(id, idParticipant);
+    public ResponseEntity<ParticipantResponse> changePresence(@PathVariable("id") Integer id, @RequestBody ParticipantPresenceRequest participantPresenceRequest) {
+        Participant participant = participantsService.changePresence(id, participantPresenceRequest);
         return ResponseEntity.ok().body(ParticipantMapper.participantToResponse(participant));
     }
 
     @PostMapping("/{id}/participants/newlist")
-    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@RequestBody @Valid ParticipantsListRequest participantsListRequest){
-        List<Participant> participants = participantsService.setParticipants(participantsListRequest);
+    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id /*, @RequestBody ParticipantsListRequest participantsListRequest*/) throws IOException {
+        List<Participant> participants = participantsService.setParticipants(id);
         return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
     }
 
     @GetMapping("/{id}/participants/list/xlsx")
-    public ResponseEntity<List<ParticipantResponse>> getParticipantsXlsxFile(@Min(1) @PathVariable("id") Integer id) {
+    public ResponseEntity<List<ParticipantResponse>> getParticipantsXlsxFile( @PathVariable("id") Integer id) throws IOException {
         List<Participant> participants = participantsService.getParticipantsXlsx(id);
         return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
     }
