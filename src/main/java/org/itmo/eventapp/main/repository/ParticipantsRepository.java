@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface ParticipantsRepository extends JpaRepository<Participant, Integer> {
     List<Participant> findAllByEvent(Event event);
-    Participant findByNameAndEvent(String name, Event event);
-    Participant findByName(String name);
+    //todo разобраться, нужны ли эти методы
+//    Participant findByNameAndEvent(String name, Event event);
+//    Participant findByName(String name);
 }
