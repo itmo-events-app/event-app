@@ -8,6 +8,8 @@ public record UserRoleResponse(@Schema(example = "13")
                                String name,
                                @Schema(example = "Иванов")
                                String surname,
+                               @Schema(example = "test_mail@itmo.ru")
+                               String login,
                                @Schema(example = "Организатор")
                                String roleName) {
 }

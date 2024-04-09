@@ -56,6 +56,22 @@ public class MailSenderServiceImpl implements MailSenderService{
         mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
     }
 
+    @Async
+    @Override
+    public void sendApproveRegistrationRequestMessage(String userEmail, String userName) throws MessagingException, IOException {
+        String subject = "Заявка на регистрацию одобрена";
+        String templatePath = "notification/email-templates/approve-registration-request.html";
+        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getRegistrationResponseTemplateFields(userName)));
+    }
+
+    @Async
+    @Override
+    public void sendDeclineRegistrationRequestMessage(String userEmail, String userName) throws MessagingException, IOException {
+        String subject = "Заявка на регистрацию отклонена";
+        String templatePath = "notification/email-templates/decline-registration-request.html";
+        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getRegistrationResponseTemplateFields(userName)));
+    }
+
     // Создаёт MIME письмо для отправки
     private MimeMessage createMessageFromTemplate(String recipient, String subject, String templatePath, Map<String, String> templateFields) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
@@ -77,6 +93,12 @@ public class MailSenderServiceImpl implements MailSenderService{
         templateFields.put("${eventName}", eventName);
         templateFields.put("${taskName}", taskName);
         templateFields.put("${taskLink}", taskLink);
+        return templateFields;
+    }
+
+    private Map<String, String> getRegistrationResponseTemplateFields(String userName) {
+        HashMap<String, String> templateFields = new HashMap<>();
+        templateFields.put("${userName}", userName);
         return templateFields;
     }
 

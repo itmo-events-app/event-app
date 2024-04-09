@@ -18,7 +18,7 @@ VALUES
     ('VIEW_ROUTE_BETWEEN_ROOMS', 'SYSTEM','Просмотр маршрута между помещениями'),
     ('ASSIGN_ORGANIZER_ROLE', 'EVENT','Назначение пользователю роли Организатор'),
     ('REVOKE_ORGANIZER_ROLE', 'SYSTEM','Лишение пользователя роли Организатор'),
-    ('CREATE_EVENT_VENUE', 'SYSTEM','создание площадки проведения мероприятия'),
+    ('CREATE_EVENT_VENUE', 'SYSTEM','Создание площадки проведения мероприятия'),
     ('DELETE_EVENT_VENUE', 'SYSTEM','Удаление площадки проведения мероприятия'),
     ('EDIT_EVENT_VENUE', 'SYSTEM','Редактирование площадки проведения мероприятия'),
     ('CREATE_ROLE', 'SYSTEM','Создание роли'),
