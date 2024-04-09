@@ -254,12 +254,13 @@ public class TaskService {
     }
 
 
-    public List<Task> getUserTasksWithFilter(Integer eventId,
+    public Page<Task> getUserTasksWithFilter(Integer eventId,
                                              Integer userId,
                                              Integer assignerId,
                                              TaskStatus taskStatus,
                                              LocalDateTime deadlineLowerLimit,
-                                             LocalDateTime deadlineUpperLimit) {
+                                             LocalDateTime deadlineUpperLimit,
+                                             Pageable pageRequest) {
 
 
         Specification<Task> taskSpecification =
@@ -269,7 +270,7 @@ public class TaskService {
                         taskStatus,
                         deadlineLowerLimit,
                         deadlineUpperLimit);
-        return taskRepository.findAll(taskSpecification);
+        return taskRepository.findAll(taskSpecification, pageRequest);
     }
 
     public List<Task> getTasksWithDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){

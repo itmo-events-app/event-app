@@ -235,11 +235,33 @@ public class TaskController {
     @Operation(summary = "Получение списка задач где пользователь является исполнителем")
     @GetMapping("/where-assignee")
     public ResponseEntity<List<TaskResponse>> taskListShowWhereAssignee(
-            @RequestParam(required = false) @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId,
-            @RequestParam(required = false) @Parameter(name = "assignerId", description = "ID Создателя задачи", example = "13") Integer assignerId,
-            @RequestParam(required = false) @Parameter(name = "taskStatus", description = "Статус задачи") TaskStatus taskStatus,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(name = "deadlineLowerLimit", description = "Мягкий дедлайн задачи") LocalDateTime deadlineLowerLimit,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(name = "deadlineUpperLimit", description = "Жесткий дедлайн задачи") LocalDateTime deadlineUpperLimit
+            @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
+            @RequestParam(required = false)
+            @Parameter(name = "eventId", description = "ID мероприятия", example = "1")
+            Integer eventId,
+            @Min(value = 1, message = "Параметр assignerId не может быть меньше 1!")
+            @RequestParam(required = false)
+            @Parameter(name = "assignerId", description = "ID Создателя задачи", example = "13")
+            Integer assignerId,
+            @Valid @RequestParam(required = false)
+            @Parameter(name = "taskStatus", description = "Статус задачи")
+            TaskStatus taskStatus,
+            @RequestParam(required = false)
+            @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            @Parameter(name = "deadlineLowerLimit", description = "Мягкий дедлайн задачи")
+            LocalDateTime deadlineLowerLimit,
+            @RequestParam(required = false)
+            @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            @Parameter(name = "deadlineUpperLimit", description = "Жесткий дедлайн задачи")
+            LocalDateTime deadlineUpperLimit,
+            @Min(value = 0, message = "Параметр page не может быть меньше 0!")
+            @RequestParam(required = false, defaultValue = "0")
+            @Parameter(name = "page", description = "Номер страницы")
+            Integer page,
+            @Min(value = 1, message = "Параметр pageSize не может быть меньше 1!")
+            @RequestParam(required = false, defaultValue = "50")
+            @Parameter(name = "pageSize", description = "Размер страницы")
+            Integer pageSize
     ) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -247,13 +269,21 @@ public class TaskController {
 
         Integer userId = userService.findByLogin(currentPrincipalName).getId();
 
-        List<Task> userTasks = taskService.getUserTasksWithFilter(eventId,
+        Pageable pageRequest = PageRequest.of(page, pageSize, Sort.by("deadline"));
+        Page<Task> userTasks = taskService.getUserTasksWithFilter(eventId,
                 userId,
                 assignerId,
                 taskStatus,
                 deadlineLowerLimit,
-                deadlineUpperLimit);
-        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(userTasks));
+                deadlineUpperLimit,
+                pageRequest);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("totalElements", String.valueOf(userTasks.getTotalElements()));
+
+        return ResponseEntity.ok()
+                .headers(responseHeaders)
+                .body(TaskMapper.tasksToTaskResponseList(userTasks.toList()));
     }
 
 
