@@ -13,10 +13,13 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.junit.jupiter.api.AfterEach;
@@ -26,6 +29,7 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class EventControllerTest extends AbstractTestContainers {
@@ -41,6 +45,7 @@ class EventControllerTest extends AbstractTestContainers {
             throw new RuntimeException(e.getMessage());
         }
     }
+
     private final EventRepository eventRepository;
 
     @Autowired
@@ -55,6 +60,16 @@ class EventControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_event.sql");
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_event_role.sql");
+    }
+
+    private void setUpEventsByRoleData() {
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_2.sql");
+        executeSqlScript("/sql/insert_event_3.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
     }
 
     private UserLoginInfo getUserLoginInfo() {
@@ -145,7 +160,7 @@ class EventControllerTest extends AbstractTestContainers {
                         .contentType("multipart/form-data")
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().is(404))
-                .andExpect(content().string(containsString("Place not found")));;
+                .andExpect(content().string(containsString("Place not found")));
         assertThat(eventRepository.findById(3).isEmpty()).isTrue();
     }
 
@@ -458,15 +473,15 @@ class EventControllerTest extends AbstractTestContainers {
                     "title": "test event"
                 }""";
         mockMvc.perform(
-                        post("/api/events")
-                                .content(eventJson)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .with(user(getUserLoginInfo()))
-                );
+                post("/api/events")
+                        .content(eventJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(getUserLoginInfo()))
+        );
 
         String expectedJson = """
-                        [{"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","roleName":"Организатор"}]
-                        """;
+                [{"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","roleName":"Организатор"}]
+                """;
         mockMvc.perform(
                         get("/api/events/1/organizers")
                                 .with(user(getUserLoginInfo())))
@@ -474,6 +489,7 @@ class EventControllerTest extends AbstractTestContainers {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(content().json(expectedJson));
     }
+
     @Test
     void copyEventTest() throws Exception {
         setUpEventData();
@@ -513,10 +529,40 @@ class EventControllerTest extends AbstractTestContainers {
         // copy
         mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/3/copy")
                         .with(user(userLoginInfo)))
-            .andExpect(status().isCreated())
-            .andExpect(content().string("4"));
+                .andExpect(status().isCreated())
+                .andExpect(content().string("4"));
         boolean isNewImageExists = isImageExist("4.jpeg");
         assertThat(isNewImageExists).isTrue();
         assertThat(eventRepository.findById(4).isPresent()).isTrue();
+    }
+
+    @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
+    void getEventsByRoleTest() throws Exception {
+        setUpEventsByRoleData();
+
+        mockMvc.perform(get("/api/roles/3/events")
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].title").value("party"))
+                .andExpect(jsonPath("$[0].shortDescription").value("cool party"))
+                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
+                .andExpect(jsonPath("$[0].status").value("PUBLISHED"))
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
+    void getEventsByRoleTestEmptyArray() throws Exception {
+        setUpEventsByRoleData();
+
+        mockMvc.perform(get("/api/roles/10/events")
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty())
+                .andDo(print());
     }
 }
