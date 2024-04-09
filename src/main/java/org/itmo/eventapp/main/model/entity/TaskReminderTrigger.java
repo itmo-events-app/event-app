@@ -17,7 +17,7 @@ public class TaskReminderTrigger {
     @Id
     private Integer taskId;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @PrimaryKeyJoinColumn(name = "task_id")
     private Task task;
 
