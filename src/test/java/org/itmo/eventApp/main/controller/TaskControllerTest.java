@@ -42,6 +42,9 @@ class TaskControllerTest extends AbstractTestContainers {
         String expectedTaskJson = """
             {
               "id": 1,
+              "event": {
+                "eventId":1
+              },
               "assignee": {
                 "id": 1,
                 "name": "test",
@@ -678,7 +681,10 @@ class TaskControllerTest extends AbstractTestContainers {
         expectedTaskJson = """
             [{
               "id": 4,
-              "eventId": 2,
+              "event": {
+                "eventId":1,
+                "activityId":2
+              },
               "assignee": {
                 "id": 1,
                 "name": "test",
@@ -753,7 +759,10 @@ class TaskControllerTest extends AbstractTestContainers {
         String expectedTaskJson = """
             [{
               "id": 4,
-              "eventId": 2,
+              "event": {
+                "eventId":1,
+                "activityId":2
+              },
               "assignee": {
                 "id": 1,
                 "name": "test",
