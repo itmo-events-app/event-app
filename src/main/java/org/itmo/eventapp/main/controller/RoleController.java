@@ -6,9 +6,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
+import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
+import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
+import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.model.mapper.RoleMapper;
 import org.itmo.eventapp.main.service.EventRoleService;
@@ -18,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -205,5 +209,15 @@ public class RoleController {
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId) {
         roleService.revokeSystemRole(authentication.getName(), userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @Operation(summary = "Получение списка мероприятий пользователя по роли")
+    @GetMapping("{id}/events")
+    public ResponseEntity<List<EventResponse>> getEventsByRole(@AuthenticationPrincipal UserLoginInfo userDetails,
+                                                               @Positive(message = "Параметр roleId не может быть меньше 1!")
+                                                               @PathVariable Integer id) {
+        return ResponseEntity.ok().body(
+                EventMapper.eventsToEventResponseList(eventRoleService.getEventsByRole(userDetails.getUser().getId(), id))
+        );
     }
 }

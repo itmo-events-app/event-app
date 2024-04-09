@@ -25,4 +25,6 @@ public interface EventRoleRepository extends JpaRepository<EventRole, Integer> {
     boolean existsByUserIdAndRoleIdAndEventId(Integer userId, Integer roleId, Integer eventId);
 
     long deleteByEventId(int eventId);
+
+    List<EventRole> findAllByUserIdAndRoleId(Integer userId, Integer roleId);
 }
