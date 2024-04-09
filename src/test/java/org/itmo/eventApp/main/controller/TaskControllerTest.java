@@ -1,9 +1,9 @@
 package org.itmo.eventApp.main.controller;
 
-import org.itmo.eventapp.main.model.entity.Task;
-import org.itmo.eventapp.main.model.entity.User;
-import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
+import org.itmo.eventapp.main.repository.TaskDeadlineTriggerRepository;
+import org.itmo.eventapp.main.repository.TaskReminderTriggerRepository;
 import org.itmo.eventapp.main.repository.TaskRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,6 +21,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TaskControllerTest extends AbstractTestContainers {
     @Autowired
     TaskRepository taskRepository;
+
+    @Autowired
+    TaskDeadlineTriggerRepository taskDeadlineTriggerRepository;
+
+    @Autowired
+    TaskReminderTriggerRepository taskReminderTriggerRepository;
 
     private UserLoginInfo getUserLoginInfo() {
         UserLoginInfo userDetails = new UserLoginInfo();
@@ -111,6 +117,16 @@ class TaskControllerTest extends AbstractTestContainers {
             () -> Assertions.assertEquals(newreminder, task.getReminder()),
             () -> Assertions.assertEquals(assigneeId, task.getAssignee().getId()),
             () -> Assertions.assertEquals(assignerId, task.getAssigner().getId())
+        );
+
+        TaskDeadlineTrigger deadlineTrigger = taskDeadlineTriggerRepository.findById(1).orElseThrow();
+        TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(1, deadlineTrigger.getTaskId()),
+            () -> Assertions.assertEquals(newDeadline, deadlineTrigger.getTriggerTime()),
+            () -> Assertions.assertEquals(1, reminderTrigger.getTaskId()),
+            () -> Assertions.assertEquals(newreminder, reminderTrigger.getTriggerTime())
         );
     }
 
@@ -244,6 +260,16 @@ class TaskControllerTest extends AbstractTestContainers {
             }
 
         );
+
+        TaskDeadlineTrigger deadlineTrigger = taskDeadlineTriggerRepository.findById(1).orElseThrow();
+        TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1, deadlineTrigger.getTaskId()),
+                () -> Assertions.assertEquals(newDeadline, deadlineTrigger.getTriggerTime()),
+                () -> Assertions.assertEquals(1, reminderTrigger.getTaskId()),
+                () -> Assertions.assertEquals(newreminder, reminderTrigger.getTriggerTime())
+        );
     }
 
     @Test
@@ -345,6 +371,15 @@ class TaskControllerTest extends AbstractTestContainers {
 
         Assertions.assertEquals(2, edited.getAssignee().getId());
 
+        TaskDeadlineTrigger deadlineTrigger = taskDeadlineTriggerRepository.findById(1).orElseThrow();
+        TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1, deadlineTrigger.getTaskId()),
+                () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", deadlineTrigger.getTriggerTime().toString()),
+                () -> Assertions.assertEquals(1, reminderTrigger.getTaskId()),
+                () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", reminderTrigger.getTriggerTime().toString())
+        );
     }
 
 

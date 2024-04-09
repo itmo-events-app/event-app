@@ -2,6 +2,7 @@ package org.itmo.eventApp.main.service;
 
 import org.itmo.eventApp.main.controller.AbstractTestContainers;
 import org.itmo.eventapp.main.model.entity.TaskDeadlineTrigger;
+import org.itmo.eventapp.main.model.entity.TaskReminderTrigger;
 import org.itmo.eventapp.main.repository.TaskDeadlineTriggerRepository;
 import org.itmo.eventapp.main.repository.TaskReminderTriggerRepository;
 import org.itmo.eventapp.main.service.TaskDeadlineTriggerService;
@@ -55,7 +56,7 @@ public class TaskTriggerServicesTest extends AbstractTestContainers {
         databaseFilling();
         LocalDateTime triggerTime = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
         taskReminderTriggerService.retrieveTasksOnReminder(triggerTime);
-        List<TaskDeadlineTrigger> triggers = taskReminderTriggerRepository.findAll();
+        List<TaskReminderTrigger> triggers = taskReminderTriggerRepository.findAll();
         assertTrue(triggers.isEmpty());
     }
 }
