@@ -57,20 +57,6 @@ public class UserService {
         userNotificationInfoService.save(userNotificationInfo);
     }
 
-    public ProfileResponse getUserInfo(String login){
-        User user = userLoginInfoService.findByLogin(login).getUser();
-        return new ProfileResponse(
-                user.getId(),
-                user.getName(),
-                user.getSurname(),
-                Collections.singletonList(new UserInfoResponse(login, user.getUserLoginInfo().getLoginType())),
-                user.getUserLoginInfo().getLastLoginDate(),
-                user.getUserNotificationInfo().isEnablePushNotifications(),
-                user.getUserNotificationInfo().isEnableEmailNotifications(),
-                user.getUserNotificationInfo().getDevices()
-        );
-    }
-
     public void changeName(String login, UserChangeNameRequest request) {
         User user = userLoginInfoService.findByLogin(login).getUser();
         user.setName(request.name());

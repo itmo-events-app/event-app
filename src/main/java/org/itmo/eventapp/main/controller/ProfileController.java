@@ -11,7 +11,9 @@ import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.dto.response.ProfileResponse;
+import org.itmo.eventapp.main.model.dto.response.UserInfoResponse;
 import org.itmo.eventapp.main.model.entity.Privilege;
+import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.service.EventRoleService;
@@ -22,6 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -34,11 +37,22 @@ public class ProfileController {
 
     private final EventRoleService eventRoleService;
 
+    @Operation(summary = "Получение информации о текущем пользователе")
     @GetMapping("/me")
     public ResponseEntity<ProfileResponse> getUserInfo(Authentication authentication) {
         String login = authentication.getName();
-        ProfileResponse profileResponse = userService.getUserInfo(login);
-        return ResponseEntity.ok(profileResponse);
+        User user = userService.findByLogin(login);
+
+        return ResponseEntity.ok(new ProfileResponse(
+                user.getId(),
+                user.getName(),
+                user.getSurname(),
+                Collections.singletonList(new UserInfoResponse(login, user.getUserLoginInfo().getLoginType())),
+                user.getUserLoginInfo().getLastLoginDate(),
+                user.getUserNotificationInfo().isEnablePushNotifications(),
+                user.getUserNotificationInfo().isEnableEmailNotifications(),
+                user.getUserNotificationInfo().getDevices()
+        ));
     }
 
     @Operation(summary = "Обновление настроек уведомлений")
