@@ -45,28 +45,28 @@ public class ProfileController {
     @PutMapping("/notifications")
     public ResponseEntity<Void> updateNotifications(Authentication authentication, @RequestBody NotificationSettingsRequest request) {
         userService.updateNotifications(authentication.getName(), request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Смена имени пользователя")
     @PutMapping("/change-name")
     public ResponseEntity<Void> changeName(Authentication authentication, @Valid @RequestBody UserChangeNameRequest request) {
         userService.changeName(authentication.getName(), request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Смена логина пользователя")
     @PutMapping("/change-login")
     public ResponseEntity<Void> changeLogin(Authentication authentication, @Valid @RequestBody UserChangeLoginRequest request) {
         userService.changeLogin(authentication.getName(), request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Смена пароля пользователя")
     @PutMapping("/change-password")
     public ResponseEntity<Void> changePassword(Authentication authentication, @Valid @RequestBody UserChangePasswordRequest request) {
         userService.changePassword(authentication.getName(), request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Получение списка всех привилегий пользователя в данном мероприятии")
