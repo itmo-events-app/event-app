@@ -13,7 +13,9 @@ public record TaskRequest(
         @Min(value = 1, message = "Поле eventId не может быть меньше 1!")
         @Schema(example = "1")
         Integer eventId,
-        UserShortDataRequest assignee,
+        @Min(value = 1, message = "Поле assigneeId не может быть меньше 1!")
+        @Schema(example = "1")
+        Integer assigneeId,
         @NotBlank(message = "Поле title не может быть пустым!")
         @Schema(example = "Настроить проектор")
         String title,
@@ -21,7 +23,9 @@ public record TaskRequest(
         @Schema(example = "Настроить проектор в коворкинге")
         String description,
         TaskStatus taskStatus,
-        PlaceShortDataRequest place,
+        @Min(value = 1, message = "Поле placeId не может быть меньше 1!")
+        @Schema(example = "1")
+        Integer placeId,
         @NotNull(message = "Поле deadline не может быть null!")
         LocalDateTime deadline,
         @NotNull(message = "Поле notificationDeadline не может быть null!")
