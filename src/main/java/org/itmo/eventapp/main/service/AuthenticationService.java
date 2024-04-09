@@ -2,49 +2,59 @@ package org.itmo.eventapp.main.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.*;
+import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
-import org.itmo.eventapp.main.model.entity.enums.EmailStatus;
+import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
+import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
+import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
-import org.itmo.eventapp.main.repository.*;
 import org.itmo.eventapp.main.security.util.JwtTokenUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.mail.MessagingException;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-
-    private final UserRepository userRepository;
-    private final UserLoginInfoRepository userLoginInfoRepository;
-    private final UserNotificationInfoRepository userNotificationInfoRepository;
-    private final RoleRepository roleRepository;
-    private final RegistrationRequestRepository registrationRequestRepository;
+    private final UserService userService;
+    private final UserLoginInfoService userLoginInfoService;
+    private final UserNotificationInfoService userNotificationInfoService;
+    private final RoleService roleService;
+    private final RegistrationRequestService registrationRequestService;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
 
-    public String login(LoginRequest loginRequest) throws BadCredentialsException {
+    @Autowired
+    private MailSenderService mailSenderService;
 
+    public String login(LoginRequest loginRequest) {
         try {
             var authentication =
                     new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password());
             authenticationManager.authenticate(authentication);
 
+            var userLoginInfo = userLoginInfoService.findByLogin(loginRequest.login());
+            userLoginInfoService.setLastLoginDate(userLoginInfo, LocalDateTime.now());
+
             return jwtTokenUtil.generateToken(loginRequest.login());
         }
-        catch (BadCredentialsException ex) {
+        catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка аутентификации.");
         }
     }
@@ -52,60 +62,96 @@ public class AuthenticationService {
     public void createRegisterRequest(RegistrationUserRequest registrationUserRequest) {
         String login = registrationUserRequest.email();
 
-        Optional<RegistrationRequest> info = registrationRequestRepository.getRegistrationRequestByEmail(login);
-        if (info.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format("Запрос с email '%s' уже существует.", login));
+        if (registrationRequestService.existsByEmail(login)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.REGISTRATION_REQUEST_EMAIL_EXIST);
         }
-
-        RegistrationRequest registrationRequest = new RegistrationRequest();
-
-        registrationRequest.setEmail(registrationUserRequest.email());
-        registrationRequest.setPasswordHash(passwordEncoder.encode(registrationUserRequest.password()));
-        registrationRequest.setName(registrationUserRequest.name());
-        registrationRequest.setSurname(registrationUserRequest.surname());
-        registrationRequest.setStatus(RegistrationRequestStatus.NEW);
-        registrationRequest.setSentTime(LocalDateTime.now());
-
-        registrationRequestRepository.save(registrationRequest);
+        else {
+            RegistrationRequest registrationRequest = RegistrationRequest.builder()
+                    .email(registrationUserRequest.email())
+                    .passwordHash(passwordEncoder.encode(registrationUserRequest.password()))
+                    .name(registrationUserRequest.name())
+                    .surname(registrationUserRequest.surname())
+                    .status(RegistrationRequestStatus.NEW)
+                    .sentTime(LocalDateTime.now())
+                    .build();
+            registrationRequestService.save(registrationRequest);
+        }
     }
+
 
     @Transactional
     public void approveRegistrationRequestCallback(int requestId) {
 
-        var request = registrationRequestRepository.findById(requestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Запрос на регистрацию не найден"));
+        var request = registrationRequestService.findById(requestId);
 
-        UserLoginInfo loginInfo = new UserLoginInfo();
-        User user = new User();
-        UserNotificationInfo notificationInfo = new UserNotificationInfo();
+        if (request.getStatus() != RegistrationRequestStatus.NEW) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Запрос уже обработан");
+        }
 
-        var reader = roleRepository.findByName("Читатель")
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Роли 'Читатель' не существует"));
+        var reader = roleService.getReaderRole();
 
-        notificationInfo.setDevices(new String[] {});
-        notificationInfo.setEnableEmailNotifications(false);
-        notificationInfo.setEnablePushNotifications(false);
+        UserNotificationInfo notificationInfo = UserNotificationInfo.builder()
+                .devices(new String[] {})
+                .enableEmailNotifications(false)
+                .enablePushNotifications(false)
+                .build();
 
-        userNotificationInfoRepository.save(notificationInfo);
+        userNotificationInfoService.save(notificationInfo);
 
-        user.setName(request.getName());
-        user.setSurname(request.getSurname());
-        user.setRole(reader);
-        user.setUserNotificationInfo(notificationInfo);
+        User user = User.builder()
+                .name(request.getName())
+                .surname(request.getSurname())
+                .role(reader)
+                .userNotificationInfo(notificationInfo)
+                .build();
 
-        userRepository.save(user);
+        userService.save(user);
 
-        loginInfo.setRegistration(request);
-        loginInfo.setEmail(request.getEmail());
-        loginInfo.setPasswordHash(request.getPasswordHash());
-        loginInfo.setLastLoginDate(LocalDateTime.now());
-        loginInfo.setUser(user);
-        loginInfo.setEmailStatus(EmailStatus.APPROVED);
+        UserLoginInfo loginInfo = UserLoginInfo.builder()
+                .registration(request)
+                .login(request.getEmail())
+                .loginType(LoginType.EMAIL)
+                .passwordHash(request.getPasswordHash())
+                .lastLoginDate(LocalDateTime.now())
+                .user(user)
+                .loginStatus(LoginStatus.APPROVED)
+                .build();
 
-        userLoginInfoRepository.save(loginInfo);
+        userLoginInfoService.save(loginInfo);
 
         request.setStatus(RegistrationRequestStatus.APPROVED);
-        registrationRequestRepository.save(request);
+        registrationRequestService.save(request);
+
+        try {
+            mailSenderService.sendApproveRegistrationRequestMessage(request.getEmail(), request.getName());
+        } catch (MessagingException | IOException e) {}
+    }
+
+    @Transactional
+    public void declineRegistrationRequestCallback(int requestId) {
+        var request = registrationRequestService.findById(requestId);
+
+        if (request.getStatus() != RegistrationRequestStatus.NEW) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Запрос уже обработан");
+        }
+
+        request.setStatus(RegistrationRequestStatus.DECLINED);
+        registrationRequestService.save(request);
+
+        try {
+            mailSenderService.sendDeclineRegistrationRequestMessage(request.getEmail(), request.getName());
+        } catch (MessagingException | IOException e) {}
+    }
+
+    public List<RegistrationRequestForAdmin> listRegisterRequestsCallback() {
+        return registrationRequestService.getByStatus(RegistrationRequestStatus.NEW)
+                .stream()
+                .map((request) -> new RegistrationRequestForAdmin(
+                        request.getEmail(),
+                        request.getName(),
+                        request.getSurname(),
+                        request.getStatus(),
+                        request.getSentTime()))
+                .toList();
     }
 }

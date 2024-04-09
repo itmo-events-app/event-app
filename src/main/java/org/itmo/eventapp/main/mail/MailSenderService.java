@@ -42,4 +42,19 @@ public interface MailSenderService {
      */
     void sendReminderTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) throws MessagingException, IOException;
 
+    /**
+     * Отправляет писмо на указанный email с уведомлением о принятии заявки на регистрацию
+     * Использует шаблон письма о создании задачи
+     * @param userEmail - почта, на которую отправится письмо
+     * @param userName - имя пользователя для шаблона
+     */
+    void sendApproveRegistrationRequestMessage(String userEmail, String userName) throws MessagingException, IOException;
+
+    /**
+     * Отправляет писмо на указанный email с уведомлением об отказе в регистрации
+     * Использует шаблон письма о создании задачи
+     * @param userEmail - почта, на которую отправится письмо
+     * @param userName - имя пользователя для шаблона
+     */
+    void sendDeclineRegistrationRequestMessage(String userEmail, String userName) throws MessagingException, IOException;
 }

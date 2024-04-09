@@ -2,27 +2,22 @@ package org.itmo.eventapp.main.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.security.service.UserDetailsServiceImpl;
 import org.itmo.eventapp.main.security.util.JwtTokenUtil;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 
 @Component
 @RequiredArgsConstructor
@@ -53,7 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
 
-            String login = jwtTokenUtil.extractUserEmail(token);
+            String login = jwtTokenUtil.extractUserLogin(token);
 
             if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(login);

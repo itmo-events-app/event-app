@@ -13,9 +13,11 @@ import java.util.Optional;
 @Repository
 public interface EventRoleRepository extends JpaRepository<EventRole, Integer> {
 
-    List<EventRole> findAllByRole(Role role);
+    boolean existsByRole(Role role);
 
     Optional<EventRole> findByUserAndEvent(User user, Event event);
+
+    List<EventRole> findByUserIdAndEventId(int userId, int eventId);
 
     Optional<EventRole> findByUserIdAndEventId(Integer userId, Integer eventId);
 
@@ -26,4 +28,6 @@ public interface EventRoleRepository extends JpaRepository<EventRole, Integer> {
     List<EventRole> findAllByUserId(Integer userId);
 
     List<EventRole> findAllByEventId(Integer eventId);
+
+    long deleteByEventId(int eventId);
 }

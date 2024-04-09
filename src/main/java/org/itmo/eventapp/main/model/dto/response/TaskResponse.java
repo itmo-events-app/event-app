@@ -1,13 +1,18 @@
 package org.itmo.eventapp.main.model.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 
 import java.time.LocalDateTime;
 
 public record TaskResponse(
+        @Schema(example = "1")
         Integer id,
+        @Schema(example = "827")
         Integer eventId,
+        @Schema(example = "Настроить проектор")
         String title,
+        @Schema(example = "Настроить проектор в коворкинге")
         String description,
         TaskStatus taskStatus,
         UserShortDataResponse assignee,

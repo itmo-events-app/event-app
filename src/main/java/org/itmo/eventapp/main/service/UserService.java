@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -28,21 +27,21 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
-    public List<User> findAllByRole(Role role) {
-        return userRepository.findAllByRole(role);
+    public boolean existsByRole(Role role) {
+        return userRepository.existsByRole(role);
     }
 
     public void save(User user) {
         userRepository.save(user);
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByUserLoginInfo_Email(email)
+    public User findByLogin(String login) {
+        return userRepository.findByUserLoginInfo_Login(login)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
     public void changeName(String email, UserChangeNameRequest request) {
-        User user = userLoginInfoService.findByEmail(email).getUser();
+        User user = userLoginInfoService.findByLogin(email).getUser();
         user.setName(request.name());
         user.setSurname(request.surname());
         userRepository.save(user);
@@ -50,10 +49,10 @@ public class UserService {
 
     //TODO добавить нотификацию о смене почты и его подтверждения
     public void changeEmail(String email, UserChangeEmailRequest request) {
-        User user = userLoginInfoService.findByEmail(email).getUser();
+        User user = userLoginInfoService.findByLogin(email).getUser();
 
         // Проверка на уникальность нового email перед обновлением
-        if (userLoginInfoService.existsByEmail(request.email())) {
+        if (userLoginInfoService.existsByLogin(request.email())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.USER_EMAIL_EXIST);
         }
 
@@ -61,7 +60,7 @@ public class UserService {
     }
 
     public void changePassword(String email, UserChangePasswordRequest request) {
-        User user = userLoginInfoService.findByEmail(email).getUser();
+        User user = userLoginInfoService.findByLogin(email).getUser();
 
         // Проверяем, что новый пароль совпадает с подтверждением
         if (!request.newPassword().equals(request.confirmNewPassword())) {

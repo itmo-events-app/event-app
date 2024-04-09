@@ -1,6 +1,11 @@
 package org.itmo.eventapp.main.model.dto.response;
 
-public record UserShortDataResponse(Integer id,
-                                   String name,
-                                   String surname) {
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record UserShortDataResponse(@Schema(example = "1")
+                                    Integer id,
+                                    @Schema(example = "Иван")
+                                    String name,
+                                    @Schema(example = "Иванов")
+                                    String surname) {
 }

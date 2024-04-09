@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,7 @@ public class ProfileController {
     @GetMapping("/event-privileges/{id}")
     public ResponseEntity<List<PrivilegeResponse>> getUserEventPrivileges(
             @AuthenticationPrincipal UserLoginInfo userDetails,
-            @Min(value = 1, message = "Поле eventId не может быть меньше 1!") @PathVariable("id") Integer id) {
+            @Min(value = 1, message = "Поле eventId не может быть меньше 1!") @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id) {
         Integer userId = userDetails.getUser().getId();
         return ResponseEntity.ok(
                 PrivilegeMapper.privilegesToPrivilegeResponseList(eventRoleService.getUserEventPrivileges(userId, id)));
