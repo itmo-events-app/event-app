@@ -90,25 +90,29 @@ public final class EventMapper {
 
     public static List<Event> eventRolesToEvents(List<EventRole> eventRoles) {
         return eventRoles.stream()
-                .map(eventRole -> Event.builder()
-                        .id(eventRole.getEvent().getId())
-                        .place(eventRole.getEvent().getPlace())
-                        .startDate(eventRole.getEvent().getStartDate())
-                        .endDate(eventRole.getEvent().getEndDate())
-                        .title(eventRole.getEvent().getTitle())
-                        .shortDescription(eventRole.getEvent().getShortDescription())
-                        .fullDescription(eventRole.getEvent().getFullDescription())
-                        .format(eventRole.getEvent().getFormat())
-                        .status(eventRole.getEvent().getStatus())
-                        .registrationStart(eventRole.getEvent().getRegistrationStart())
-                        .registrationEnd(eventRole.getEvent().getRegistrationEnd())
-                        .parent(eventRole.getEvent().getParent())
-                        .participantLimit(eventRole.getEvent().getParticipantLimit())
-                        .participantAgeLowest(eventRole.getEvent().getParticipantAgeLowest())
-                        .participantAgeHighest(eventRole.getEvent().getParticipantAgeHighest())
-                        .preparingStart(eventRole.getEvent().getPreparingStart())
-                        .preparingEnd(eventRole.getEvent().getPreparingEnd())
-                        .build())
+                .map(EventMapper::eventRoleToEvent)
                 .toList();
+    }
+
+    public static Event eventRoleToEvent(EventRole eventRole) {
+        return Event.builder()
+                .id(eventRole.getEvent().getId())
+                .place(eventRole.getEvent().getPlace())
+                .startDate(eventRole.getEvent().getStartDate())
+                .endDate(eventRole.getEvent().getEndDate())
+                .title(eventRole.getEvent().getTitle())
+                .shortDescription(eventRole.getEvent().getShortDescription())
+                .fullDescription(eventRole.getEvent().getFullDescription())
+                .format(eventRole.getEvent().getFormat())
+                .status(eventRole.getEvent().getStatus())
+                .registrationStart(eventRole.getEvent().getRegistrationStart())
+                .registrationEnd(eventRole.getEvent().getRegistrationEnd())
+                .parent(eventRole.getEvent().getParent())
+                .participantLimit(eventRole.getEvent().getParticipantLimit())
+                .participantAgeLowest(eventRole.getEvent().getParticipantAgeLowest())
+                .participantAgeHighest(eventRole.getEvent().getParticipantAgeHighest())
+                .preparingStart(eventRole.getEvent().getPreparingStart())
+                .preparingEnd(eventRole.getEvent().getPreparingEnd())
+                .build();
     }
 }
