@@ -8,7 +8,7 @@ VALUES
 
 INSERT INTO role_privilege (role_id, privilege_id)
 VALUES
-    (1,1),
-    (2,2),
-    (3,3),
-    (4,4);
+    (5,45),
+    (6,46),
+    (7,47),
+    (8,48);
