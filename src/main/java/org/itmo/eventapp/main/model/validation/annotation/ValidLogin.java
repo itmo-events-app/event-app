@@ -10,6 +10,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Для того, чтобы использовать этот валидатор
+ * нужно чтобы у класса обязательно присутствавали
+ * поля "login" и "type"
+ * Пример: @see org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest
+ */
+
 @Constraint(validatedBy = ValidLoginValidator.class)
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
