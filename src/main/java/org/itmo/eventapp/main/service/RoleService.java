@@ -84,6 +84,13 @@ public class RoleService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(ExceptionConst.ROLE_ID_NOT_FOUND_MESSAGE, id)));
     }
 
+    public Role findOrganizationalRoleById(Integer id) {
+        var role = findRoleById(id);
+        if (role.getType().equals(RoleType.SYSTEM))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(ExceptionConst.INVALID_ROLE_TYPE, "организационная"));
+        return role;
+    }
+
     public List<Role> getOrganizational() {
         return roleRepository.findAllByType(RoleType.EVENT);
     }
