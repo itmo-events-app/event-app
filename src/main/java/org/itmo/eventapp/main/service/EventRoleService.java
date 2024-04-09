@@ -7,6 +7,7 @@ import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
+import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.repository.EventRoleRepository;
 import org.springframework.http.HttpStatus;
@@ -115,5 +116,9 @@ public class EventRoleService {
     EventRole findByUserIdAndEventId(Integer userId, Integer eventId) {
         return eventRoleRepository.findByUserIdAndEventId(userId, eventId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
+    }
+
+    public List<Event> getEventsByRole(Integer userId, Integer roleId){
+        return EventMapper.eventRolesToEvents(eventRoleRepository.findAllByUserIdAndRoleId(userId, roleId));
     }
 }
