@@ -433,7 +433,7 @@ class EventControllerTest extends AbstractTestContainers {
                 );
 
         String expectedJson = """
-                        [{"id":1,"name":"test","surname":"user","roleName":"Организатор"}]
+                        [{"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","roleName":"Организатор"}]
                         """;
         mockMvc.perform(
                         get("/api/events/1/organizers"))
