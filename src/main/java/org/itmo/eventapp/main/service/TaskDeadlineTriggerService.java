@@ -2,6 +2,7 @@ package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.entity.Task;
+import org.itmo.eventapp.main.model.entity.TaskDeadlineTrigger;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.repository.TaskDeadlineTriggerRepository;
 import org.springframework.stereotype.Service;
@@ -22,5 +23,11 @@ public class TaskDeadlineTriggerService {
         tasks.forEach(task -> taskService.setStatus(task.getId(), TaskStatus.EXPIRED));
         taskDeadlineTriggerRepository.deleteAllByTriggerTimeBefore(deadlineTime);
         return tasks;
+    }
+
+    public void createNewDeadlineTrigger(Integer taskId, LocalDateTime triggerTime){
+        TaskDeadlineTrigger taskDeadlineTrigger = TaskDeadlineTrigger.builder()
+                .taskId(taskId).triggerTime(triggerTime).build();
+        taskDeadlineTriggerRepository.save(taskDeadlineTrigger);
     }
 }

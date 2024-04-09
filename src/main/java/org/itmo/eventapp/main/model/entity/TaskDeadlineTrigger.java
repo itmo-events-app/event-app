@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public class TaskDeadlineTrigger {
     @Id
-    private Integer task_id;
+    private Integer taskId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
