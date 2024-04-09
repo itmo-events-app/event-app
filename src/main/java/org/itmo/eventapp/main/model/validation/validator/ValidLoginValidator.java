@@ -23,16 +23,15 @@ public class ValidLoginValidator implements ConstraintValidator<ValidLogin, Obje
         Object loginValue = new BeanWrapperImpl(o).getPropertyValue(login);
         Object typeValue = new BeanWrapperImpl(o).getPropertyValue(type);
 
-        if (loginValue == null && typeValue == null)
-            return false;
 
-        if (!(loginValue instanceof String) && !(typeValue instanceof LoginType))
-            return false;
-
-        // Проверяем, является ли логин действительным адресом электронной почты
-        if (typeValue == LoginType.EMAIL && !isValidEmail((String) loginValue)) {
-            context.disableDefaultConstraintViolation(); // Отключаем стандартное сообщение
-            context.buildConstraintViolationWithTemplate("Некорректный email. Поддерживаемые домены: @itmo.ru, @idu.itmo.ru и @niuitmo.ru").addConstraintViolation();
+        if (loginValue instanceof String && typeValue instanceof LoginType) {
+            // Проверяем, является ли логин действительным адресом электронной почты
+            if (typeValue == LoginType.EMAIL && !isValidEmail((String) loginValue)) {
+                context.disableDefaultConstraintViolation(); // Отключаем стандартное сообщение
+                context.buildConstraintViolationWithTemplate("Некорректный email. Поддерживаемые домены: @itmo.ru, @idu.itmo.ru и @niuitmo.ru").addConstraintViolation();
+                return false;
+            }
+        } else {
             return false;
         }
 
