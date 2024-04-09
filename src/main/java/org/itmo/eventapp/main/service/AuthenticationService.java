@@ -4,12 +4,15 @@ package org.itmo.eventapp.main.service;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.*;
+import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
+import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
 import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
 import org.itmo.eventapp.main.security.util.JwtTokenUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,12 +21,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.mail.MessagingException;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-
     private final UserService userService;
     private final UserLoginInfoService userLoginInfoService;
     private final UserNotificationInfoService userNotificationInfoService;
@@ -33,6 +39,9 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    private MailSenderService mailSenderService;
 
     public String login(LoginRequest loginRequest) {
         try {
@@ -75,8 +84,9 @@ public class AuthenticationService {
 
         var request = registrationRequestService.findById(requestId);
 
-        if (request.getStatus() != RegistrationRequestStatus.APPROVED)
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.REGISTRATION_REQUEST_NOT_APPROVED);
+        if (request.getStatus() != RegistrationRequestStatus.NEW) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Запрос уже обработан");
+        }
 
         var reader = roleService.getReaderRole();
 
@@ -108,5 +118,40 @@ public class AuthenticationService {
                 .build();
 
         userLoginInfoService.save(loginInfo);
+
+        request.setStatus(RegistrationRequestStatus.APPROVED);
+        registrationRequestService.save(request);
+
+        try {
+            mailSenderService.sendApproveRegistrationRequestMessage(request.getEmail(), request.getName());
+        } catch (MessagingException | IOException e) {}
+    }
+
+    @Transactional
+    public void declineRegistrationRequestCallback(int requestId) {
+        var request = registrationRequestService.findById(requestId);
+
+        if (request.getStatus() != RegistrationRequestStatus.NEW) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Запрос уже обработан");
+        }
+
+        request.setStatus(RegistrationRequestStatus.DECLINED);
+        registrationRequestService.save(request);
+
+        try {
+            mailSenderService.sendDeclineRegistrationRequestMessage(request.getEmail(), request.getName());
+        } catch (MessagingException | IOException e) {}
+    }
+
+    public List<RegistrationRequestForAdmin> listRegisterRequestsCallback() {
+        return registrationRequestService.getByStatus(RegistrationRequestStatus.NEW)
+                .stream()
+                .map((request) -> new RegistrationRequestForAdmin(
+                        request.getEmail(),
+                        request.getName(),
+                        request.getSurname(),
+                        request.getStatus(),
+                        request.getSentTime()))
+                .toList();
     }
 }
