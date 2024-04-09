@@ -121,3 +121,13 @@ create table if not exists task
     place_id int references place(id),
     reminder timestamp not null
 );
+create table if not exists task_deadline_trigger
+(
+    task_id int primary key references task(id),
+    triggerTime timestamp not null
+);
+create table if not exists task_reminder_trigger
+(
+    task_id int primary key references task(id),
+    triggerTime timestamp not null
+);
