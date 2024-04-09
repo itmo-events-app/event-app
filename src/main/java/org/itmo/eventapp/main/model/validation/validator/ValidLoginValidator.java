@@ -23,6 +23,17 @@ public class ValidLoginValidator implements ConstraintValidator<ValidLogin, Obje
         Object loginValue = new BeanWrapperImpl(o).getPropertyValue(login);
         Object typeValue = new BeanWrapperImpl(o).getPropertyValue(type);
 
+        if (loginValue == null) {
+            context.disableDefaultConstraintViolation(); // Отключаем стандартное сообщение
+            context.buildConstraintViolationWithTemplate("Логин не может быть пустым").addConstraintViolation();
+            return false;
+        }
+
+        if (typeValue == null) {
+            context.disableDefaultConstraintViolation(); // Отключаем стандартное сообщение
+            context.buildConstraintViolationWithTemplate("Тип логина не может быть пустым").addConstraintViolation();
+            return false;
+        }
 
         if (loginValue instanceof String && typeValue instanceof LoginType) {
             // Проверяем, является ли логин действительным адресом электронной почты
