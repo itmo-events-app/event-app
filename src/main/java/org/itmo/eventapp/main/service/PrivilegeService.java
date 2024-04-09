@@ -26,15 +26,10 @@ public class PrivilegeService {
 
     public List<Privilege> getPrivilegeByType(PrivilegeType type) {
         List<Privilege> privileges = privilegeRepository.findAllByType(type);
-
         if (type.equals(PrivilegeType.SYSTEM)) {
-            Privilege assignOrganizerPrivilege =
-                    privilegeRepository.findByName(
-                            PrivilegeName.ASSIGN_ORGANIZER_ROLE);
-            if (null != assignOrganizerPrivilege)
-                privileges.add(assignOrganizerPrivilege);
+            var assignOrganizerPrivilege = privilegeRepository.findByName(PrivilegeName.ASSIGN_ORGANIZER_ROLE);
+            assignOrganizerPrivilege.ifPresent(privileges::add);
         }
-
         return privileges;
     }
 

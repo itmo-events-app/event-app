@@ -6,7 +6,6 @@ import org.itmo.eventapp.main.model.dto.request.UserChangeEmailRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.entity.Privilege;
-import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -27,8 +26,8 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
-    public boolean existsByRole(Role role) {
-        return userRepository.existsByRole(role);
+    public boolean existsByRoleId(Integer roleId) {
+        return userRepository.existsByRoleId(roleId);
     }
 
     public void save(User user) {
