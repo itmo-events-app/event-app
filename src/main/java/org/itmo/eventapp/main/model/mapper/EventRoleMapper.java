@@ -14,6 +14,7 @@ public class EventRoleMapper {
                 eventRole.getUser().getId(),
                 eventRole.getUser().getName(),
                 eventRole.getUser().getSurname(),
+                eventRole.getUser().getUserLoginInfo().getLogin(),
                 eventRole.getRole().getName());
     }
 

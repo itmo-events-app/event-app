@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -41,13 +42,13 @@ public class AuthController {
 
     @Operation(summary = "Одобрение заявки на регистрацию")
     @PostMapping(value = "/approveRegister/{requestId}")
-    ResponseEntity<Void> approveRegister(@PathVariable("requestId") Integer requestId) {
+    ResponseEntity<Void> approveRegister(@PathVariable("requestId") @Parameter(name = "requestId", description = "ID заявки на регистрацию", example = "1") Integer requestId) {
         // TODO: check for administrator
         authenticationService.approveRegistrationRequestCallback(requestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping(value = "/declineRegister/{requestId}")
+    @PostMapping(value = "/declineRegister/{requestId}")
     ResponseEntity<Void> declineRegister(@PathVariable("requestId") Integer requestId) {
         // TODO: check for administrator
         authenticationService.declineRegistrationRequestCallback(requestId);

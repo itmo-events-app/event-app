@@ -299,7 +299,6 @@ class EventControllerTest extends AbstractTestContainers {
                   "status": "PUBLISHED",
                   "registrationStart": "2024-03-30T21:32:23.536819",
                   "registrationEnd": "2024-03-30T21:32:23.536819",
-                  "parent": null,
                   "participantLimit": 10,
                   "participantAgeLowest": 5,
                   "participantAgeHighest": 7,
@@ -434,7 +433,7 @@ class EventControllerTest extends AbstractTestContainers {
                 );
 
         String expectedJson = """
-                        [{"id":1,"name":"test","surname":"user","roleName":"Организатор"}]
+                        [{"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","roleName":"Организатор"}]
                         """;
         mockMvc.perform(
                         get("/api/events/1/organizers"))

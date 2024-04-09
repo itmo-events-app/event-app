@@ -9,6 +9,8 @@ import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
 import org.itmo.eventapp.main.model.entity.enums.EmailStatus;
+import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
+import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
 import org.itmo.eventapp.main.security.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,7 @@ public class AuthenticationService {
                     new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password());
             authenticationManager.authenticate(authentication);
 
-            var userLoginInfo = userLoginInfoService.findByEmail(loginRequest.login());
+            var userLoginInfo = userLoginInfoService.findByLogin(loginRequest.login());
             userLoginInfoService.setLastLoginDate(userLoginInfo, LocalDateTime.now());
 
             return jwtTokenUtil.generateToken(loginRequest.login());
@@ -108,11 +110,12 @@ public class AuthenticationService {
 
         UserLoginInfo loginInfo = UserLoginInfo.builder()
                 .registration(request)
-                .email(request.getEmail())
+                .login(request.getEmail())
+                .loginType(LoginType.EMAIL)
                 .passwordHash(request.getPasswordHash())
                 .lastLoginDate(LocalDateTime.now())
                 .user(user)
-                .emailStatus(EmailStatus.APPROVED)
+                .loginStatus(LoginStatus.APPROVED)
                 .build();
 
         userLoginInfoService.save(loginInfo);

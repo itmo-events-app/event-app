@@ -12,7 +12,10 @@ import java.util.List;
 public interface RegistrationRequestRepository extends JpaRepository<RegistrationRequest, Integer> {
 
     Optional<RegistrationRequest> getRegistrationRequestByEmail(String email);
+
     List<RegistrationRequest> getRegistrationRequestsByStatus(RegistrationRequestStatus status);
+
     Optional<RegistrationRequest> findRegistrationRequestById(Integer id);
-    boolean existsByEmail(String email);
+
+    boolean existsByEmail(String login);
 }
