@@ -185,11 +185,11 @@ public class TaskController {
             TaskStatus taskStatus,
             @RequestParam(required = false)
             @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            @Parameter(name = "deadlineLowerLimit", description = "Мягкий дедлайн задачи")
+            @Parameter(name = "deadlineLowerLimit", description = "Нижняя граница для фильтрации задач по дедлайну")
             LocalDateTime deadlineLowerLimit,
             @RequestParam(required = false)
             @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            @Parameter(name = "deadlineUpperLimit", description = "Жесткий дедлайн задачи")
+            @Parameter(name = "deadlineUpperLimit", description = "Верхняя граница для фильтрации задач по дедлайну")
             LocalDateTime deadlineUpperLimit,
             @RequestParam(required = false, defaultValue = "false")
             @Parameter(name = "subEventTasksGet", description = "Включить получение задач активностей мероприятия")
@@ -248,11 +248,11 @@ public class TaskController {
             TaskStatus taskStatus,
             @RequestParam(required = false)
             @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            @Parameter(name = "deadlineLowerLimit", description = "Мягкий дедлайн задачи")
+            @Parameter(name = "deadlineLowerLimit", description = "Нижняя граница для фильтрации задач по дедлайну")
             LocalDateTime deadlineLowerLimit,
             @RequestParam(required = false)
             @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            @Parameter(name = "deadlineUpperLimit", description = "Жесткий дедлайн задачи")
+            @Parameter(name = "deadlineUpperLimit", description = "Верхняя граница для фильтрации задач по дедлайну")
             LocalDateTime deadlineUpperLimit,
             @Min(value = 0, message = "Параметр page не может быть меньше 0!")
             @RequestParam(required = false, defaultValue = "0")
