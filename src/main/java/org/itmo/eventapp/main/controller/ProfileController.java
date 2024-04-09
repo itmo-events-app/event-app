@@ -49,21 +49,21 @@ public class ProfileController {
     }
 
     @Operation(summary = "Смена имени пользователя")
-    @PutMapping("/change-name")
+    @PutMapping("/name")
     public ResponseEntity<Void> changeName(Authentication authentication, @Valid @RequestBody UserChangeNameRequest request) {
         userService.changeName(authentication.getName(), request);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Смена логина пользователя")
-    @PutMapping("/change-login")
+    @PutMapping("/login")
     public ResponseEntity<Void> changeLogin(Authentication authentication, @Valid @RequestBody UserChangeLoginRequest request) {
         userService.changeLogin(authentication.getName(), request);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Смена пароля пользователя")
-    @PutMapping("/change-password")
+    @PutMapping("/password")
     public ResponseEntity<Void> changePassword(Authentication authentication, @Valid @RequestBody UserChangePasswordRequest request) {
         userService.changePassword(authentication.getName(), request);
         return ResponseEntity.noContent().build();
