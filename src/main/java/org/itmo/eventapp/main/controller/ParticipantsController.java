@@ -14,38 +14,39 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/api/events/")
+@RequestMapping(value = "/api/events/{id}/participants")
 @Validated
 public class ParticipantsController {
     private final ParticipantsService participantsService;
 
-    @GetMapping("/{id}/participants/list")
+    @GetMapping
     public ResponseEntity<List<ParticipantResponse>> getParticipants(@Min(1) @PathVariable("id") Integer id) {
         List<Participant> participants = participantsService.getParticipants(id);
         return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
     }
 
-    @PutMapping("/{id}/participants")
+    @PutMapping
     public ResponseEntity<ParticipantResponse> changePresence(@PathVariable("id") Integer id, @RequestBody ParticipantPresenceRequest participantPresenceRequest) {
         Participant participant = participantsService.changePresence(id, participantPresenceRequest);
         return ResponseEntity.ok().body(ParticipantMapper.participantToResponse(participant));
     }
 
-    @PostMapping("/{id}/participants/newlist")
-    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id /*, @RequestBody ParticipantsListRequest participantsListRequest*/) throws IOException {
-        List<Participant> participants = participantsService.setParticipants(id);
+    @PostMapping
+    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id, @RequestBody ParticipantsListRequest participantsListRequest) throws IOException {
+        List<Participant> participants = participantsService.setParticipants(id, participantsListRequest);
         return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
     }
 
-    @GetMapping("/{id}/participants/list/xlsx")
-    public ResponseEntity<List<ParticipantResponse>> getParticipantsXlsxFile( @PathVariable("id") Integer id) throws IOException {
-        List<Participant> participants = participantsService.getParticipantsXlsx(id);
-        return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
+    @GetMapping("/xlsxExport")
+    public ResponseEntity<MultipartFile> getParticipantsXlsxFile(@PathVariable("id") Integer id) throws IOException {
+        MultipartFile participants = participantsService.getParticipantsXlsx(id);
+        return ResponseEntity.ok().body(participants);
     }
 }

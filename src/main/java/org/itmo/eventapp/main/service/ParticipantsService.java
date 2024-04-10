@@ -1,6 +1,8 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -11,11 +13,14 @@ import org.itmo.eventapp.main.model.dto.request.ParticipantsListRequest;
 import org.itmo.eventapp.main.model.entity.Participant;
 import org.itmo.eventapp.main.repository.ParticipantsRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +42,7 @@ public class ParticipantsService {
         return participant;
     }
 
-    public List<Participant> setParticipants(Integer eventId) throws IOException {
+    public List<Participant> setParticipants(Integer eventId, ParticipantsListRequest participantsListRequest) throws IOException {
         File list = new File("D:/eventapptest/participants.xlsx");
         savetoMinio(list);
         Workbook workbook = new XSSFWorkbook(new FileInputStream(list));
@@ -94,7 +99,7 @@ public class ParticipantsService {
 
     }
 
-    public List<Participant> getParticipantsXlsx(Integer eventId) throws IOException {
+    public MultipartFile getParticipantsXlsx(Integer eventId) throws IOException {
         List<Participant> participants = getParticipants(eventId);
         Workbook book = new XSSFWorkbook();
         Sheet sheet = book.createSheet("Участники");
@@ -143,7 +148,11 @@ public class ParticipantsService {
         book.write(outputStream);
         book.close();
 
-        return participants;
+        File file = new File("");
+        MultipartFile multipartFile = new CommonsMultipartFile(new DiskFileItem("file", Files.probeContentType(file.toPath()),
+                false, file.getName(), (int) file.length(), file.getParentFile()));
+        return multipartFile;
+
     }
 
 }
