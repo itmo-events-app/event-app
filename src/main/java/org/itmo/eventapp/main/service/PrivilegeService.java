@@ -19,26 +19,28 @@ public class PrivilegeService {
 
     public Privilege findById(Integer id) {
         return privilegeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                ExceptionConst.PRIVILEGE_ID_NOT_FOUND_MESSAGE.formatted(id)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ExceptionConst.PRIVILEGE_ID_NOT_FOUND_MESSAGE.formatted(id)));
     }
 
-    public List<Privilege> getPrivilegeByType(PrivilegeType type) {
+    private List<Privilege> getPrivilegesByType(PrivilegeType type) {
         List<Privilege> privileges = privilegeRepository.findAllByType(type);
-
         if (type.equals(PrivilegeType.SYSTEM)) {
-            Privilege assignOrganizerPrivilege =
-                    privilegeRepository.findByName(
-                            PrivilegeName.ASSIGN_ORGANIZER_ROLE);
-            if (null != assignOrganizerPrivilege)
-                privileges.add(assignOrganizerPrivilege);
+            var assignOrganizerPrivilege = privilegeRepository.findByName(PrivilegeName.ASSIGN_ORGANIZER_ROLE);
+            assignOrganizerPrivilege.ifPresent(privileges::add);
         }
-
         return privileges;
     }
 
-    public List<Privilege> getAll() {
+    private List<Privilege> getAll() {
         return privilegeRepository.findAll();
+    }
+
+    public List<Privilege> getPrivileges(PrivilegeType type) {
+        if (type == null) {
+            return getAll();
+        } else {
+            return getPrivilegesByType(type);
+        }
     }
 }

@@ -6,6 +6,7 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
+import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.model.mapper.RoleMapper;
 import org.itmo.eventapp.main.repository.EventRoleRepository;
 import org.itmo.eventapp.main.repository.RoleRepository;
@@ -25,17 +26,15 @@ public class RoleService {
     private final PrivilegeService privilegeService;
     private final UserService userService;
     private final List<String> basicRoles = Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
-    private  final EventRoleRepository eventRoleRepository;
+    private final EventRoleRepository eventRoleRepository;
     private final UserLoginInfoService userLoginInfoService;
 
     @Transactional
     public Role createRole(RoleRequest roleRequest) {
         if (roleRepository.findByName(roleRequest.name()).isPresent())
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.ROLE_EXIST_MESSAGE);
-        Role role = RoleMapper.roleRequestToRole(roleRequest);
-        roleRequest.privileges().stream()
-                .map(privilegeService::findById)
-                .forEach(role::addPrivilege);
+        var privileges = roleRequest.privileges().stream().map(privilegeService::findById);
+        Role role = RoleMapper.roleRequestToRole(roleRequest, privileges);
         return roleRepository.save(role);
     }
 
@@ -52,9 +51,8 @@ public class RoleService {
         editedRole.setDescription(roleRequest.description());
         editedRole.setType(roleRequest.isEvent() ? RoleType.EVENT : RoleType.SYSTEM);
         editedRole.setPrivileges(new HashSet<>());
-        roleRequest.privileges().stream()
-                .map(privilegeService::findById)
-                .forEach(editedRole::addPrivilege);
+        var privileges = roleRequest.privileges().stream().map(privilegeService::findById);
+        editedRole.setPrivileges(PrivilegeMapper.privilegeStreamToPrivilegeSet(privileges, roleRequest.isEvent()));
         return roleRepository.save(editedRole);
     }
 
@@ -64,11 +62,11 @@ public class RoleService {
         if (basicRoles.contains(role.getName()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ROLE_DELETING_FORBIDDEN_MESSAGE);
         if (role.getType().equals(RoleType.SYSTEM)) {
-            if (userService.existsByRole(role))
+            if (userService.existsByRoleId(id))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.USERS_WITH_ROLE_EXIST);
         } else {
             // TODO: временно, надо будет переделать
-            if (eventRoleRepository.existsByRole(role))
+            if (eventRoleRepository.existsByRoleId(id))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.USERS_WITH_ROLE_EXIST);
         }
         role.setPrivileges(null);
@@ -81,7 +79,16 @@ public class RoleService {
 
     public Role findRoleById(Integer id) {
         return roleRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(ExceptionConst.ROLE_ID_NOT_FOUND_MESSAGE, id)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ExceptionConst.ROLE_ID_NOT_FOUND_MESSAGE.formatted(id)));
+    }
+
+    public Role findOrganizationalRoleById(Integer id) {
+        var role = findRoleById(id);
+        if (role.getType().equals(RoleType.SYSTEM))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
+        return role;
     }
 
     public List<Role> getOrganizational() {
@@ -99,7 +106,7 @@ public class RoleService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ASSIGN_SELF_ROLE_FORBIDDEN_MESSAGE);
         var role = findRoleById(roleId);
         if (role.getType().equals(RoleType.EVENT))
-            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(ExceptionConst.INVALID_ROLE_TYPE, "системная"));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_ROLE_TYPE.formatted("системная"));
         user.setRole(role);
         userService.save(user);
     }
@@ -115,7 +122,8 @@ public class RoleService {
 
     public Role findByName(String name) {
         return roleRepository.findByName(name)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format(ExceptionConst.ROLE_NAME_NOT_FOUND_MESSAGE, name)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ExceptionConst.ROLE_NAME_NOT_FOUND_MESSAGE.formatted(name)));
     }
 
     public Role getReaderRole() {

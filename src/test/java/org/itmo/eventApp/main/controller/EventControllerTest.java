@@ -160,7 +160,7 @@ class EventControllerTest extends AbstractTestContainers {
                         .contentType("multipart/form-data")
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().is(404))
-                .andExpect(content().string(containsString("Place not found")));
+                .andExpect(content().string(containsString("Площадка не найдена")));
         assertThat(eventRepository.findById(3).isEmpty()).isTrue();
     }
 
@@ -291,7 +291,7 @@ class EventControllerTest extends AbstractTestContainers {
                                 .with(user(getUserLoginInfo()))
                 )
                 .andExpect(status().is(404))
-                .andExpect(content().string(containsString("User not found")));
+                .andExpect(content().string(containsString("Пользователь не найден")));
         assertThat(eventRepository.findById(1).isEmpty()).isTrue();
     }
 
