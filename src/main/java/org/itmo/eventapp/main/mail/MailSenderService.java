@@ -57,4 +57,11 @@ public interface MailSenderService {
      * @param userName - имя пользователя для шаблона
      */
     void sendDeclineRegistrationRequestMessage(String userEmail, String userName) throws MessagingException, IOException;
+
+    /**
+     * Отправляет письмо на указанный email с ссылкой на восстановление пароля
+     * @param userEmail - почта, на которую отправится письмо
+     * @param url - адрес метода установки нового пароля
+     */
+    void sendRecoveryPasswordMessage(String userEmail, String url) throws MessagingException, IOException;
 }

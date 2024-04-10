@@ -72,6 +72,15 @@ public class MailSenderServiceImpl implements MailSenderService{
         mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getRegistrationResponseTemplateFields(userName)));
     }
 
+    @Async
+    @Override
+    public void sendRecoveryPasswordMessage(String userEmail, String url) throws MessagingException, IOException {
+        String subject = "Восстановление пароля";
+        String templatePath = "notification/email-templates/recovery-password.html";
+        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getRecoveryPasswordTemplateFields(url)));
+
+    }
+
     // Создаёт MIME письмо для отправки
     private MimeMessage createMessageFromTemplate(String recipient, String subject, String templatePath, Map<String, String> templateFields) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
@@ -99,6 +108,12 @@ public class MailSenderServiceImpl implements MailSenderService{
     private Map<String, String> getRegistrationResponseTemplateFields(String userName) {
         HashMap<String, String> templateFields = new HashMap<>();
         templateFields.put("${userName}", userName);
+        return templateFields;
+    }
+
+    private Map<String, String> getRecoveryPasswordTemplateFields(String url) {
+        HashMap<String, String> templateFields = new HashMap<>();
+        templateFields.put("${url}", url);
         return templateFields;
     }
 

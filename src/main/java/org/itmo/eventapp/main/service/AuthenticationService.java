@@ -3,6 +3,7 @@ package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
+import org.itmo.eventapp.main.model.dto.request.NewPasswordRequest;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
@@ -11,6 +12,7 @@ import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
 import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
+import org.itmo.eventapp.main.repository.UserPasswordRecoveryInfoRepository;
 import org.itmo.eventapp.main.security.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,10 @@ import jakarta.mail.MessagingException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +40,7 @@ public class AuthenticationService {
     private final UserNotificationInfoService userNotificationInfoService;
     private final RoleService roleService;
     private final RegistrationRequestService registrationRequestService;
+    private final UserPasswordRecoveryInfoService userPasswordRecoveryInfoService;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
@@ -153,5 +159,40 @@ public class AuthenticationService {
                         request.getStatus(),
                         request.getSentTime()))
                 .toList();
+    }
+
+    public void recoverPassword(String email, String returnUrl) {
+
+        User user = userService.findByLogin(email);
+
+        String token = UUID.randomUUID().toString();
+
+        UserPasswordRecoveryInfo info = UserPasswordRecoveryInfo.builder()
+                .token(token)
+                .user(user)
+                .expiryDate(LocalDateTime.now().plusDays(1))
+                .build();
+
+        userPasswordRecoveryInfoService.save(info);
+
+        String url = returnUrl + "?token=" + token;
+
+        try {
+            mailSenderService.sendRecoveryPasswordMessage(email, url);
+        }
+        catch (MessagingException | IOException e) {}
+    }
+
+    public void validateRecoveryToken(String token) {
+
+        UserPasswordRecoveryInfo info = userPasswordRecoveryInfoService.findByToken(token);
+
+        if (!info.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Время запроса истекло");
+        }
+    }
+
+    public void newPassword(NewPasswordRequest request) {
+        userService.changePassword(request);
     }
 }

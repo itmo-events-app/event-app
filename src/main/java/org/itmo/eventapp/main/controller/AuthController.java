@@ -2,22 +2,22 @@ package org.itmo.eventapp.main.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
+import org.itmo.eventapp.main.model.dto.request.NewPasswordRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
 import org.itmo.eventapp.main.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -60,5 +60,24 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(authenticationService.listRegisterRequestsCallback());
+    }
+
+    @PostMapping("/recoveryPassword")
+    ResponseEntity<Void> recoveryPassword(@RequestBody String email, @RequestParam("returnUrl") String returnUrl) {
+        authenticationService.recoverPassword(email, returnUrl);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/validateRecoveryToken")
+    ResponseEntity<Void> validateRecoveryToken(@RequestParam
+                                               @NotBlank(message = "Токен отсутствует") String token) {
+        authenticationService.validateRecoveryToken(token);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/newPassword")
+    ResponseEntity<Void> newPassword(@RequestBody NewPasswordRequest request) {
+        authenticationService.newPassword(request);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
