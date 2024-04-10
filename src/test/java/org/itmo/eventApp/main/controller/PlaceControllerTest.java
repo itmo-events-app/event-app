@@ -25,11 +25,6 @@ class PlaceControllerTest extends AbstractTestContainers {
         this.placeRepository = placeRepository;
     }
 
-    @AfterEach
-    public void cleanUp() {
-        executeSqlScript("/sql/clean_tables.sql");
-    }
-
     private UserLoginInfo getUserLoginInfo() {
         UserLoginInfo userDetails = new UserLoginInfo();
         userDetails.setLogin("test_mail@itmo.ru");

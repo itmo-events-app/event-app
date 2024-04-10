@@ -37,11 +37,6 @@ class NotificationControllerTest extends AbstractTestContainers{
         return userDetails;
     }
 
-    @AfterEach
-    public void cleanUp() {
-        executeSqlScript("/sql/clean_tables.sql");
-    }
-
     @Test
     @WithMockUser(username = "test_mail@itmo.ru")
     void getNotificationsTest() throws Exception {
