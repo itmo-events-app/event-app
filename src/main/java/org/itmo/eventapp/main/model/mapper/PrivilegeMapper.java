@@ -33,7 +33,7 @@ public final class PrivilegeMapper {
     }
 
     public static Set<Privilege> privilegeStreamToPrivilegeSet(Stream<Privilege> privileges, Boolean isEvent) {
-        var privilegeType = isEvent ? PrivilegeType.EVENT : PrivilegeType.SYSTEM;
+        var privilegeType = Boolean.TRUE.equals(isEvent) ? PrivilegeType.EVENT : PrivilegeType.SYSTEM;
         Set<Privilege> privilegesSet = new HashSet<>();
          privileges.forEach(privilege -> {
                     if (checkInvalidPrivilegeType(privilege, privilegeType)) {
