@@ -57,4 +57,6 @@ public interface MailSenderService {
      * @param userName - имя пользователя для шаблона
      */
     void sendDeclineRegistrationRequestMessage(String userEmail, String userName) throws MessagingException, IOException;
+
+    void sendEmailVerificationMessage(String userEmail, String userName) throws MessagingException, IOException;
 }

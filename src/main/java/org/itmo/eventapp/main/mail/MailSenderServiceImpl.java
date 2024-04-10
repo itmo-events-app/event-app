@@ -72,6 +72,13 @@ public class MailSenderServiceImpl implements MailSenderService{
         mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getRegistrationResponseTemplateFields(userName)));
     }
 
+    @Async
+    @Override
+    public void sendEmailVerificationMessage(String userEmail, String userName, String url) throws MessagingException, IOException {
+        String subject = "Подтверждение почты";
+        String templatePath = "notification/email-templates/decline-registration-request.html";
+    }
+
     // Создаёт MIME письмо для отправки
     private MimeMessage createMessageFromTemplate(String recipient, String subject, String templatePath, Map<String, String> templateFields) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();

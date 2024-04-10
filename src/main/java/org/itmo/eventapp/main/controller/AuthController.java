@@ -61,4 +61,10 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(authenticationService.listRegisterRequestsCallback());
     }
+
+    @PostMapping("verifyEmail")
+    ResponseEntity<Void> verifyEmail(@RequestBody String email) {
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

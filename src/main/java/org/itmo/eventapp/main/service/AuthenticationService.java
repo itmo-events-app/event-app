@@ -154,4 +154,8 @@ public class AuthenticationService {
                         request.getSentTime()))
                 .toList();
     }
+
+    public void verifyEmail(String email) {
+
+    }
 }
