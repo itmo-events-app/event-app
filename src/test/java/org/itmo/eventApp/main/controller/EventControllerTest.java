@@ -89,11 +89,6 @@ class EventControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
     }
 
-    @AfterEach
-    public void cleanUp() {
-        executeSqlScript("/sql/clean_tables.sql");
-    }
-
     @Test
     void addProperEvent() throws Exception {
         setUpEventData();
