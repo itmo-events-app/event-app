@@ -60,7 +60,6 @@ public class PlaceController {
         return ResponseEntity.ok().body(PlaceMapper.placeToPlaceResponse(edited));
     }
 
-    // TODO: Add privilege validation
     @Operation(summary = "Удаление площадки")
     @PreAuthorize("@placeSecurityExpression.canDeletePlace()")
     @DeleteMapping("/{id}")

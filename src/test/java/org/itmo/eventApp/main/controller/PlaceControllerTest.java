@@ -25,7 +25,6 @@ class PlaceControllerTest extends AbstractTestContainers {
         this.placeRepository = placeRepository;
     }
 
-
     @AfterEach
     public void cleanUp() {
         executeSqlScript("/sql/clean_tables.sql");
@@ -38,14 +37,6 @@ class PlaceControllerTest extends AbstractTestContainers {
         dummyUser.setId(1);
         userDetails.setUser(dummyUser);
         return userDetails;
-    }
-
-    private void setUpUserData() {
-        executeSqlScript("/sql/insert_user.sql");
-    }
-
-    private void setUpEventData() {
-        executeSqlScript("/sql/insert_event.sql");
     }
 
     @Test
@@ -106,7 +97,7 @@ class PlaceControllerTest extends AbstractTestContainers {
 
     @Test
     void placeAddTest() throws Exception {
-        setUpUserData();
+        executeSqlScript("/sql/insert_user.sql");
 
         String name = "name";
         String address = "address";
@@ -150,7 +141,7 @@ class PlaceControllerTest extends AbstractTestContainers {
 
     @Test
     void placeAddInvalidTest() throws Exception {
-        setUpUserData();
+        executeSqlScript("/sql/insert_user.sql");
 
         String taskJson = """
                 {
@@ -166,7 +157,7 @@ class PlaceControllerTest extends AbstractTestContainers {
 
     @Test
     void placeEditTest() throws Exception {
-        setUpUserData();
+        executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
         String name = "name";
         String address = "address";
@@ -209,8 +200,8 @@ class PlaceControllerTest extends AbstractTestContainers {
 
     @Test
     void placeEditInvalidTest() throws Exception {
-        setUpUserData();
-        
+        executeSqlScript("/sql/insert_user.sql");
+
         executeSqlScript("/sql/insert_place.sql");
         Place notEdited = placeRepository.findById(1).orElseThrow();
         String taskJson = """
@@ -239,7 +230,7 @@ class PlaceControllerTest extends AbstractTestContainers {
 
     @Test
     void placeDeleteTest() throws Exception {
-        setUpUserData();
+        executeSqlScript("/sql/insert_user.sql");
 
         executeSqlScript("/sql/insert_place.sql");
 
