@@ -11,11 +11,12 @@ import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
 import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
-import org.itmo.eventapp.main.security.util.JwtTokenUtil;
+import org.itmo.eventapp.main.security.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +38,7 @@ public class AuthenticationService {
     private final RegistrationRequestService registrationRequestService;
 
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
@@ -47,15 +48,18 @@ public class AuthenticationService {
         try {
             var authentication =
                     new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password());
+
             authenticationManager.authenticate(authentication);
+
+            var auth = SecurityContextHolder.getContext().getAuthentication();
 
             var userLoginInfo = userLoginInfoService.findByLogin(loginRequest.login());
             userLoginInfoService.setLastLoginDate(userLoginInfo, LocalDateTime.now());
 
-            return jwtTokenUtil.generateToken(loginRequest.login());
+            return jwtUtil.generateToken(loginRequest.login());
         }
         catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка аутентификации.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден.");
         }
     }
 
