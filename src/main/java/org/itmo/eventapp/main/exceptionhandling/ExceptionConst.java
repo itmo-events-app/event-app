@@ -1,11 +1,11 @@
 package org.itmo.eventapp.main.exceptionhandling;
 
 public class ExceptionConst {
-    public static final String EVENT_NOT_FOUND_MESSAGE = "Event not found";
+    public static final String EVENT_NOT_FOUND_MESSAGE = "Мероприятие не найдено";
     public static final String EVENT_PARENT_NOT_FOUND_MESSAGE = "Event's parent not found";
     public static final String EVENT_ROLE_NOT_FOUND_MESSAGE = "EventRole not found";
-    public static final String ACTIVITY_RECURSION = "Cannot create activity for another activity";
-    public static final String PLACE_NOT_FOUND_MESSAGE = "Place not found";
+    public static final String ACTIVITY_RECURSION = "Невозможно создать активность для другой активности";
+    public static final String PLACE_NOT_FOUND_MESSAGE = "Площадка не найдена";
 
     public static final String ROLE_ID_NOT_FOUND_MESSAGE = "Роль с id %d не найдена";
     public static final String ROLE_NAME_NOT_FOUND_MESSAGE = "Роль с именем %s не найдена";
@@ -26,21 +26,18 @@ public class ExceptionConst {
     public static final String AT_LEAST_ONE_ORGANIZER_MESSAGE = "Мероприятие должно содержать не менее одного пользователя с ролью Организатор";
     public static final String USER_ROLE_ALREADY_EXISTS_IN_EVENT_MESSAGE = "У пользователя с id %d уже есть роль %s в мероприятии с id %d";
 
-    public static final String USER_NOT_FOUND_MESSAGE = "User not found";
-    public static final String USER_EMAIL_EXIST = "User with this email exists";
-    public static final String USER_PASSWORD_MISMATCH = "Password mismatch";
+    public static final String USER_NOT_FOUND_MESSAGE = "Пользователь не найден";
+    public static final String USER_EMAIL_EXIST = "Пользователь с указанным email уже существует";
+    public static final String USER_PASSWORD_MISMATCH = "Пароли не совпадают";
 
-    public static final String NOTIFICATION_ERROR_MESSAGE = "Notification fetching error, please refresh";
+    public static final String NOTIFICATION_ERROR_MESSAGE = "Ошибка получения уведомления, пожалуйста, обновите страницу";
 
-    public static final String TASK_NOT_FOUND_MESSAGE = "Task not found";
+    public static final String TASK_NOT_FOUND_MESSAGE = "Задача не найдена";
 
-    public static final String REGISTRATION_REQUEST_NOT_FOUND_MESSAGE = "Registration request not found";
-    public static final String REGISTRATION_REQUEST_EMAIL_EXIST = "Registration request with this email exists";
+    public static final String REGISTRATION_REQUEST_NOT_FOUND_MESSAGE = "Заявка на регистрацию не найдена";
+    public static final String REGISTRATION_REQUEST_EMAIL_EXIST = "Заявка на регистрацию с указанным email уже существует";
 
-    public static final String REGISTRATION_REQUEST_NOT_APPROVED = "Registration request not approved";
-
-    public static final String INVALID_TYPE = "Invalid type";
-
+    public static final String INVALID_LOGIN_TYPE = "Неерный тип логина";
 
     private ExceptionConst() {
     }

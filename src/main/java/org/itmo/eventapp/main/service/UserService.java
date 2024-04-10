@@ -75,7 +75,7 @@ public class UserService {
         if (request.type() == LoginType.EMAIL) {
             userLoginInfoService.setEmail(user.getUserLoginInfo(), request.login());
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TYPE);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_LOGIN_TYPE);
         }
     }
 
