@@ -24,7 +24,7 @@ public class TaskReminderTriggerService {
 
     public void createNewReminderTrigger(Task task){
         TaskReminderTrigger taskReminderTrigger = TaskReminderTrigger.builder()
-                .task(task).taskId(task.getId()).triggerTime(task.getReminder()).build();
+                .task(task).triggerTime(task.getReminder()).build();
         taskReminderTriggerRepository.save(taskReminderTrigger);
     }
 }

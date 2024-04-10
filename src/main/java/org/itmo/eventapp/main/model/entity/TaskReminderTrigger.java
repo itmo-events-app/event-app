@@ -15,10 +15,11 @@ import java.time.LocalDateTime;
 @Builder
 public class TaskReminderTrigger {
     @Id
-    private Integer taskId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @PrimaryKeyJoinColumn(name = "task_id")
+    @OneToOne(fetch = FetchType.EAGER , cascade = CascadeType.ALL)
+    @JoinColumn(name = "task_id")
     private Task task;
 
     private LocalDateTime triggerTime;

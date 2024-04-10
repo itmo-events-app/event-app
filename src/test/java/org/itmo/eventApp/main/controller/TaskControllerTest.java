@@ -123,9 +123,9 @@ class TaskControllerTest extends AbstractTestContainers {
         TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(1, deadlineTrigger.getTaskId()),
+            () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
             () -> Assertions.assertEquals(newDeadline, deadlineTrigger.getTriggerTime()),
-            () -> Assertions.assertEquals(1, reminderTrigger.getTaskId()),
+            () -> Assertions.assertEquals(1, reminderTrigger.getId()),
             () -> Assertions.assertEquals(newreminder, reminderTrigger.getTriggerTime())
         );
     }
@@ -265,9 +265,9 @@ class TaskControllerTest extends AbstractTestContainers {
         TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(1, deadlineTrigger.getTaskId()),
+                () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
                 () -> Assertions.assertEquals(newDeadline, deadlineTrigger.getTriggerTime()),
-                () -> Assertions.assertEquals(1, reminderTrigger.getTaskId()),
+                () -> Assertions.assertEquals(1, reminderTrigger.getId()),
                 () -> Assertions.assertEquals(newreminder, reminderTrigger.getTriggerTime())
         );
     }
@@ -375,9 +375,9 @@ class TaskControllerTest extends AbstractTestContainers {
         TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(1, deadlineTrigger.getTaskId()),
+                () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
                 () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", deadlineTrigger.getTriggerTime().toString()),
-                () -> Assertions.assertEquals(1, reminderTrigger.getTaskId()),
+                () -> Assertions.assertEquals(1, reminderTrigger.getId()),
                 () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", reminderTrigger.getTriggerTime().toString())
         );
     }

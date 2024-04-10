@@ -27,7 +27,7 @@ public class TaskDeadlineTriggerService {
 
     public void createNewDeadlineTrigger(Task task){
         TaskDeadlineTrigger taskDeadlineTrigger = TaskDeadlineTrigger.builder()
-                .task(task).taskId(task.getId()).triggerTime(task.getDeadline()).build();
+                .task(task).triggerTime(task.getDeadline()).build();
         taskDeadlineTriggerRepository.save(taskDeadlineTrigger);
     }
 }

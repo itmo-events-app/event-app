@@ -123,11 +123,13 @@ create table if not exists task
 );
 create table if not exists task_deadline_trigger
 (
-    task_id int primary key references task(id),
+    id int generated always as identity primary key not null,
+    task_id int references task(id),
     trigger_time timestamp not null
 );
 create table if not exists task_reminder_trigger
 (
-    task_id int primary key references task(id),
+    id int generated always as identity primary key not null,
+    task_id int references task(id),
     trigger_time timestamp not null
 );
