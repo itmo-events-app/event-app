@@ -209,19 +209,11 @@ class TaskControllerTest extends AbstractTestContainers {
         String taskJson = """
             {
               "eventId": 1,
-              "assignee": {
-                "id": 2,
-                "name": "test2",
-                "surname": "user2"
-              },
+              "assigneeId": 2,
               "title": "UPDATED",
               "description": "upd",
               "taskStatus": "IN_PROGRESS",
-              "place": {
-                "id": 1,
-                "name": "itmo place",
-                "address": "itmo university"
-              },
+              "placeId": 1,
               "deadline": "2025-04-20T21:00:00",
               "notificationDeadline": "2025-04-20T21:00:00"
             }

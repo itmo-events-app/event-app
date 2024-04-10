@@ -51,12 +51,12 @@ public class TaskService {
 
 
         User assignee = null;
-        if (taskRequest.assignee() != null) {
-            assignee = userService.findById(taskRequest.assignee().id());
+        if (taskRequest.assigneeId() != null) {
+            assignee = userService.findById(taskRequest.assigneeId());
         }
         Place place = null;
-        if (taskRequest.place() != null) {
-            place = placeService.findById(taskRequest.place().id());
+        if (taskRequest.placeId() != null) {
+            place = placeService.findById(taskRequest.placeId());
         }
 
         Task newTask = TaskMapper.taskRequestToTask(taskRequest, event, assignee, assigner, place);
@@ -88,13 +88,13 @@ public class TaskService {
         User prevAssignee = task.getAssignee();
 
         User assignee = null;
-        if (taskRequest.assignee() != null) {
-            assignee = userService.findById(taskRequest.assignee().id());
+        if (taskRequest.assigneeId() != null) {
+            assignee = userService.findById(taskRequest.assigneeId());
 
         }
         Place place = null;
-        if (taskRequest.place() != null) {
-            place = placeService.findById(taskRequest.place().id());
+        if (taskRequest.placeId() != null) {
+            place = placeService.findById(taskRequest.placeId());
         }
 
         Task newTaskData = TaskMapper.taskRequestToTask(taskRequest, event, assignee, assigner, place);
