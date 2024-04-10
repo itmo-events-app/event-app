@@ -4,11 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
-import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.Role;
-import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
-import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
+import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.model.mapper.RoleMapper;
 import org.itmo.eventapp.main.repository.EventRoleRepository;
 import org.itmo.eventapp.main.repository.RoleRepository;
@@ -35,16 +33,8 @@ public class RoleService {
     public Role createRole(RoleRequest roleRequest) {
         if (roleRepository.findByName(roleRequest.name()).isPresent())
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.ROLE_EXIST_MESSAGE);
-        Role role = RoleMapper.roleRequestToRole(roleRequest);
-        var privilegeType = roleRequest.isEvent() ? PrivilegeType.EVENT : PrivilegeType.SYSTEM;
-        roleRequest.privileges().stream()
-                .map(privilegeService::findById)
-                .forEach(privilege -> {
-                    if (checkInvalidPrivilegeType(privilege, privilegeType)) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_PRIVILEGE_TYPE);
-                    }
-                    role.addPrivilege(privilege);
-                });
+        var privileges = roleRequest.privileges().stream().map(privilegeService::findById);
+        Role role = RoleMapper.roleRequestToRole(roleRequest, privileges);
         return roleRepository.save(role);
     }
 
@@ -61,15 +51,8 @@ public class RoleService {
         editedRole.setDescription(roleRequest.description());
         editedRole.setType(roleRequest.isEvent() ? RoleType.EVENT : RoleType.SYSTEM);
         editedRole.setPrivileges(new HashSet<>());
-        var privilegeType = roleRequest.isEvent() ? PrivilegeType.EVENT : PrivilegeType.SYSTEM;
-        roleRequest.privileges().stream()
-                .map(privilegeService::findById)
-                .forEach(privilege -> {
-                    if (checkInvalidPrivilegeType(privilege, privilegeType)) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_PRIVILEGE_TYPE);
-                    }
-                    editedRole.addPrivilege(privilege);
-                });
+        var privileges = roleRequest.privileges().stream().map(privilegeService::findById);
+        editedRole.setPrivileges(PrivilegeMapper.privilegeStreamToPrivilegeSet(privileges, roleRequest.isEvent()));
         return roleRepository.save(editedRole);
     }
 
@@ -88,13 +71,6 @@ public class RoleService {
         }
         role.setPrivileges(null);
         roleRepository.deleteById(id);
-    }
-
-    private boolean checkInvalidPrivilegeType(Privilege privilege, PrivilegeType type) {
-        if (!privilege.getName().equals(PrivilegeName.ASSIGN_ORGANIZER_ROLE)) {
-            return !privilege.getType().equals(type);
-        }
-        return false;
     }
 
     public List<Role> getAll() {
