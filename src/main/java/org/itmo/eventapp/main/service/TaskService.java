@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -36,11 +37,14 @@ public class TaskService {
     private final PlaceService placeService;
     private final TaskRepository taskRepository;
     private final TaskNotificationUtils taskNotificationUtils;
+    private final TaskReminderTriggerService taskReminderTriggerService;
+    private final TaskDeadlineTriggerService taskDeadlineTriggerService;
 
     public Task findById(int id) {
         return taskRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
     }
 
+    @Transactional
     public Task save(TaskRequest taskRequest) {
 
         Event event = eventService.findById(taskRequest.eventId());
@@ -73,11 +77,14 @@ public class TaskService {
 
         if (assignee != null) {
             taskNotificationUtils.createIncomingTaskNotification(newTask);
+            taskDeadlineTriggerService.createNewDeadlineTrigger(newTask);
+            taskReminderTriggerService.createNewReminderTrigger(newTask);
         }
 
         return newTask;
     }
 
+    @Transactional
     public Task edit(Integer id, TaskRequest taskRequest) {
 
         Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
@@ -109,6 +116,8 @@ public class TaskService {
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(newTaskData);
+            taskDeadlineTriggerService.createNewDeadlineTrigger(newTaskData);
+            taskReminderTriggerService.createNewReminderTrigger(newTaskData);
 
         }
 
@@ -119,7 +128,7 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-
+    @Transactional
     public Task setAssignee(Integer taskId, Integer assigneeId) {
 
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
@@ -137,6 +146,8 @@ public class TaskService {
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(task);
+            taskDeadlineTriggerService.createNewDeadlineTrigger(task);
+            taskReminderTriggerService.createNewReminderTrigger(task);
 
         }
 
@@ -188,7 +199,7 @@ public class TaskService {
             newTask.setAssigner(task.getAssigner());
             newTask.setAssignee(null);
             newTask.setDeadline(task.getDeadline());
-            newTask.setNotificationDeadline(task.getNotificationDeadline());
+            newTask.setReminder(task.getReminder());
 
             newTask.setCreationTime(LocalDateTime.now());
             TaskStatus status = TaskStatus.NEW;
@@ -271,14 +282,6 @@ public class TaskService {
                         deadlineLowerLimit,
                         deadlineUpperLimit);
         return taskRepository.findAll(taskSpecification, pageRequest);
-    }
-
-    public List<Task> getTasksWithDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByDeadlineBetween(startTime, endTime);
-    }
-
-    public List<Task> getTasksWithNotificationDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByNotificationDeadlineBetween(startTime, endTime);
     }
 
 }

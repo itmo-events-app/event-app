@@ -47,7 +47,7 @@ public class NotificationController {
     public ResponseEntity<List<NotificationResponse>> getAllNotifications(
             @AuthenticationPrincipal UserLoginInfo userDetails,
             @RequestParam(name = "page") @Min(0) @Parameter(name = "page", description = "Номер страницы, с которой начать показ уведомлений", example = "0") Integer page,
-            @RequestParam(name = "size") @Min(1) @Max(25) @Parameter(name = "size", description = "Число мероприятий на странице", example = "15") Integer size
+            @RequestParam(name = "size") @Min(1) @Max(25) @Parameter(name = "size", description = "Число уведомлений на странице", example = "15") Integer size
     ) {
         List<Notification> notifications = notificationService.getAllByUserId(userDetails.getUser().getId(), page, size);
         List<NotificationResponse> responseBody = new ArrayList<>();
@@ -62,7 +62,7 @@ public class NotificationController {
     public ResponseEntity<List<NotificationResponse>> setAllAsSeenNotifications(
             @AuthenticationPrincipal UserLoginInfo userDetails,
             @RequestParam(name = "page") @Min(0) @Parameter(name = "page", description = "Номер страницы, с которой начать показ уведомлений", example = "0") Integer page,
-            @RequestParam(name = "size") @Min(1) @Max(25) @Parameter(name = "size", description = "Число мероприятий на странице", example = "15") Integer size
+            @RequestParam(name = "size") @Min(1) @Max(25) @Parameter(name = "size", description = "Число уведомлений на странице", example = "15") Integer size
     ) {
 
         List<Notification> notifications = notificationService.updateSeenToAllByUserId(userDetails.getUser().getId(), page, size);

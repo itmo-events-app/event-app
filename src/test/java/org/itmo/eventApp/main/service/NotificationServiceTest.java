@@ -87,8 +87,9 @@ class NotificationServiceTest extends AbstractTestContainers {
         String title = "TestTitle";
         String description = "TestDescription";
         Integer notificationId = 5;
+        String link = "http://localhost:8080/task/1";
 
-        notificationService.createNotification(title, description, userId);
+        notificationService.createNotification(title, description, userId, link);
 
         Notification afterCreate = notificationRepository.findById(notificationId).get();
 
@@ -98,6 +99,7 @@ class NotificationServiceTest extends AbstractTestContainers {
         assertEquals(description, afterCreate.getDescription());
         assertFalse(afterCreate.isSeen());
         assertNotNull(afterCreate.getSentTime());
+        assertEquals(link, afterCreate.getLink());
     }
 
     @Test
