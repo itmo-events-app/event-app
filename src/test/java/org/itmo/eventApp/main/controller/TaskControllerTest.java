@@ -1,9 +1,9 @@
 package org.itmo.eventApp.main.controller;
 
-import org.itmo.eventapp.main.model.entity.Task;
-import org.itmo.eventapp.main.model.entity.User;
-import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
+import org.itmo.eventapp.main.repository.TaskDeadlineTriggerRepository;
+import org.itmo.eventapp.main.repository.TaskReminderTriggerRepository;
 import org.itmo.eventapp.main.repository.TaskRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,6 +21,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TaskControllerTest extends AbstractTestContainers {
     @Autowired
     TaskRepository taskRepository;
+
+    @Autowired
+    TaskDeadlineTriggerRepository taskDeadlineTriggerRepository;
+
+    @Autowired
+    TaskReminderTriggerRepository taskReminderTriggerRepository;
 
     private UserLoginInfo getUserLoginInfo() {
         UserLoginInfo userDetails = new UserLoginInfo();
@@ -60,7 +66,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
 
@@ -101,7 +107,7 @@ class TaskControllerTest extends AbstractTestContainers {
         String newDescription = "created";
         TaskStatus newStatus = TaskStatus.NEW;
         LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+        LocalDateTime newreminder = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
         Integer assigneeId = 1;
         Integer assignerId = 1;
 
@@ -111,9 +117,19 @@ class TaskControllerTest extends AbstractTestContainers {
             () -> Assertions.assertEquals(newStatus, task.getStatus()),
             () -> Assertions.assertNull(task.getPlace()),
             () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
-            () -> Assertions.assertEquals(newNotificationDeadline, task.getNotificationDeadline()),
+            () -> Assertions.assertEquals(newreminder, task.getReminder()),
             () -> Assertions.assertEquals(assigneeId, task.getAssignee().getId()),
             () -> Assertions.assertEquals(assignerId, task.getAssigner().getId())
+        );
+
+        TaskDeadlineTrigger deadlineTrigger = taskDeadlineTriggerRepository.findById(1).orElseThrow();
+        TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
+            () -> Assertions.assertEquals(newDeadline, deadlineTrigger.getTriggerTime()),
+            () -> Assertions.assertEquals(1, reminderTrigger.getId()),
+            () -> Assertions.assertEquals(newreminder, reminderTrigger.getTriggerTime())
         );
     }
 
@@ -138,11 +154,11 @@ class TaskControllerTest extends AbstractTestContainers {
         Task task = taskRepository.findById(1).orElseThrow();
 
         LocalDateTime newDeadline = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
+        LocalDateTime newreminder = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
 
         Assertions.assertAll(
             () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
-            () -> Assertions.assertEquals(newNotificationDeadline, task.getNotificationDeadline()),
+            () -> Assertions.assertEquals(newreminder, task.getReminder()),
             () -> Assertions.assertEquals(TaskStatus.EXPIRED, task.getStatus())
         );
     }
@@ -202,28 +218,20 @@ class TaskControllerTest extends AbstractTestContainers {
         String newDescription = "upd";
         TaskStatus newStatus = TaskStatus.IN_PROGRESS;
         LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
-        LocalDateTime newNotificationDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+        LocalDateTime newreminder = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
         Integer assigneeId = 2;
         Integer placeId = 1;
 
         String taskJson = """
             {
               "eventId": 1,
-              "assignee": {
-                "id": 2,
-                "name": "test2",
-                "surname": "user2"
-              },
+              "assigneeId": 2,
               "title": "UPDATED",
               "description": "upd",
               "taskStatus": "IN_PROGRESS",
-              "place": {
-                "id": 1,
-                "name": "itmo place",
-                "address": "itmo university"
-              },
+              "placeId": 1,
               "deadline": "2025-04-20T21:00:00",
-              "notificationDeadline": "2025-04-20T21:00:00"
+              "reminder": "2025-04-20T21:00:00"
             }
             """;
 
@@ -239,13 +247,23 @@ class TaskControllerTest extends AbstractTestContainers {
             () -> Assertions.assertEquals(newDescription, edited.getDescription()),
             () -> Assertions.assertEquals(newStatus, edited.getStatus()),
             () -> Assertions.assertEquals(newDeadline, edited.getDeadline()),
-            () -> Assertions.assertEquals(newNotificationDeadline, edited.getNotificationDeadline()),
+            () -> Assertions.assertEquals(newreminder, edited.getReminder()),
             () -> Assertions.assertEquals(assigneeId, edited.getAssignee().getId()),
             () -> {
                 Assertions.assertNotNull(edited.getPlace());
                 Assertions.assertEquals(placeId, edited.getPlace().getId());
             }
 
+        );
+
+        TaskDeadlineTrigger deadlineTrigger = taskDeadlineTriggerRepository.findById(1).orElseThrow();
+        TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
+                () -> Assertions.assertEquals(newDeadline, deadlineTrigger.getTriggerTime()),
+                () -> Assertions.assertEquals(1, reminderTrigger.getId()),
+                () -> Assertions.assertEquals(newreminder, reminderTrigger.getTriggerTime())
         );
     }
 
@@ -335,7 +353,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
 
@@ -348,6 +366,15 @@ class TaskControllerTest extends AbstractTestContainers {
 
         Assertions.assertEquals(2, edited.getAssignee().getId());
 
+        TaskDeadlineTrigger deadlineTrigger = taskDeadlineTriggerRepository.findById(1).orElseThrow();
+        TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
+                () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", deadlineTrigger.getTriggerTime().toString()),
+                () -> Assertions.assertEquals(1, reminderTrigger.getId()),
+                () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", reminderTrigger.getTriggerTime().toString())
+        );
     }
 
 
@@ -393,7 +420,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
 
@@ -437,7 +464,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
 
@@ -510,7 +537,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }]
             """;
 
@@ -612,7 +639,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2024-03-10T21:32:23.536819",
               "deadline": "2024-03-30T21:32:23.536819",
-              "notificationDeadline": "2024-03-30T21:32:23.536819"
+              "reminder": "2024-03-30T21:32:23.536819"
             }]
             """;
 
@@ -700,7 +727,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }]
             """;
 
@@ -778,7 +805,7 @@ class TaskControllerTest extends AbstractTestContainers {
               },
               "creationTime": "2025-03-10T21:32:23.536819",
               "deadline": "2025-03-30T21:32:23.536819",
-              "notificationDeadline": "2025-03-30T21:32:23.536819"
+              "reminder": "2025-03-30T21:32:23.536819"
             }]
             """;
 

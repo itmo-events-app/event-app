@@ -14,6 +14,7 @@ public final class NotificationMapper {
                 notification.getTitle(),
                 notification.getDescription(),
                 notification.isSeen(),
-                notification.getSentTime());
+                notification.getSentTime(),
+                notification.getLink());
     }
 }

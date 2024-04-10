@@ -24,7 +24,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserService userService;
 
-    public void createNotification(String title, String description, Integer userId) {
+    public void createNotification(String title, String description, Integer userId, String link) {
         User user;
         try {
             user = userService.findById(userId);
@@ -38,6 +38,7 @@ public class NotificationService {
                 .description(description)
                 .seen(false)
                 .sentTime(LocalDateTime.now())
+                .link(link)
                 .build());
     }
 
