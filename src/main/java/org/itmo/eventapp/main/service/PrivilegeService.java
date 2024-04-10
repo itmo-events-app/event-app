@@ -23,7 +23,7 @@ public class PrivilegeService {
                         ExceptionConst.PRIVILEGE_ID_NOT_FOUND_MESSAGE.formatted(id)));
     }
 
-    public List<Privilege> getPrivilegeByType(PrivilegeType type) {
+    private List<Privilege> getPrivilegesByType(PrivilegeType type) {
         List<Privilege> privileges = privilegeRepository.findAllByType(type);
         if (type.equals(PrivilegeType.SYSTEM)) {
             var assignOrganizerPrivilege = privilegeRepository.findByName(PrivilegeName.ASSIGN_ORGANIZER_ROLE);
@@ -32,7 +32,15 @@ public class PrivilegeService {
         return privileges;
     }
 
-    public List<Privilege> getAll() {
+    private List<Privilege> getAll() {
         return privilegeRepository.findAll();
+    }
+
+    public List<Privilege> getPrivileges(PrivilegeType type) {
+        if (type == null) {
+            return getAll();
+        } else {
+            return getPrivilegesByType(type);
+        }
     }
 }

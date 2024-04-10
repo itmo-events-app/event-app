@@ -107,25 +107,12 @@ public class RoleController {
         return ResponseEntity.ok(RoleMapper.roleToRoleResponse(roleService.editRole(id, roleRequest)));
     }
 
-    @Operation(summary = "Получение списка всех привилегий")
+    @Operation(summary = "Получение списка привилегий")
     @PreAuthorize("@roleSecurityExpression.canCreateRole() or @roleSecurityExpression.canEditRole()")
     @GetMapping("/privileges")
-    public ResponseEntity<List<PrivilegeResponse>> getAllPrivileges() {
-        return ResponseEntity.ok(PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeService.getAll()));
-    }
-
-    @Operation(summary = "Получение списка системных привилегий")
-    @PreAuthorize("@roleSecurityExpression.canCreateRole() or @roleSecurityExpression.canEditRole()")
-    @GetMapping("/system-privileges")
-    public ResponseEntity<List<PrivilegeResponse>> getSystemPrivileges() {
-        return ResponseEntity.ok(PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeService.getPrivilegeByType(PrivilegeType.SYSTEM)));
-    }
-
-    @Operation(summary = "Получение списка организационных привилегий")
-    @PreAuthorize("@roleSecurityExpression.canCreateRole() or @roleSecurityExpression.canEditRole()")
-    @GetMapping("/organizational-privileges")
-    public ResponseEntity<List<PrivilegeResponse>> getOrganizationalPrivileges() {
-        return ResponseEntity.ok(PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeService.getPrivilegeByType(PrivilegeType.EVENT)));
+    public ResponseEntity<List<PrivilegeResponse>> getAllPrivileges(
+            @Parameter(name = "type", description = "Тип привилегии", example = "SYSTEM") @RequestParam(required = false) PrivilegeType type) {
+        return ResponseEntity.ok(PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeService.getPrivileges(type)));
     }
 
     @Operation(summary = "Назначение пользователю организационной роли")
