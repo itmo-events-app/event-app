@@ -43,7 +43,7 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
 
         UserChangeNameRequest request = new UserChangeNameRequest("Кодзима", "Гений");
-        mockMvc.perform(put("/api/profile/change-name")
+        mockMvc.perform(put("/api/profile/name")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -61,7 +61,7 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
 
         UserChangePasswordRequest request = new UserChangePasswordRequest("old123passwordNEW!", "123passwordNEW!", "123passwordNEW!");
-        mockMvc.perform(put("/api/profile/change-password")
+        mockMvc.perform(put("/api/profile/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -73,7 +73,7 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
 
         UserChangePasswordRequest request = new UserChangePasswordRequest("oldPassword", "123passwordNEW123!", "123passwordNEW321!");
-        mockMvc.perform(put("/api/profile/change-password")
+        mockMvc.perform(put("/api/profile/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -85,7 +85,7 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
 
         UserChangeLoginRequest request = new UserChangeLoginRequest("newEmail@itmo.ru", LoginType.EMAIL);
-        mockMvc.perform(put("/api/profile/change-login")
+        mockMvc.perform(put("/api/profile/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -104,7 +104,7 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_3.sql");
 
         UserChangeLoginRequest request = new UserChangeLoginRequest("test_mail3@itmo.ru", LoginType.EMAIL);
-        mockMvc.perform(put("/api/profile/change-login")
+        mockMvc.perform(put("/api/profile/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isConflict());

@@ -1,14 +1,10 @@
 {
   "eventId": 100000,
-  "assignee": {
-    "id": 1,
-    "name": "test",
-    "surname": "user"
-  },
+  "assigneeId": 1,
   "title": "CREATED",
   "description": "created",
   "taskStatus": "NEW",
-  "place": null,
+  "placeId": null,
   "deadline": "2025-04-20T21:00:00",
   "reminder": "2025-04-20T21:00:00"
 }

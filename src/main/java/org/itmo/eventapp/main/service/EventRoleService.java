@@ -7,6 +7,7 @@ import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
+import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.repository.EventRoleRepository;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -84,9 +86,15 @@ public class EventRoleService {
     }
 
     public Set<Privilege> getUserEventPrivileges(Integer userId, Integer eventId) {
-        EventRole eventRole = eventRoleRepository.findByUserIdAndEventId(userId, eventId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_ROLE_NOT_FOUND_MESSAGE));
-        return eventRole.getRole().getPrivileges();
+        List<EventRole> eventRoles = eventRoleRepository.findByUserIdAndEventId(userId, eventId);
+        if (eventRoles.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_ROLE_NOT_FOUND_MESSAGE);
+        }
+        Set<Privilege> privileges = new HashSet<>();
+        eventRoles.stream()
+                .map(it -> it.getRole().getPrivileges())
+                .forEach(privileges::addAll);
+        return privileges;
     }
 
     EventRole save(EventRole eventRole) {
@@ -112,8 +120,7 @@ public class EventRoleService {
         eventRoleRepository.deleteByEventId(eventId);
     }
 
-    EventRole findByUserIdAndEventId(Integer userId, Integer eventId) {
-        return eventRoleRepository.findByUserIdAndEventId(userId, eventId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
+    public List<Event> getEventsByRole(Integer userId, Integer roleId){
+        return EventMapper.eventRolesToEvents(eventRoleRepository.findAllByUserIdAndRoleId(userId, roleId));
     }
 }
