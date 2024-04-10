@@ -13,6 +13,7 @@ import org.itmo.eventapp.main.model.mapper.PlaceMapper;
 import org.itmo.eventapp.main.service.PlaceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,16 +42,16 @@ public class PlaceController {
         return ResponseEntity.ok().body(PlaceMapper.placeToPlaceResponse(placeService.findById(id)));
     }
 
-    // TODO: Add privilege validation
     @Operation(summary = "Создание площадки")
+    @PreAuthorize("@placeSecurityExpression.canCreatePlace()")
     @PostMapping
     public ResponseEntity<Integer> placeAdd(@Valid @RequestBody PlaceRequest placeRequest) {
         Place place = placeService.save(PlaceMapper.placeRequestToPlace(placeRequest));
         return ResponseEntity.status(HttpStatus.CREATED).body(place.getId());
     }
 
-    // TODO: Add privilege validation
     @Operation(summary = "Редактирование площадки")
+    @PreAuthorize("@placeSecurityExpression.canEditPlace()")
     @PutMapping("/{id}")
     public ResponseEntity<PlaceResponse> placeEdit(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                    @PathVariable @Parameter(name = "id", description = "ID площадки", example = "1") Integer id,
@@ -61,6 +62,7 @@ public class PlaceController {
 
     // TODO: Add privilege validation
     @Operation(summary = "Удаление площадки")
+    @PreAuthorize("@placeSecurityExpression.canDeletePlace()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> placeDelete(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                             @PathVariable @Parameter(name = "id", description = "ID площадки", example = "1") Integer id) {

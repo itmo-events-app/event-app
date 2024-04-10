@@ -2,6 +2,8 @@ package org.itmo.eventApp.main.controller;
 
 
 import org.itmo.eventapp.main.model.entity.Place;
+import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.repository.PlaceRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,6 +29,23 @@ class PlaceControllerTest extends AbstractTestContainers {
     @AfterEach
     public void cleanUp() {
         executeSqlScript("/sql/clean_tables.sql");
+    }
+
+    private UserLoginInfo getUserLoginInfo() {
+        UserLoginInfo userDetails = new UserLoginInfo();
+        userDetails.setLogin("test_mail@itmo.ru");
+        User dummyUser = new User();
+        dummyUser.setId(1);
+        userDetails.setUser(dummyUser);
+        return userDetails;
+    }
+
+    private void setUpUserData() {
+        executeSqlScript("/sql/insert_user.sql");
+    }
+
+    private void setUpEventData() {
+        executeSqlScript("/sql/insert_event.sql");
     }
 
     @Test
@@ -86,6 +106,8 @@ class PlaceControllerTest extends AbstractTestContainers {
 
     @Test
     void placeAddTest() throws Exception {
+        setUpUserData();
+
         String name = "name";
         String address = "address";
         String format = "ONLINE";
@@ -108,7 +130,8 @@ class PlaceControllerTest extends AbstractTestContainers {
 
         mockMvc.perform(post("/api/places")
                         .content(taskJson)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isCreated())
                 .andExpect(content().string(containsString("1")));
 
@@ -127,6 +150,8 @@ class PlaceControllerTest extends AbstractTestContainers {
 
     @Test
     void placeAddInvalidTest() throws Exception {
+        setUpUserData();
+
         String taskJson = """
                 {
                   "longitude": 10000
@@ -134,12 +159,14 @@ class PlaceControllerTest extends AbstractTestContainers {
 
         mockMvc.perform(post("/api/tasks")
                         .content(taskJson)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void taskEditTest() throws Exception {
+    void placeEditTest() throws Exception {
+        setUpUserData();
         executeSqlScript("/sql/insert_place.sql");
         String name = "name";
         String address = "address";
@@ -149,7 +176,7 @@ class PlaceControllerTest extends AbstractTestContainers {
         float longitude = 100.2f;
         float latitude = 50.3f;
 
-        String taskJson = """
+        String placeJson = """
                 {
                     "name": "name",
                     "address": "address",
@@ -162,8 +189,9 @@ class PlaceControllerTest extends AbstractTestContainers {
                 """;
 
         mockMvc.perform(put("/api/places/1")
-                        .content(taskJson)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .content(placeJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk());
 
         Place place = placeRepository.findById(1).orElseThrow();
@@ -181,6 +209,8 @@ class PlaceControllerTest extends AbstractTestContainers {
 
     @Test
     void placeEditInvalidTest() throws Exception {
+        setUpUserData();
+        
         executeSqlScript("/sql/insert_place.sql");
         Place notEdited = placeRepository.findById(1).orElseThrow();
         String taskJson = """
@@ -191,7 +221,8 @@ class PlaceControllerTest extends AbstractTestContainers {
 
         mockMvc.perform(put("/api/places/1")
                         .content(taskJson)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isBadRequest());
 
         Place place = placeRepository.findById(1).orElseThrow();
@@ -208,11 +239,14 @@ class PlaceControllerTest extends AbstractTestContainers {
 
     @Test
     void placeDeleteTest() throws Exception {
+        setUpUserData();
+
         executeSqlScript("/sql/insert_place.sql");
 
         Assertions.assertTrue(placeRepository.findById(1).isPresent());
 
-        mockMvc.perform(delete("/api/places/1"))
+        mockMvc.perform(delete("/api/places/1")
+                        .with(user(getUserLoginInfo())))
                 .andExpect(status().isNoContent());
 
         Assertions.assertFalse(placeRepository.findById(1).isPresent());
