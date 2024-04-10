@@ -31,4 +31,6 @@ public class Notification {
     private boolean seen;
 
     private LocalDateTime sentTime;
+
+    private String link;
 }

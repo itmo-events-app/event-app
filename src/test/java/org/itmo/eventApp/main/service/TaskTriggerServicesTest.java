@@ -1,10 +1,12 @@
 package org.itmo.eventApp.main.service;
 
 import org.itmo.eventApp.main.controller.AbstractTestContainers;
+import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.TaskDeadlineTrigger;
 import org.itmo.eventapp.main.model.entity.TaskReminderTrigger;
 import org.itmo.eventapp.main.repository.TaskDeadlineTriggerRepository;
 import org.itmo.eventapp.main.repository.TaskReminderTriggerRepository;
+import org.itmo.eventapp.main.repository.TaskRepository;
 import org.itmo.eventapp.main.service.TaskDeadlineTriggerService;
 import org.itmo.eventapp.main.service.TaskReminderTriggerService;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,9 @@ public class TaskTriggerServicesTest extends AbstractTestContainers {
     @Autowired
     private TaskDeadlineTriggerRepository taskDeadlineTriggerRepository;
 
+    @Autowired
+    private TaskRepository taskRepository;
+
 
     private void databaseFilling(){
         executeSqlScript("/sql/insert_user.sql");
@@ -49,6 +54,10 @@ public class TaskTriggerServicesTest extends AbstractTestContainers {
         taskDeadlineTriggerService.updateAndRetrieveTaskOnDeadline(triggerTime);
         List<TaskDeadlineTrigger> triggers = taskDeadlineTriggerRepository.findAll();
         assertTrue(triggers.isEmpty());
+        assertDoesNotThrow(() -> {
+            taskRepository.findById(1).orElseThrow();
+            taskRepository.findById(2).orElseThrow();}
+        );
     }
 
     @Test
@@ -58,5 +67,9 @@ public class TaskTriggerServicesTest extends AbstractTestContainers {
         taskReminderTriggerService.retrieveTasksOnReminder(triggerTime);
         List<TaskReminderTrigger> triggers = taskReminderTriggerRepository.findAll();
         assertTrue(triggers.isEmpty());
+        assertDoesNotThrow(() -> {
+            taskRepository.findById(1).orElseThrow();
+            taskRepository.findById(2).orElseThrow();}
+        );
     }
 }

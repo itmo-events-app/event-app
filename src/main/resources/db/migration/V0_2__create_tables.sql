@@ -59,7 +59,8 @@ create table if not exists notification(
     title varchar(256) not null,
     description text not null ,
     seen boolean not null default FALSE,
-    sent_time timestamp not null
+    sent_time timestamp not null,
+    link text
 );
 create table if not exists place
 (
