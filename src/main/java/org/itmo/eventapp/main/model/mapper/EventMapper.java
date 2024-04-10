@@ -2,6 +2,7 @@ package org.itmo.eventapp.main.model.mapper;
 
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
+import org.itmo.eventapp.main.model.dto.response.EventShortDataResponse;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Place;
@@ -33,6 +34,24 @@ public final class EventMapper {
                 event.getParticipantAgeHighest(),
                 event.getPreparingStart(),
                 event.getPreparingEnd()
+        );
+    }
+
+    public static EventShortDataResponse eventToEventShortDataResponse(Event event) {
+        boolean isActivity = event.getParent() != null;
+        if (isActivity) {
+            return new EventShortDataResponse(
+                    event.getParent().getId(),
+                    event.getId(),
+                    event.getParent().getTitle(),
+                    event.getTitle()
+            );
+        }
+        return new EventShortDataResponse(
+                event.getId(),
+                null,
+                event.getTitle(),
+                null
         );
     }
 
