@@ -28,7 +28,7 @@ public class ExceptionConst {
 
     public static final String USER_NOT_FOUND_MESSAGE = "Пользователь не найден";
     public static final String USER_EMAIL_EXIST = "Пользователь с указанным email уже существует";
-    public static final String USER_PASSWORD_MISMATCH = "Пароли не совпадают";
+    public static final String USER_PASSWORD_MISMATCH_MESSAGE = "Пароли не совпадают";
 
     public static final String NOTIFICATION_ERROR_MESSAGE = "Ошибка получения уведомления, пожалуйста, обновите страницу";
 

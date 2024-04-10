@@ -6,8 +6,6 @@ import org.itmo.eventapp.main.model.dto.request.NotificationSettingsRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
-import org.itmo.eventapp.main.model.dto.response.ProfileResponse;
-import org.itmo.eventapp.main.model.dto.response.UserInfoResponse;
 import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserNotificationInfo;
@@ -17,9 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -84,7 +79,7 @@ public class UserService {
 
         // Проверяем, что новый пароль совпадает с подтверждением
         if (!request.newPassword().equals(request.confirmNewPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.USER_PASSWORD_MISMATCH);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.USER_PASSWORD_MISMATCH_MESSAGE);
         }
 
         userLoginInfoService.setPassword(user.getUserLoginInfo(), request.newPassword());
