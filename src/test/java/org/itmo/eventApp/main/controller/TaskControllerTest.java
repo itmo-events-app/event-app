@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 
@@ -79,6 +80,7 @@ class TaskControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void taskAddTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -90,8 +92,7 @@ class TaskControllerTest extends AbstractTestContainers {
 
         mockMvc.perform(post("/api/tasks")
                 .content(taskJson)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token))
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is(201))
             .andExpect(content().string(containsString("1")));
 
@@ -119,6 +120,7 @@ class TaskControllerTest extends AbstractTestContainers {
 
 
     @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
     void taskAddExpiredTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -130,8 +132,7 @@ class TaskControllerTest extends AbstractTestContainers {
 
         mockMvc.perform(post("/api/tasks")
                 .content(taskJson)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token))
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is(201))
             .andExpect(content().string(containsString("1")));
 
@@ -190,6 +191,7 @@ class TaskControllerTest extends AbstractTestContainers {
     }*/
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void taskEditTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
@@ -221,8 +223,7 @@ class TaskControllerTest extends AbstractTestContainers {
 
         mockMvc.perform(put("/api/tasks/1")
                 .content(taskJson)
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(user(getUserLoginInfo())))
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
 
         Task edited = taskRepository.findById(1).orElseThrow();

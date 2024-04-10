@@ -6,6 +6,7 @@ import io.minio.errors.ErrorResponseException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,15 +18,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class TestControllerTest extends AbstractTestContainers {
     @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
     void sayHelloTest() throws Exception {
+
+        executeSqlScript("/sql/insert_user.sql");
+
         mockMvc.perform(get("/hello").param("s", "test"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Hello, test!")));
     }
 
     @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
     void uploadTest() throws Exception {
         String originalFilename = "upload-test";
+
+        executeSqlScript("/sql/insert_user.sql");
 
         // name should be multipartFile as param name
         MockMultipartFile jsonFile = new MockMultipartFile(
@@ -48,7 +56,11 @@ class TestControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
     void deleteTest() throws Exception {
+
+        executeSqlScript("/sql/insert_user.sql");
+
         String originalFilename = "upload-test";
 
         // name should be multipartFile as param name

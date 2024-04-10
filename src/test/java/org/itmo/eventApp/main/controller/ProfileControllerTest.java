@@ -160,6 +160,7 @@ class ProfileControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
     void testGetUserEventPrivileges() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         UserLoginInfo userLoginInfo = getUserLoginInfo();
