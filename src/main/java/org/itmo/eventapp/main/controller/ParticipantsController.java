@@ -10,12 +10,14 @@ import org.itmo.eventapp.main.model.dto.response.ParticipantResponse;
 import org.itmo.eventapp.main.model.entity.Participant;
 import org.itmo.eventapp.main.model.mapper.ParticipantMapper;
 import org.itmo.eventapp.main.service.ParticipantsService;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -45,8 +47,10 @@ public class ParticipantsController {
     }
 
     @GetMapping("/xlsxExport")
-    public ResponseEntity<MultipartFile> getParticipantsXlsxFile(@PathVariable("id") Integer id) throws IOException {
-        MultipartFile participants = participantsService.getParticipantsXlsx(id);
-        return ResponseEntity.ok().body(participants);
+    @ResponseBody
+    public ResponseEntity<FileSystemResource> getParticipantsXlsxFile(@PathVariable("id") Integer id) throws IOException {
+        File participants = participantsService.getParticipantsXlsx(id);
+        return ResponseEntity.ok().body(new FileSystemResource(participants));
     }
+
 }

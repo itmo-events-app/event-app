@@ -1,36 +1,31 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.ParticipantPresenceRequest;
 import org.itmo.eventapp.main.model.dto.request.ParticipantsListRequest;
 import org.itmo.eventapp.main.model.entity.Participant;
 import org.itmo.eventapp.main.repository.ParticipantsRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
 public class ParticipantsService {
     private final ParticipantsRepository participantsRepository;
     private final EventService eventService;
+    private final MinioService minioService;
+    private static final String BUCKET_NAME = "event-participants";
+
     public List<Participant> getParticipants(Integer id) {
         return participantsRepository.findAllByEvent(eventService.findById(id));
     }
@@ -43,9 +38,10 @@ public class ParticipantsService {
     }
 
     public List<Participant> setParticipants(Integer eventId, ParticipantsListRequest participantsListRequest) throws IOException {
-        File list = new File("D:/eventapptest/participants.xlsx");
-        savetoMinio(list);
-        Workbook workbook = new XSSFWorkbook(new FileInputStream(list));
+        //File list = new File("D:/eventapptest/participants.xlsx");
+        savetoMinio(participantsListRequest.participantsListFile(), eventId);
+        InputStream list = participantsListRequest.participantsListFile().getInputStream();
+        Workbook workbook = new XSSFWorkbook(list);
         Sheet excelSheet = workbook.getSheetAt(0);
         List<Map<String, Object>> data = new ArrayList<>();
 
@@ -95,11 +91,14 @@ public class ParticipantsService {
         return participants;
     }
 
-    private void savetoMinio(File file){
-
+    private void savetoMinio(MultipartFile file, Integer id){
+        if (!Objects.isNull(file)) {
+            String modifiedFileName = id.toString() + "." + FilenameUtils.getExtension(file.getName());
+            minioService.uploadWithModifiedFileName(file, BUCKET_NAME, modifiedFileName);
+        }
     }
 
-    public MultipartFile getParticipantsXlsx(Integer eventId) throws IOException {
+    public File getParticipantsXlsx(Integer eventId) throws IOException {
         List<Participant> participants = getParticipants(eventId);
         Workbook book = new XSSFWorkbook();
         Sheet sheet = book.createSheet("Участники");
@@ -142,16 +141,13 @@ public class ParticipantsService {
             index++;
         }
 
-        File list = new File("D:/eventapptest/ListOfParticipants.xlsx");
+        File list = new File("/ListOfParticipants.xlsx");
 
         FileOutputStream outputStream = new FileOutputStream(list);
         book.write(outputStream);
         book.close();
 
-        File file = new File("");
-        MultipartFile multipartFile = new CommonsMultipartFile(new DiskFileItem("file", Files.probeContentType(file.toPath()),
-                false, file.getName(), (int) file.length(), file.getParentFile()));
-        return multipartFile;
+        return list;
 
     }
 
