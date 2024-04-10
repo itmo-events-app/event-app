@@ -61,7 +61,7 @@ public class AuthenticationService {
             return jwtTokenUtil.generateToken(loginRequest.login());
         }
         catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка аутентификации.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE);
         }
     }
 
