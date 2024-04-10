@@ -74,7 +74,7 @@ public class MailSenderServiceImpl implements MailSenderService{
 
     @Async
     @Override
-    public void sendRecoveryPasswordMessage(String userEmail, String url) throws MessagingException, IOException {
+    public void sendRecoveryPasswordMessage(String userEmail, String userName, String url) throws MessagingException, IOException {
         String subject = "Восстановление пароля";
         String templatePath = "notification/email-templates/recovery-password.html";
         mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getRecoveryPasswordTemplateFields(url)));

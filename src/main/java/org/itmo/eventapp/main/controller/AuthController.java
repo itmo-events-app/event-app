@@ -12,8 +12,10 @@ import java.util.List;
 
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.NewPasswordRequest;
+import org.itmo.eventapp.main.model.dto.request.RecoveryPasswordRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
+import org.itmo.eventapp.main.model.validation.annotation.ValidLogin;
 import org.itmo.eventapp.main.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,8 +65,8 @@ public class AuthController {
     }
 
     @PostMapping("/recoveryPassword")
-    ResponseEntity<Void> recoveryPassword(@RequestBody String email, @RequestParam("returnUrl") String returnUrl) {
-        authenticationService.recoverPassword(email, returnUrl);
+    ResponseEntity<Void> recoveryPassword(@Valid @RequestBody RecoveryPasswordRequest request) {
+        authenticationService.recoverPassword(request.email(), request.returnUrl());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

@@ -178,7 +178,7 @@ public class AuthenticationService {
         String url = returnUrl + "?token=" + token;
 
         try {
-            mailSenderService.sendRecoveryPasswordMessage(email, url);
+            mailSenderService.sendRecoveryPasswordMessage(email, user.getName(), url);
         }
         catch (MessagingException | IOException e) {}
     }
