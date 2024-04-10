@@ -12,6 +12,7 @@ public record NotificationResponse(
         String description,
         boolean seen,
         LocalDateTime sent_time,
+        @Schema(example = "http://event-app/tasks/1")
         String link
 ) {
 }
