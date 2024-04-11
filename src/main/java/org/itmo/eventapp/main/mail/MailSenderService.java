@@ -58,5 +58,11 @@ public interface MailSenderService {
      */
     void sendDeclineRegistrationRequestMessage(String userEmail, String userName) throws MessagingException, IOException;
 
-    void sendEmailVerificationMessage(String userEmail, String userName) throws MessagingException, IOException;
+    /**
+     * Отправляет писмо на указанный email с ссылкой для подтверждения почты
+     * @param userEmail - почта, на которую отправится письмо
+     * @param userName - имя пользователя для шаблона
+     * @param url - адрес возврата после подтверждения почты
+     */
+    void sendEmailVerificationMessage(String userEmail, String userName, String url)throws MessagingException, IOException;
 }
