@@ -18,7 +18,7 @@ import java.util.function.Function;
 @Component
 public class JwtTokenUtil {
 
-    private static final String SECRET = "hello";
+    private static final String SECRET = "HellMegaSecretKeyForItmoEventAppNoOneShouldKnowItKeepYourMouthShut";
     private static final Key SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET));
     private static final int MINUTES = 60 * 24 * 365;
 
