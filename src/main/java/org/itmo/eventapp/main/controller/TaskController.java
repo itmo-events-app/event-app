@@ -77,7 +77,7 @@ public class TaskController {
     @PutMapping("/{id}/files")
     public ResponseEntity<List<TaskObjectResponse>> uploadFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                                 @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
-                                                                @RequestParam List<MultipartFile> files) {
+                                                                @RequestPart List<MultipartFile> files) {
 
         List<TaskObject> taskObjects = taskService.addFiles(id, files);
 

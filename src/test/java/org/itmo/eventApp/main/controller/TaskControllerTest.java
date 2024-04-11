@@ -1,8 +1,11 @@
 package org.itmo.eventApp.main.controller;
 
 import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
+import io.minio.PutObjectArgs;
 import io.minio.StatObjectArgs;
 import io.minio.errors.ErrorResponseException;
+import io.minio.errors.MinioException;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.repository.TaskDeadlineTriggerRepository;
@@ -335,7 +338,7 @@ class TaskControllerTest extends AbstractTestContainers {
 
 
     @Test
-    void taskAddFilesTest() throws Exception {
+    void taskAddAndDeleteFilesTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -346,43 +349,54 @@ class TaskControllerTest extends AbstractTestContainers {
 
         ClassPathResource imageResource = new ClassPathResource("/images/itmo.jpeg");
         byte[] content = imageResource.getInputStream().readAllBytes();
-        MockMultipartFile image = new MockMultipartFile("image", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
+        MockMultipartFile image = new MockMultipartFile("files", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
 
-//        ClassPathResource imageResource2 = new ClassPathResource("/images/itmo.png");
-//        byte[] content2 = imageResource2.getInputStream().readAllBytes();
-//        MockMultipartFile image2 = new MockMultipartFile("image2", "itmo.png", MediaType.IMAGE_PNG_VALUE, content2);
+        ClassPathResource imageResource2 = new ClassPathResource("/images/itmo.png");
+        byte[] content2 = imageResource2.getInputStream().readAllBytes();
+        MockMultipartFile image2 = new MockMultipartFile("files", "itmo.png", MediaType.IMAGE_PNG_VALUE, content2);
 
         mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/api/tasks/1/files")
                         .file(image)
-//                        .file(image2)
+                        .file(image2)
                         .contentType("multipart/form-data")
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk());
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("task-objects").build());
         boolean isImageExists = isImageExist("1.jpeg");
-//        boolean isImage2Exists = isImageExist("2.png");
+        boolean isImage2Exists = isImageExist("2.png");
 
-        Assertions.assertTrue(isBucketExists);
-        Assertions.assertTrue(isImageExists);
-//        Assertions.assertTrue(isImage2Exists);
 
-//        Assertions.assertAll(
-//                ()->Assertions.assertTrue(isBucketExists),
-//                ()->Assertions.assertTrue(isImageExists),
-//                ()->Assertions.assertTrue(isImage2Exists),
-//                ()->{
-//                    Assertions.assertTrue(taskObjectRepository.findById(1).isPresent());
-//                    Assertions.assertEquals("itmo.jpeg", taskObjectRepository.findById(1).get().getOriginalFilename());
-//                    Assertions.assertEquals(1, taskObjectRepository.findById(1).get().getTask().getId());
-//                },
-//                ()->{
-//                    Assertions.assertTrue(taskObjectRepository.findById(2).isPresent());
-//                    Assertions.assertEquals("itmo.png", taskObjectRepository.findById(2).get().getOriginalFilename());
-//                    Assertions.assertEquals(1, taskObjectRepository.findById(2).get().getTask().getId());
-//                }
-//        );
+        Assertions.assertAll(
+                ()->Assertions.assertTrue(isBucketExists),
+                ()->Assertions.assertTrue(isImageExists),
+                ()->Assertions.assertTrue(isImage2Exists),
+                ()->{
+                    Assertions.assertTrue(taskObjectRepository.findById(1).isPresent());
+                    Assertions.assertEquals("itmo.jpeg", taskObjectRepository.findById(1).get().getOriginalFilename());
+                    Assertions.assertEquals(1, taskObjectRepository.findById(1).get().getTask().getId());
+                },
+                ()->{
+                    Assertions.assertTrue(taskObjectRepository.findById(2).isPresent());
+                    Assertions.assertEquals("itmo.png", taskObjectRepository.findById(2).get().getOriginalFilename());
+                    Assertions.assertEquals(1, taskObjectRepository.findById(2).get().getTask().getId());
+                }
+        );
+
+        String arrayJson = """
+                [1]
+                """;
+
+        mockMvc.perform(delete("/api/tasks/1/files")
+                        .content(arrayJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().is(204));
+
+        Assertions.assertFalse(isImageExist("1.jpeg"));
+        Assertions.assertFalse(taskObjectRepository.findById(1).isPresent());
 
     }
+
 
     @Test
     void taskDeleteTest() throws Exception {

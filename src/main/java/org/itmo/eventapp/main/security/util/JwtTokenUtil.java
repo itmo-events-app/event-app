@@ -23,8 +23,7 @@ public class JwtTokenUtil {
         try {
             return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build()
                     .parseClaimsJws(token).getBody();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка валидации токена");
         }
     }
