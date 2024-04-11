@@ -107,7 +107,6 @@ public class ProfileController {
     }
 
     @Operation(summary = "Получение списка пользователей в системе")
-    @PreAuthorize("@userSecurityExpression.canGetAllUsers()")
     @GetMapping("/all-system-users")
     public ResponseEntity<List<UserSystemRoleResponse>> getAllUsers() {
         List<User> allUsers = userService.getAllUsers();
