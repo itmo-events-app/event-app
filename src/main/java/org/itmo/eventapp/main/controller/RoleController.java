@@ -200,9 +200,10 @@ public class RoleController {
 
     @Operation(summary = "Получение списка мероприятий пользователя по роли")
     @GetMapping("{id}/events")
-    public ResponseEntity<List<EventResponse>> getEventsByRole(@AuthenticationPrincipal UserLoginInfo userDetails,
-                                                               @Positive(message = "Параметр roleId не может быть меньше 1!")
-                                                               @PathVariable Integer id) {
+    public ResponseEntity<List<EventResponse>> getEventsByRole(
+            @AuthenticationPrincipal UserLoginInfo userDetails,
+            @Positive(message = "Параметр id не может быть меньше 1!")
+            @Parameter(name = "id", description = "ID роли", example = "1") @PathVariable Integer id) {
         return ResponseEntity.ok().body(
                 EventMapper.eventsToEventResponseList(eventRoleService.getEventsByRole(userDetails.getUser().getId(), id))
         );
