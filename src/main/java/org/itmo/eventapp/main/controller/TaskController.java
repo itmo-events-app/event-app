@@ -8,10 +8,13 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
+import org.itmo.eventapp.main.model.dto.response.TaskObjectResponse;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Task;
+import org.itmo.eventapp.main.model.entity.TaskObject;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
+import org.itmo.eventapp.main.model.mapper.TaskObjectMapper;
 import org.itmo.eventapp.main.service.TaskService;
 import org.itmo.eventapp.main.service.UserService;
 import org.springframework.data.domain.Page;
@@ -26,6 +29,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -64,6 +68,31 @@ public class TaskController {
                                                  @Valid @RequestBody TaskRequest taskRequest) {
         Task edited = taskService.edit(id, taskRequest);
         return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(edited));
+    }
+
+
+    @Operation(summary = "Добавление файлов к задаче")
+    @PreAuthorize("@taskSecurityExpression.canEditTask(#id)")
+    @PutMapping("/{id}/files")
+    public ResponseEntity<List<TaskObjectResponse>> uploadFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                             @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
+                                         @RequestBody List<MultipartFile> files) {
+
+        List<TaskObject> taskObjects = taskService.addFiles(id, files);
+
+        return ResponseEntity.ok().body(TaskObjectMapper.taskObjectsToResponseList(taskObjects));
+    }
+
+    @Operation(summary = "Удаление файлов из задачи")
+    @PreAuthorize("@taskSecurityExpression.canEditTask(#id)")
+    @DeleteMapping("/{id}/files")
+    public ResponseEntity<?> deleteFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                         @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
+                                         @RequestBody List<Integer> fileObjectIds) {
+
+        taskService.deleteFiles(id, fileObjectIds);
+
+        return ResponseEntity.status(204).build();
     }
 
     @Operation(summary = "Удаление задачи")

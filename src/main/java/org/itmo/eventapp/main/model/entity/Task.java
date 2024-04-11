@@ -7,6 +7,7 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -47,4 +48,7 @@ public class Task {
     private LocalDateTime deadline;
 
     private LocalDateTime reminder;
+
+    @OneToMany(mappedBy = "task")
+    List<TaskObject> taskObjects;
 }

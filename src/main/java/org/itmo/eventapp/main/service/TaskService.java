@@ -1,14 +1,16 @@
 package org.itmo.eventapp.main.service;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
+import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
-import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.Place;
-import org.itmo.eventapp.main.model.entity.Task;
-import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
+import org.itmo.eventapp.main.model.mapper.TaskObjectMapper;
+import org.itmo.eventapp.main.repository.TaskObjectRepository;
 import org.itmo.eventapp.main.repository.TaskRepository;
 import org.itmo.eventapp.main.util.TaskNotificationUtils;
 import org.springframework.context.annotation.Lazy;
@@ -21,8 +23,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashSet;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,17 +35,22 @@ import java.util.Objects;
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @Service
 public class TaskService {
+
+    private static final String BUCKET_NAME = "task-objects";
+
     @Lazy
     private final EventService eventService;
     private final UserService userService;
     private final PlaceService placeService;
     private final TaskRepository taskRepository;
+    private final TaskObjectRepository taskObjectRepository;
     private final TaskNotificationUtils taskNotificationUtils;
     private final TaskReminderTriggerService taskReminderTriggerService;
     private final TaskDeadlineTriggerService taskDeadlineTriggerService;
+    private final MinioService minioService;
 
     public Task findById(int id) {
-        return taskRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+        return taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
     }
 
     @Transactional
@@ -127,6 +136,61 @@ public class TaskService {
     public void delete(Integer id) {
         taskRepository.deleteById(id);
     }
+
+
+    @Transactional
+    public List<TaskObject> addFiles(Integer id, List<MultipartFile> files) {
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+
+        List<TaskObject> taskObjects = new ArrayList<>();
+
+        if (!Objects.isNull(files)) {
+
+            for (MultipartFile file: files) {
+
+                TaskObject taskObject = TaskObject.builder()
+                        .originalFilename(file.getName())
+                        .task(task)
+                        .build();
+
+                taskObject = taskObjectRepository.save(taskObject);
+                taskObjects.add(taskObject);
+                String modifiedFileName = taskObject.getId().toString() + "." + FilenameUtils.getExtension(file.getOriginalFilename());
+                minioService.uploadWithModifiedFileName(file, BUCKET_NAME, modifiedFileName);
+            }
+
+        }
+
+        return taskObjects;
+
+    }
+
+
+    @Transactional
+    public void deleteFiles(Integer id, List<Integer> taskObjectIds) {
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+        List<Integer> actualTaskObjectIds = task.getTaskObjects().stream().map(TaskObject::getId).toList();
+
+        boolean allBelong = new HashSet<>(actualTaskObjectIds).containsAll(taskObjectIds);
+        if (!allBelong) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TASK_OBJECT_IDS_MESSAGE);
+        }
+
+        for (TaskObject taskObject: task.getTaskObjects()) {
+            if (taskObjectIds.contains(taskObject.getId())) {
+                minioService.delete(
+                        BUCKET_NAME,
+                        taskObject.getId().toString() + "." + FilenameUtils.getExtension(taskObject.getOriginalFilename())
+                );
+            }
+        }
+
+        taskObjectRepository.deleteAllById(taskObjectIds);
+
+    }
+
 
     @Transactional
     public Task setAssignee(Integer taskId, Integer assigneeId) {
