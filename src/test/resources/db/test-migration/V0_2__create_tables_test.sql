@@ -7,7 +7,7 @@ create table if not exists registration_request
     surname varchar(128) not null,
     status registration_request_status not null,
     sent_time timestamp not null default current_timestamp
-);
+    );
 create table if not exists privilege
 (
     id int generated always as identity primary key not null,
@@ -21,19 +21,19 @@ create table if not exists role
     name varchar(256) not null,
     description text not null,
     type role_type not null
-);
+    );
 create table if not exists role_privilege
 (
     id int generated always as identity primary key not null,
     role_id int not null references role(id),
     privilege_id int not null references privilege(id)
-);
+    );
 create table if not exists user_notification_info(
-    id int generated always as identity primary key not null,
-    devices varchar(64)[] not null,
+                                                     id int generated always as identity primary key not null,
+                                                     devices varchar(64)[] not null,
     enable_push_notifications boolean not null default true,
     enable_email_notifications boolean not null default true
-);
+    );
 create table if not exists user_t
 (
     id int generated always as identity primary key not null,
@@ -41,10 +41,10 @@ create table if not exists user_t
     notification_info_id int not null references user_notification_info(id),
     name varchar(256) not null,
     surname varchar(256)
-);
+    );
 create table if not exists user_login_info(
-    id int generated always as identity primary key not null,
-    user_id int not null references user_t(id),
+                                              id int generated always as identity primary key not null,
+                                              user_id int not null references user_t(id),
     login varchar(256) not null unique,
     login_status login_status not null,
     login_type login_type not null,
@@ -52,16 +52,16 @@ create table if not exists user_login_info(
     reset_token varchar(512),
     last_login_date date,
     registration_id int not null references registration_request(id)
-);
+    );
 create table if not exists notification(
-    id int generated always as identity primary key not null,
-    user_id int not null references user_t(id),
+                                           id int generated always as identity primary key not null,
+                                           user_id int not null references user_t(id),
     title varchar(256) not null,
     description text not null ,
     seen boolean not null default FALSE,
     sent_time timestamp not null,
     link text
-);
+    );
 create table if not exists place
 (
     id int generated always as identity primary key not null ,
@@ -73,7 +73,7 @@ create table if not exists place
     latitude float not null ,
     longitude float not null,
     render_info text
-);
+    );
 create table if not exists event
 (
     id int generated always as identity primary key not null,
@@ -93,21 +93,21 @@ create table if not exists event
     participant_age_highest int,
     preparing_start timestamp,
     preparing_end timestamp
-);
+    );
 create table if not exists participant(
-    id int generated always as identity primary key not null,
-    name varchar(256) not null ,
+                                          id int generated always as identity primary key not null,
+                                          name varchar(256) not null ,
     email varchar(256) not null ,
     additional_info text,
     visited boolean not null ,
     event_id int references event(id) not null
-);
+    );
 create table if not exists event_role(
-    id int generated always as identity primary key not null,
-    user_id integer not null references user_t(id),
+                                         id int generated always as identity primary key not null,
+                                         user_id integer not null references user_t(id),
     event_id integer not null references event(id),
     role_id integer not null references role(id)
-);
+    );
 create table if not exists task
 (
     id int generated always as identity primary key not null,
@@ -121,16 +121,22 @@ create table if not exists task
     deadline timestamp not null,
     place_id int references place(id),
     reminder timestamp not null
-);
+    );
+create table if not exists task_object
+(
+    id int generated always as identity primary key not null,
+    task_id integer not null references task(id),
+    original_filename varchar(128) not null
+    );
 create table if not exists task_deadline_trigger
 (
     id int generated always as identity primary key not null,
     task_id int references task(id),
     trigger_time timestamp not null
-);
+    );
 create table if not exists task_reminder_trigger
 (
     id int generated always as identity primary key not null,
     task_id int references task(id),
     trigger_time timestamp not null
-);
+    );

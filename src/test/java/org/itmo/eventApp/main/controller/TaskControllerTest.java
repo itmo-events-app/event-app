@@ -1,17 +1,26 @@
 package org.itmo.eventApp.main.controller;
 
+import io.minio.BucketExistsArgs;
+import io.minio.StatObjectArgs;
+import io.minio.errors.ErrorResponseException;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.repository.TaskDeadlineTriggerRepository;
+import org.itmo.eventapp.main.repository.TaskObjectRepository;
 import org.itmo.eventapp.main.repository.TaskReminderTriggerRepository;
 import org.itmo.eventapp.main.repository.TaskRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDateTime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -23,10 +32,26 @@ class TaskControllerTest extends AbstractTestContainers {
     TaskRepository taskRepository;
 
     @Autowired
+    TaskObjectRepository taskObjectRepository;
+
+    @Autowired
     TaskDeadlineTriggerRepository taskDeadlineTriggerRepository;
 
     @Autowired
     TaskReminderTriggerRepository taskReminderTriggerRepository;
+
+    private boolean isImageExist(String imageName) {
+        try {
+            minioClient.statObject(StatObjectArgs.builder()
+                    .bucket("task-objects")
+                    .object(imageName).build());
+            return true;
+        } catch (ErrorResponseException e) {
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
     private UserLoginInfo getUserLoginInfo() {
         UserLoginInfo userDetails = new UserLoginInfo();
@@ -306,6 +331,57 @@ class TaskControllerTest extends AbstractTestContainers {
             }
 
         );
+    }
+
+
+    @Test
+    void taskAddFilesTest() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
+        executeSqlScript("/sql/insert_task.sql");
+
+
+        ClassPathResource imageResource = new ClassPathResource("/images/itmo.jpeg");
+        byte[] content = imageResource.getInputStream().readAllBytes();
+        MockMultipartFile image = new MockMultipartFile("image", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
+
+//        ClassPathResource imageResource2 = new ClassPathResource("/images/itmo.png");
+//        byte[] content2 = imageResource2.getInputStream().readAllBytes();
+//        MockMultipartFile image2 = new MockMultipartFile("image2", "itmo.png", MediaType.IMAGE_PNG_VALUE, content2);
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/api/tasks/1/files")
+                        .file(image)
+//                        .file(image2)
+                        .contentType("multipart/form-data")
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().isOk());
+        boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("task-objects").build());
+        boolean isImageExists = isImageExist("1.jpeg");
+//        boolean isImage2Exists = isImageExist("2.png");
+
+        Assertions.assertTrue(isBucketExists);
+        Assertions.assertTrue(isImageExists);
+//        Assertions.assertTrue(isImage2Exists);
+
+//        Assertions.assertAll(
+//                ()->Assertions.assertTrue(isBucketExists),
+//                ()->Assertions.assertTrue(isImageExists),
+//                ()->Assertions.assertTrue(isImage2Exists),
+//                ()->{
+//                    Assertions.assertTrue(taskObjectRepository.findById(1).isPresent());
+//                    Assertions.assertEquals("itmo.jpeg", taskObjectRepository.findById(1).get().getOriginalFilename());
+//                    Assertions.assertEquals(1, taskObjectRepository.findById(1).get().getTask().getId());
+//                },
+//                ()->{
+//                    Assertions.assertTrue(taskObjectRepository.findById(2).isPresent());
+//                    Assertions.assertEquals("itmo.png", taskObjectRepository.findById(2).get().getOriginalFilename());
+//                    Assertions.assertEquals(1, taskObjectRepository.findById(2).get().getTask().getId());
+//                }
+//        );
+
     }
 
     @Test
