@@ -11,6 +11,7 @@ import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
+import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.model.mapper.RoleMapper;
@@ -61,7 +62,14 @@ public class RoleController {
     @PreAuthorize("@roleSecurityExpression.canCreateRole() or @roleSecurityExpression.canEditRole() or @roleSecurityExpression.canDeleteRole()")
     @GetMapping("/")
     public ResponseEntity<List<RoleResponse>> getAllRoles() {
-        return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.getAll()));
+        return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.getRoles(null)));
+    }
+
+    @Operation(summary = "Получение списка системных ролей")
+    @PreAuthorize("@roleSecurityExpression.canAssignSystemRole()")
+    @GetMapping("/system")
+    public ResponseEntity<List<RoleResponse>> getSystemRoles() {
+        return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.getRoles(RoleType.SYSTEM)));
     }
 
     @Operation(summary = "Получение списка организационных ролей")
@@ -71,7 +79,7 @@ public class RoleController {
     public ResponseEntity<List<RoleResponse>> getOrganizationalRoles(
             @Positive(message = "Параметр eventId не может быть меньше 1!")
             @RequestParam @Parameter(name = "eventId", description = "ID меропрятия", example = "1") Integer eventId) {
-        return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.getOrganizational()));
+        return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.getRoles(RoleType.EVENT)));
     }
 
     @Operation(summary = "Поиск ролей по совпадению в названии")
