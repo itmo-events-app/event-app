@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -75,8 +76,8 @@ public class TaskController {
     @PreAuthorize("@taskSecurityExpression.canEditTask(#id)")
     @PutMapping("/{id}/files")
     public ResponseEntity<List<TaskObjectResponse>> uploadFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
-                                             @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
-                                         @RequestBody List<MultipartFile> files) {
+                                                                @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
+                                                                @RequestParam List<MultipartFile> files) {
 
         List<TaskObject> taskObjects = taskService.addFiles(id, files);
 

@@ -150,7 +150,7 @@ public class TaskService {
             for (MultipartFile file: files) {
 
                 TaskObject taskObject = TaskObject.builder()
-                        .originalFilename(file.getName())
+                        .originalFilename(file.getOriginalFilename())
                         .task(task)
                         .build();
 
