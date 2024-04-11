@@ -3,8 +3,6 @@ package org.itmo.eventapp.main.security.securityexpression;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
-import org.itmo.eventapp.main.service.EventRoleService;
-import org.itmo.eventapp.main.service.EventService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

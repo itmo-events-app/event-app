@@ -49,7 +49,6 @@ public class ParticipantsController {
                                             schema = @Schema(implementation = ParticipantResponse.class))
                             })
             })
-    @PostMapping
     @GetMapping
     public ResponseEntity<List<ParticipantResponse>> getParticipants(@Min(1) @PathVariable("id") Integer id) {
         List<Participant> participants = participantsService.getParticipants(id);
@@ -69,7 +68,7 @@ public class ParticipantsController {
             })
     @PreAuthorize("@participantsSecurityExpression.canWorkWithList(#id)")
     @PutMapping
-    public ResponseEntity<ParticipantResponse> changePresence(@PathVariable("id") Integer id, @RequestBody ParticipantPresenceRequest participantPresenceRequest) {
+    public ResponseEntity<ParticipantResponse> changePresence(@PathVariable("id") Integer id, @Valid @RequestBody ParticipantPresenceRequest participantPresenceRequest) {
         Participant participant = participantsService.changePresence(id, participantPresenceRequest);
         return ResponseEntity.ok().body(ParticipantMapper.participantToResponse(participant));
     }
@@ -86,7 +85,7 @@ public class ParticipantsController {
             })
     @PreAuthorize("@participantsSecurityExpression.canImportList(#id)")
     @PostMapping
-    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id, @RequestBody ParticipantsListRequest participantsListRequest) throws IOException {
+    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id, @Valid @RequestBody ParticipantsListRequest participantsListRequest) throws IOException {
         List<Participant> participants = participantsService.setParticipants(id, participantsListRequest);
         return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
     }
