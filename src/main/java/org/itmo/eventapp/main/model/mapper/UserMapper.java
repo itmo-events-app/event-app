@@ -27,10 +27,11 @@ public class UserMapper {
     public static UserSystemRoleResponse userToUserSystemRoleResponse(User user) {
         return new UserSystemRoleResponse(
                 // getUserLoginInfo is always not null
-                user.getUserLoginInfo().getLogin(),
-                user.getUserLoginInfo().getLoginType(),
+                user.getId(),
                 user.getName(),
                 user.getSurname(),
+                user.getUserLoginInfo().getLogin(),
+                user.getUserLoginInfo().getLoginType(),
                 user.getRole().getName()
         );
     }
@@ -38,6 +39,6 @@ public class UserMapper {
     public static List<UserSystemRoleResponse> usersToUserSystemRoleResponses(List<User> users) {
         return users.stream()
                 .map(UserMapper::userToUserSystemRoleResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
