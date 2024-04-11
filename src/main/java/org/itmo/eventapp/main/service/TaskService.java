@@ -133,7 +133,20 @@ public class TaskService {
         return newTaskData;
     }
 
+    @Transactional
     public void delete(Integer id) {
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+        List<Integer> taskObjectIds = new ArrayList<>();
+
+        for (TaskObject taskObject : task.getTaskObjects()) {
+            minioService.delete(
+                    BUCKET_NAME,
+                    taskObject.getId().toString() + "." + FilenameUtils.getExtension(taskObject.getOriginalFilename())
+            );
+            taskObjectIds.add(taskObject.getId());
+
+        }
+        taskObjectRepository.deleteAllById(taskObjectIds);
         taskRepository.deleteById(id);
     }
 
@@ -147,7 +160,7 @@ public class TaskService {
 
         if (!Objects.isNull(files)) {
 
-            for (MultipartFile file: files) {
+            for (MultipartFile file : files) {
 
                 TaskObject taskObject = TaskObject.builder()
                         .originalFilename(file.getOriginalFilename())
@@ -178,7 +191,7 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TASK_OBJECT_IDS_MESSAGE);
         }
 
-        for (TaskObject taskObject: task.getTaskObjects()) {
+        for (TaskObject taskObject : task.getTaskObjects()) {
             if (taskObjectIds.contains(taskObject.getId())) {
                 minioService.delete(
                         BUCKET_NAME,
