@@ -87,7 +87,7 @@ public class TaskController {
     @Operation(summary = "Удаление файлов из задачи")
     @PreAuthorize("@taskSecurityExpression.canEditTask(#id)")
     @DeleteMapping("/{id}/files")
-    public ResponseEntity<?> deleteFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+    public ResponseEntity<Void> deleteFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                          @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
                                          @RequestBody List<Integer> fileObjectIds) {
 
