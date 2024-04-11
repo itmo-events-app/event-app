@@ -20,7 +20,6 @@ import org.itmo.eventapp.main.service.RoleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -181,10 +180,10 @@ public class RoleController {
     @PreAuthorize("@roleSecurityExpression.canAssignSystemRole()")
     @PutMapping("/system/{userId}/{roleId}")
     public ResponseEntity<Void> assignSystemRole(
-            Authentication authentication,
+            @AuthenticationPrincipal UserLoginInfo userDetails,
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
             @Positive(message = "Параметр roleId не может быть меньше 1!") @PathVariable @Parameter(name = "roleId", description = "ID роли", example = "1") Integer roleId) {
-        roleService.assignSystemRole(authentication.getName(), userId, roleId);
+        roleService.assignSystemRole(userDetails.getUser().getId(), userId, roleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -192,17 +191,18 @@ public class RoleController {
     @PreAuthorize("@roleSecurityExpression.canRevokeSystemRole()")
     @PutMapping("/system-revoke/{userId}")
     public ResponseEntity<Void> revokeSystemRole(
-            Authentication authentication,
+            @AuthenticationPrincipal UserLoginInfo userDetails,
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId) {
-        roleService.revokeSystemRole(authentication.getName(), userId);
+        roleService.revokeSystemRole(userDetails.getUser().getId(), userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Получение списка мероприятий пользователя по роли")
     @GetMapping("{id}/events")
-    public ResponseEntity<List<EventResponse>> getEventsByRole(@AuthenticationPrincipal UserLoginInfo userDetails,
-                                                               @Positive(message = "Параметр roleId не может быть меньше 1!")
-                                                               @PathVariable Integer id) {
+    public ResponseEntity<List<EventResponse>> getEventsByRole(
+            @AuthenticationPrincipal UserLoginInfo userDetails,
+            @Positive(message = "Параметр id не может быть меньше 1!")
+            @Parameter(name = "id", description = "ID роли", example = "1") @PathVariable Integer id) {
         return ResponseEntity.ok().body(
                 EventMapper.eventsToEventResponseList(eventRoleService.getEventsByRole(userDetails.getUser().getId(), id))
         );
