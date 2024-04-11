@@ -72,8 +72,12 @@ public class RoleService {
         roleRepository.deleteById(id);
     }
 
-    public List<Role> getAll() {
-        return roleRepository.findAll();
+    public List<Role> getRoles(RoleType type) {
+        if (type == null) {
+            return roleRepository.findAll();
+        } else {
+            return roleRepository.findAllByType(type);
+        }
     }
 
     public Role findRoleById(Integer id) {
@@ -88,10 +92,6 @@ public class RoleService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
         return role;
-    }
-
-    public List<Role> getOrganizational() {
-        return roleRepository.findAllByType(RoleType.EVENT);
     }
 
     public List<Role> searchByName(String name) {
