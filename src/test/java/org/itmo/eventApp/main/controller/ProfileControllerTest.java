@@ -95,7 +95,6 @@ class ProfileControllerTest extends AbstractTestContainers {
         Assertions.assertEquals("newEmail@itmo.ru", updatedUser.getUserLoginInfo().getLogin());
     }
 
-
     @Test
     @WithMockUser(username = "test_mail@itmo.ru")
     void testChangeToExistEmail() throws Exception {
@@ -203,5 +202,24 @@ class ProfileControllerTest extends AbstractTestContainers {
         Assertions.assertTrue(resultString.contains("VIEW_EVENT_ACTIVITIES"));
         Assertions.assertTrue(resultString.contains("MODIFY_PROFILE_DATA"));
         Assertions.assertTrue(resultString.contains("VIEW_ALL_EVENTS"));
+    }
+
+    @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
+    void testGetAllUsers() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_user_3.sql");
+
+        String expectedJson = """
+                [{"login":"test_mail@itmo.ru","type":"EMAIL","name":"test","surname":"user","role":"Администратор"},
+                {"login":"test_mail2@itmo.ru","type":"EMAIL","name":"test2","surname":"user2","role":"Администратор"},
+                {"login":"test_mail3@itmo.ru","type":"EMAIL","name":"test3","surname":"user3","role":"Администратор"}]
+                """;
+
+        mockMvc.perform(get("/api/profile/all-system-users")
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson));
     }
 }

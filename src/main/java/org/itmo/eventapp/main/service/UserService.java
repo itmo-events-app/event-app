@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -88,5 +89,9 @@ public class UserService {
     public Set<Privilege> getUserSystemPrivileges(Integer userId) {
         User user = findById(userId);
         return user.getRole().getPrivileges();
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }
