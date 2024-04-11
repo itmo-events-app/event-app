@@ -15,7 +15,7 @@ public final class TaskMapper {
     public static TaskResponse taskToTaskResponse(Task task) {
         return new TaskResponse(
                 task.getId(),
-                task.getEvent().getId(),
+                EventMapper.eventToEventShortDataResponse(task.getEvent()),
                 task.getTitle(),
                 task.getDescription(),
                 task.getStatus(),
@@ -23,7 +23,7 @@ public final class TaskMapper {
                 PlaceMapper.placeToPlaceShortResponse(task.getPlace()),
                 task.getCreationTime(),
                 task.getDeadline(),
-                task.getNotificationDeadline()
+                task.getReminder()
         );
     }
 
@@ -43,7 +43,7 @@ public final class TaskMapper {
                 .status(taskRequest.taskStatus())
                 .place(place)
                 .deadline(taskRequest.deadline())
-                .notificationDeadline(taskRequest.notificationDeadline())
+                .reminder(taskRequest.reminder())
                 .build();
     }
 

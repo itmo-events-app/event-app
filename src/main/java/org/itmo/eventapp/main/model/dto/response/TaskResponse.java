@@ -8,8 +8,7 @@ import java.time.LocalDateTime;
 public record TaskResponse(
         @Schema(example = "1")
         Integer id,
-        @Schema(example = "827")
-        Integer eventId,
+        EventShortDataResponse event,
         @Schema(example = "Настроить проектор")
         String title,
         @Schema(example = "Настроить проектор в коворкинге")
@@ -19,6 +18,6 @@ public record TaskResponse(
         PlaceShortDataResponse place,
         LocalDateTime creationTime,
         LocalDateTime deadline,
-        LocalDateTime notificationDeadline
+        LocalDateTime reminder
 ) {
 }

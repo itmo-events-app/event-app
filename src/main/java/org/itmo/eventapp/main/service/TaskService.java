@@ -13,18 +13,20 @@ import org.itmo.eventapp.main.repository.TaskRepository;
 import org.itmo.eventapp.main.util.TaskNotificationUtils;
 import org.springframework.context.annotation.Lazy;
 import org.itmo.eventapp.main.service.specification.TaskSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
 
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @Service
@@ -35,11 +37,14 @@ public class TaskService {
     private final PlaceService placeService;
     private final TaskRepository taskRepository;
     private final TaskNotificationUtils taskNotificationUtils;
+    private final TaskReminderTriggerService taskReminderTriggerService;
+    private final TaskDeadlineTriggerService taskDeadlineTriggerService;
 
     public Task findById(int id) {
         return taskRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
     }
 
+    @Transactional
     public Task save(TaskRequest taskRequest) {
 
         Event event = eventService.findById(taskRequest.eventId());
@@ -50,12 +55,12 @@ public class TaskService {
 
 
         User assignee = null;
-        if (taskRequest.assignee() != null) {
-            assignee = userService.findById(taskRequest.assignee().id());
+        if (taskRequest.assigneeId() != null) {
+            assignee = userService.findById(taskRequest.assigneeId());
         }
         Place place = null;
-        if (taskRequest.place() != null) {
-            place = placeService.findById(taskRequest.place().id());
+        if (taskRequest.placeId() != null) {
+            place = placeService.findById(taskRequest.placeId());
         }
 
         Task newTask = TaskMapper.taskRequestToTask(taskRequest, event, assignee, assigner, place);
@@ -72,11 +77,14 @@ public class TaskService {
 
         if (assignee != null) {
             taskNotificationUtils.createIncomingTaskNotification(newTask);
+            taskDeadlineTriggerService.createNewDeadlineTrigger(newTask);
+            taskReminderTriggerService.createNewReminderTrigger(newTask);
         }
 
         return newTask;
     }
 
+    @Transactional
     public Task edit(Integer id, TaskRequest taskRequest) {
 
         Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
@@ -87,13 +95,13 @@ public class TaskService {
         User prevAssignee = task.getAssignee();
 
         User assignee = null;
-        if (taskRequest.assignee() != null) {
-            assignee = userService.findById(taskRequest.assignee().id());
+        if (taskRequest.assigneeId() != null) {
+            assignee = userService.findById(taskRequest.assigneeId());
 
         }
         Place place = null;
-        if (taskRequest.place() != null) {
-            place = placeService.findById(taskRequest.place().id());
+        if (taskRequest.placeId() != null) {
+            place = placeService.findById(taskRequest.placeId());
         }
 
         Task newTaskData = TaskMapper.taskRequestToTask(taskRequest, event, assignee, assigner, place);
@@ -108,6 +116,8 @@ public class TaskService {
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(newTaskData);
+            taskDeadlineTriggerService.createNewDeadlineTrigger(newTaskData);
+            taskReminderTriggerService.createNewReminderTrigger(newTaskData);
 
         }
 
@@ -118,7 +128,7 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-
+    @Transactional
     public Task setAssignee(Integer taskId, Integer assigneeId) {
 
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
@@ -136,6 +146,8 @@ public class TaskService {
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(task);
+            taskDeadlineTriggerService.createNewDeadlineTrigger(task);
+            taskReminderTriggerService.createNewReminderTrigger(task);
 
         }
 
@@ -187,7 +199,7 @@ public class TaskService {
             newTask.setAssigner(task.getAssigner());
             newTask.setAssignee(null);
             newTask.setDeadline(task.getDeadline());
-            newTask.setNotificationDeadline(task.getNotificationDeadline());
+            newTask.setReminder(task.getReminder());
 
             newTask.setCreationTime(LocalDateTime.now());
             TaskStatus status = TaskStatus.NEW;
@@ -204,13 +216,14 @@ public class TaskService {
         return newTasks;
     }
 
-    public List<Task> getEventTasksWithFilter(Integer eventId,
+    public Page<Task> getEventTasksWithFilter(Integer eventId,
                                               Integer assigneeId,
                                               Integer assignerId,
                                               TaskStatus taskStatus,
                                               LocalDateTime deadlineLowerLimit,
                                               LocalDateTime deadlineUpperLimit,
-                                              Boolean subEventTasksGet) {
+                                              Boolean subEventTasksGet,
+                                              Pageable pageRequest) {
 
         Event event = eventService.findById(eventId);
 
@@ -227,7 +240,7 @@ public class TaskService {
                             taskStatus,
                             deadlineLowerLimit,
                             deadlineUpperLimit);
-            return taskRepository.findAll(taskSpecification);
+            return taskRepository.findAll(taskSpecification, pageRequest);
 
         } else {
             Specification<Task> taskSpecification =
@@ -237,7 +250,7 @@ public class TaskService {
                             taskStatus,
                             deadlineLowerLimit,
                             deadlineUpperLimit);
-            return taskRepository.findAll(taskSpecification);
+            return taskRepository.findAll(taskSpecification, pageRequest);
         }
 
 
@@ -252,12 +265,13 @@ public class TaskService {
     }
 
 
-    public List<Task> getUserTasksWithFilter(Integer eventId,
+    public Page<Task> getUserTasksWithFilter(Integer eventId,
                                              Integer userId,
                                              Integer assignerId,
                                              TaskStatus taskStatus,
                                              LocalDateTime deadlineLowerLimit,
-                                             LocalDateTime deadlineUpperLimit) {
+                                             LocalDateTime deadlineUpperLimit,
+                                             Pageable pageRequest) {
 
 
         Specification<Task> taskSpecification =
@@ -267,15 +281,7 @@ public class TaskService {
                         taskStatus,
                         deadlineLowerLimit,
                         deadlineUpperLimit);
-        return taskRepository.findAll(taskSpecification);
-    }
-
-    public List<Task> getTasksWithDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByDeadlineBetween(startTime, endTime);
-    }
-
-    public List<Task> getTasksWithNotificationDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByNotificationDeadlineBetween(startTime, endTime);
+        return taskRepository.findAll(taskSpecification, pageRequest);
     }
 
 }

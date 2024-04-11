@@ -51,7 +51,7 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
         insertBasicFilling();
 
         // ==========----  Execution  ----==========
-        List<Privilege> privileges = privilegeService.getAll();
+        List<Privilege> privileges = privilegeService.getPrivileges(null);
 
         // ==========---- Assertions  ----==========
         assertNotNull(privileges,
@@ -69,7 +69,7 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
         cleanRolesPrivileges();
 
         // ==========----  Execution  ----==========
-        List<Privilege> privileges = privilegeService.getAll();
+        List<Privilege> privileges = privilegeService.getPrivileges(null);
 
         // ==========---- Assertions  ----==========
         assertNotNull(privileges,
@@ -129,7 +129,7 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
         insertBasicFilling();
 
         // ==========----  Execution  ----==========
-        List<Privilege> systemPrivileges = privilegeService.getPrivilegeByType(PrivilegeType.SYSTEM);
+        List<Privilege> systemPrivileges = privilegeService.getPrivileges(PrivilegeType.SYSTEM);
 
         // ==========---- Assertions  ----==========
         assertNotNull(systemPrivileges,
@@ -147,7 +147,7 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
         insertBasicFilling();
 
         // ==========----  Execution  ----==========
-        List<Privilege> eventPrivileges = privilegeService.getPrivilegeByType(PrivilegeType.EVENT);
+        List<Privilege> eventPrivileges = privilegeService.getPrivileges(PrivilegeType.EVENT);
 
         // ==========---- Assertions  ----==========
         assertNotNull(eventPrivileges,
@@ -164,8 +164,8 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
         cleanRolesPrivileges();
 
         // ==========----  Execution  ----==========
-        List<Privilege> systemPrivileges = privilegeService.getPrivilegeByType(PrivilegeType.SYSTEM);
-        List<Privilege> eventPrivileges = privilegeService.getPrivilegeByType(PrivilegeType.EVENT);
+        List<Privilege> systemPrivileges = privilegeService.getPrivileges(PrivilegeType.SYSTEM);
+        List<Privilege> eventPrivileges = privilegeService.getPrivileges(PrivilegeType.EVENT);
 
         // ==========---- Assertions  ----==========
         assertNotNull(systemPrivileges,

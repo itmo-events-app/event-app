@@ -11,6 +11,8 @@ public record NotificationResponse(
         @Schema(example = "Ваша задача 'Провести инструктаж' к мероприятию 'День первокурсника' просрочнена")
         String description,
         boolean seen,
-        LocalDateTime sent_time
+        LocalDateTime sent_time,
+        @Schema(example = "http://event-app/tasks/1")
+        String link
 ) {
 }
