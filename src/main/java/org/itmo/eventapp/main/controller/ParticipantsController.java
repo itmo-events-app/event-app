@@ -92,7 +92,7 @@ public class ParticipantsController {
 
     @Operation(summary = "Экспорт списка участников мероприятия")
     @PreAuthorize("@participantsSecurityExpression.canExportList(#id)")
-    @GetMapping("/download")
+    @GetMapping("/file")
     public ResponseEntity<Resource> getParticipantsXlsxFile(@PathVariable("id") Integer id) throws IOException {
         String path = participantsService.getParticipantsXlsx(id);
         Path filePath = Paths.get(path);
