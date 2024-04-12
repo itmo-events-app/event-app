@@ -67,32 +67,6 @@ public class TaskController {
         return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(edited));
     }
 
-/*
-    @Operation(summary = "Добавление файлов к задаче")
-    @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
-    @PutMapping("/{id}/files")
-    public ResponseEntity<List<TaskObjectResponse>> uploadFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
-                                                                @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
-                                                                @RequestPart List<MultipartFile> files) {
-
-        List<TaskObject> taskObjects = taskService.addFiles(id, files);
-
-        return ResponseEntity.ok().body(TaskObjectMapper.taskObjectsToResponseList(taskObjects));
-    }
-
-    @Operation(summary = "Удаление файлов из задачи")
-    @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
-    @DeleteMapping("/{id}/files")
-    public ResponseEntity<Void> deleteFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
-                                         @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
-                                         @RequestBody List<Integer> fileObjectIds) {
-
-        taskService.deleteFiles(id, fileObjectIds);
-
-        return ResponseEntity.status(204).build();
-    }
-
- */
 
     @Operation(summary = "Добавление файлов к задаче")
     @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")

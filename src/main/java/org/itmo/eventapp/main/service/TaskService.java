@@ -134,76 +134,9 @@ public class TaskService {
 
     @Transactional
     public void delete(Integer id) {
-//        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
-//        List<Integer> taskObjectIds = new ArrayList<>();
-//
-//        for (TaskObject taskObject : task.getTaskObjects()) {
-//            minioService.delete(
-//                    BUCKET_NAME,
-//                    taskObject.getId().toString() + "." + FilenameUtils.getExtension(taskObject.getOriginalFilename())
-//            );
-//            taskObjectIds.add(taskObject.getId());
-//
-//        }
-//        taskObjectRepository.deleteAllById(taskObjectIds);
+
         taskRepository.deleteById(id);
     }
-
-/*
-    @Transactional
-    public List<TaskObject> addFiles(Integer id, List<MultipartFile> files) {
-
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
-
-        List<TaskObject> taskObjects = new ArrayList<>();
-
-        if (!Objects.isNull(files)) {
-
-            for (MultipartFile file : files) {
-
-                TaskObject taskObject = TaskObject.builder()
-                        .originalFilename(file.getOriginalFilename())
-                        .task(task)
-                        .build();
-
-                taskObject = taskObjectRepository.save(taskObject);
-                taskObjects.add(taskObject);
-                String modifiedFileName = taskObject.getId().toString() + "." + FilenameUtils.getExtension(file.getOriginalFilename());
-                minioService.uploadWithModifiedFileName(file, BUCKET_NAME, modifiedFileName);
-            }
-
-        }
-
-        return taskObjects;
-
-    }
-
-
-    @Transactional
-    public void deleteFiles(Integer id, List<Integer> taskObjectIds) {
-
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
-        List<Integer> actualTaskObjectIds = task.getTaskObjects().stream().map(TaskObject::getId).toList();
-
-        boolean allBelong = new HashSet<>(actualTaskObjectIds).containsAll(taskObjectIds);
-        if (!allBelong) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TASK_OBJECT_IDS_MESSAGE);
-        }
-
-        for (TaskObject taskObject : task.getTaskObjects()) {
-            if (taskObjectIds.contains(taskObject.getId())) {
-                minioService.delete(
-                        BUCKET_NAME,
-                        taskObject.getId().toString() + "." + FilenameUtils.getExtension(taskObject.getOriginalFilename())
-                );
-            }
-        }
-
-        taskObjectRepository.deleteAllById(taskObjectIds);
-
-    }
-
- */
 
 
     public List<String> addFiles(Integer id, List<MultipartFile> files) {
