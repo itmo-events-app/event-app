@@ -110,7 +110,7 @@ public class TaskController {
 
     @Operation(summary = "Добавление файлов к задаче")
     @PreAuthorize("@taskSecurityExpression.canGetTask(#id)")
-    @PutMapping("/{id}/files")
+    @GetMapping("/{id}/files")
     public ResponseEntity<List<String>> getFileNames(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                     @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id) {
 

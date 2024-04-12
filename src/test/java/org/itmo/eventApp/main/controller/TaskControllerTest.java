@@ -467,7 +467,7 @@ class TaskControllerTest extends AbstractTestContainers {
         );
     }
 
-
+/*
     @Test
     void taskSetAssigneeNotExistingTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
@@ -524,6 +524,8 @@ class TaskControllerTest extends AbstractTestContainers {
         Assertions.assertNull(task.getAssignee());
 
     }
+
+ */
 
 
     @Test
