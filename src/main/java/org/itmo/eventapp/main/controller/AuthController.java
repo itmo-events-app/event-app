@@ -78,7 +78,7 @@ public class AuthController {
     }
 
     @PostMapping("/newPassword")
-    ResponseEntity<Void> newPassword(@RequestBody NewPasswordRequest request) {
+    ResponseEntity<Void> newPassword(@Valid @RequestBody NewPasswordRequest request) {
         authenticationService.newPassword(request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

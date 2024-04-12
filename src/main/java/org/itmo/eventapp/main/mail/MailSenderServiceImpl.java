@@ -77,7 +77,7 @@ public class MailSenderServiceImpl implements MailSenderService{
     public void sendRecoveryPasswordMessage(String userEmail, String userName, String url) throws MessagingException, IOException {
         String subject = "Восстановление пароля";
         String templatePath = "notification/email-templates/recovery-password.html";
-        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getRecoveryPasswordTemplateFields(url)));
+        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getRecoveryPasswordTemplateFields(userName, url)));
 
     }
 
@@ -111,8 +111,9 @@ public class MailSenderServiceImpl implements MailSenderService{
         return templateFields;
     }
 
-    private Map<String, String> getRecoveryPasswordTemplateFields(String url) {
+    private Map<String, String> getRecoveryPasswordTemplateFields(String userName, String url) {
         HashMap<String, String> templateFields = new HashMap<>();
+        templateFields.put("${userName}", userName);
         templateFields.put("${url}", url);
         return templateFields;
     }

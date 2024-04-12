@@ -122,10 +122,10 @@ create table if not exists task
     notification_deadline timestamp not null
 );
 
-create table if not exists user_password_info
+create table if not exists user_password_recovery_info
 (
     id int generated always as identity primary key not null,
-    token varchar(128) not null,
+    token varchar(128),
     user_id integer not null references user_t(id),
     expiry_date timestamp not null
-)
+);

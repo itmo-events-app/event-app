@@ -17,10 +17,10 @@ spring:
   mail:
     host: smtp.mail.ru
     port: 465
-    username: username # нерабочая конфигурация, нужны реальные имя и пароль в env
-    password: password # обращаться за данными к @alex_darklol
-#    username: ${EMAIL_USERNAME}
-#    password: ${EMAIL_PASSWORD}
+    #username: username # нерабочая конфигурация, нужны реальные имя и пароль в env
+    #password: password # обращаться за данными к @alex_darklol
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
     properties:
       mail:
         smtp:
