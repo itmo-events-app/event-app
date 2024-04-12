@@ -15,6 +15,8 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -124,6 +126,25 @@ public class TaskSecurityExpression {
                     && userId == task.getAssignee().getId();
             return canEdit || isAssignee;
         });
+
+    }
+
+    public boolean getCanCopyTasks(int dstEventId, List<Integer> taskIds) {
+
+        int eventId = miscSecurityExpression.getParentEventOrSelfId(dstEventId);
+
+        Set<Integer> eventIds = taskService.findAllById(taskIds).stream().map(
+                task-> miscSecurityExpression.getParentEventOrSelfId(task.getEvent().getId())
+        ).collect(Collectors.toSet());
+
+        if (eventIds.size() == 1 && eventIds.stream().toList().get(0).equals(eventId)) {
+            boolean canEdit = miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.EDIT_TASK);
+            boolean canSee = miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.VIEW_ALL_EVENT_TASKS);
+            return canSee && canEdit;
+
+        }
+
+        return false;
 
     }
 }

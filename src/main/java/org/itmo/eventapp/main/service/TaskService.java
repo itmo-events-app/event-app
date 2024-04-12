@@ -53,6 +53,10 @@ public class TaskService {
         return taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
     }
 
+    public List<Task> findAllById(List<Integer> ids) {
+        return taskRepository.findAllById(ids);
+    }
+
     @Transactional
     public Task save(TaskRequest taskRequest) {
 
@@ -150,7 +154,7 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-
+/*
     @Transactional
     public List<TaskObject> addFiles(Integer id, List<MultipartFile> files) {
 
@@ -202,6 +206,56 @@ public class TaskService {
 
         taskObjectRepository.deleteAllById(taskObjectIds);
 
+    }
+
+ */
+
+
+    public List<String> addFiles(Integer id, List<MultipartFile> files) {
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+
+        List<String> filenames = new ArrayList<>();
+
+        if (!Objects.isNull(files)) {
+
+            for (MultipartFile file : files) {
+
+                String modifiedFileName = task.getId().toString()
+                        + "_"
+                        + FilenameUtils.getBaseName(file.getOriginalFilename())
+                        + "_"
+                        + System.currentTimeMillis()
+                        + "."
+                        + FilenameUtils.getExtension(file.getOriginalFilename());
+                minioService.uploadWithModifiedFileName(file, BUCKET_NAME, modifiedFileName);
+                filenames.add(modifiedFileName);
+            }
+
+        }
+
+        return filenames;
+
+    }
+
+
+    public void deleteFiles(Integer id, List<String> fileNamesInMinio) {
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+
+        boolean allBelong = fileNamesInMinio.stream().allMatch(filename->filename.startsWith(task.getId().toString()));
+        if (!allBelong) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TASK_FILE_NAMES_MESSAGE);
+        }
+
+        for (String filename : fileNamesInMinio) {
+                minioService.delete(BUCKET_NAME, filename);
+        }
+
+    }
+
+    public List<String> getFileNames(Integer taskId) {
+        return minioService.getFileNamesByPrefix(BUCKET_NAME, taskId.toString());
     }
 
 
@@ -360,5 +414,6 @@ public class TaskService {
                         deadlineUpperLimit);
         return taskRepository.findAll(taskSpecification, pageRequest);
     }
+
 
 }

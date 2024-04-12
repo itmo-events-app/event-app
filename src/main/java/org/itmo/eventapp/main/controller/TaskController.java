@@ -71,7 +71,7 @@ public class TaskController {
         return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(edited));
     }
 
-
+/*
     @Operation(summary = "Добавление файлов к задаче")
     @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
     @PutMapping("/{id}/files")
@@ -92,6 +92,39 @@ public class TaskController {
                                          @RequestBody List<Integer> fileObjectIds) {
 
         taskService.deleteFiles(id, fileObjectIds);
+
+        return ResponseEntity.status(204).build();
+    }
+
+ */
+
+    @Operation(summary = "Добавление файлов к задаче")
+    @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
+    @PutMapping("/{id}/files")
+    public ResponseEntity<List<String>> uploadFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                                                @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
+                                                                @RequestPart List<MultipartFile> files) {
+
+        return ResponseEntity.ok().body(taskService.addFiles(id, files));
+    }
+
+    @Operation(summary = "Добавление файлов к задаче")
+    @PreAuthorize("@taskSecurityExpression.canGetTask(#id)")
+    @PutMapping("/{id}/files")
+    public ResponseEntity<List<String>> getFileNames(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                                    @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id) {
+
+        return ResponseEntity.ok().body(taskService.getFileNames(id));
+    }
+
+    @Operation(summary = "Удаление файлов из задачи")
+    @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
+    @DeleteMapping("/{id}/files")
+    public ResponseEntity<Void> deleteFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                            @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
+                                            @RequestBody List<String> fileNamesInMinio) {
+
+        taskService.deleteFiles(id, fileNamesInMinio);
 
         return ResponseEntity.status(204).build();
     }
@@ -181,7 +214,7 @@ public class TaskController {
     }
 
     @Operation(summary = "Копирование списка задач")
-    @PreAuthorize("@taskSecurityExpression.canCreateTask(#dstEventId)")
+    @PreAuthorize("@taskSecurityExpression.getCanCopyTasks(#dstEventId, #taskIds)")
     @PostMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListCopy(
             @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")

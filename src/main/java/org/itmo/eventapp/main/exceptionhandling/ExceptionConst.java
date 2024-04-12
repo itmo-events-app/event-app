@@ -36,7 +36,9 @@ public class ExceptionConst {
 
     public static final String TASK_NOT_FOUND_MESSAGE = "Задача не найдена";
 
-    public static final String INVALID_TASK_OBJECT_IDS_MESSAGE = "Не все объекты с приведенными id относятся к задаче!";
+//    public static final String INVALID_TASK_OBJECT_IDS_MESSAGE = "Не все объекты с приведенными id относятся к задаче!";
+
+    public static final String INVALID_TASK_FILE_NAMES_MESSAGE = "Не все файлы относятся к задаче!";
 
     public static final String REGISTRATION_REQUEST_NOT_FOUND_MESSAGE = "Заявка на регистрацию не найдена";
     public static final String REGISTRATION_REQUEST_EMAIL_EXIST = "Заявка на регистрацию с указанным email уже существует";
