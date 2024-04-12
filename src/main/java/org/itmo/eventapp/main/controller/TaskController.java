@@ -108,7 +108,7 @@ public class TaskController {
         return ResponseEntity.ok().body(taskService.addFiles(id, files));
     }
 
-    @Operation(summary = "Добавление файлов к задаче")
+    @Operation(summary = "Получение списка имен файлов задачи")
     @PreAuthorize("@taskSecurityExpression.canGetTask(#id)")
     @GetMapping("/{id}/files")
     public ResponseEntity<List<String>> getFileNames(@Min(value = 1, message = "Параметр id не может быть меньше 1!")

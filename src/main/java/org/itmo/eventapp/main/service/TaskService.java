@@ -243,13 +243,13 @@ public class TaskService {
 
         Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
 
-        boolean allBelong = fileNamesInMinio.stream().allMatch(filename->filename.startsWith(task.getId().toString()));
+        boolean allBelong = fileNamesInMinio.stream().allMatch(filename -> filename.startsWith(task.getId().toString()));
         if (!allBelong) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TASK_FILE_NAMES_MESSAGE);
         }
 
         for (String filename : fileNamesInMinio) {
-                minioService.delete(BUCKET_NAME, filename);
+            minioService.delete(BUCKET_NAME, filename);
         }
 
     }
@@ -320,6 +320,8 @@ public class TaskService {
         List<Task> tasks = taskRepository.findAllById(taskIds);
 
         List<Task> newTasks = new ArrayList<>();
+        List<String> prefixes = new ArrayList<>();
+
         for (Task task : tasks) {
 
             Task newTask = new Task();
@@ -340,9 +342,16 @@ public class TaskService {
             newTask.setStatus(status);
 
             newTasks.add(newTask);
+            prefixes.add(task.getId().toString());
         }
 
         newTasks = taskRepository.saveAll(newTasks);
+
+        for (int i = 0; i < newTasks.size(); i++) {
+
+            minioService.copyImagesWithPrefix(BUCKET_NAME, BUCKET_NAME, prefixes.get(i), newTasks.get(i).getId().toString());
+
+        }
 
         return newTasks;
     }
