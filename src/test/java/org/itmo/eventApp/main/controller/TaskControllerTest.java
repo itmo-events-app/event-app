@@ -1,25 +1,16 @@
 package org.itmo.eventApp.main.controller;
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.PutObjectArgs;
 import io.minio.StatObjectArgs;
 import io.minio.errors.ErrorResponseException;
-import io.minio.errors.MinioException;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.repository.TaskDeadlineTriggerRepository;
-import org.itmo.eventapp.main.repository.TaskObjectRepository;
 import org.itmo.eventapp.main.repository.TaskReminderTriggerRepository;
 import org.itmo.eventapp.main.repository.TaskRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDateTime;
 
@@ -33,9 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TaskControllerTest extends AbstractTestContainers {
     @Autowired
     TaskRepository taskRepository;
-
-    @Autowired
-    TaskObjectRepository taskObjectRepository;
 
     @Autowired
     TaskDeadlineTriggerRepository taskDeadlineTriggerRepository;

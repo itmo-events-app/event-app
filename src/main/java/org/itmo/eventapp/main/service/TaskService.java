@@ -1,6 +1,5 @@
 package org.itmo.eventapp.main.service;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
@@ -9,8 +8,6 @@ import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
-import org.itmo.eventapp.main.model.mapper.TaskObjectMapper;
-import org.itmo.eventapp.main.repository.TaskObjectRepository;
 import org.itmo.eventapp.main.repository.TaskRepository;
 import org.itmo.eventapp.main.util.TaskNotificationUtils;
 import org.springframework.context.annotation.Lazy;
@@ -26,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashSet;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,7 +39,6 @@ public class TaskService {
     private final UserService userService;
     private final PlaceService placeService;
     private final TaskRepository taskRepository;
-    private final TaskObjectRepository taskObjectRepository;
     private final TaskNotificationUtils taskNotificationUtils;
     private final TaskReminderTriggerService taskReminderTriggerService;
     private final TaskDeadlineTriggerService taskDeadlineTriggerService;
@@ -139,18 +134,18 @@ public class TaskService {
 
     @Transactional
     public void delete(Integer id) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
-        List<Integer> taskObjectIds = new ArrayList<>();
-
-        for (TaskObject taskObject : task.getTaskObjects()) {
-            minioService.delete(
-                    BUCKET_NAME,
-                    taskObject.getId().toString() + "." + FilenameUtils.getExtension(taskObject.getOriginalFilename())
-            );
-            taskObjectIds.add(taskObject.getId());
-
-        }
-        taskObjectRepository.deleteAllById(taskObjectIds);
+//        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+//        List<Integer> taskObjectIds = new ArrayList<>();
+//
+//        for (TaskObject taskObject : task.getTaskObjects()) {
+//            minioService.delete(
+//                    BUCKET_NAME,
+//                    taskObject.getId().toString() + "." + FilenameUtils.getExtension(taskObject.getOriginalFilename())
+//            );
+//            taskObjectIds.add(taskObject.getId());
+//
+//        }
+//        taskObjectRepository.deleteAllById(taskObjectIds);
         taskRepository.deleteById(id);
     }
 

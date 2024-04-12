@@ -8,13 +8,10 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
-import org.itmo.eventapp.main.model.dto.response.TaskObjectResponse;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Task;
-import org.itmo.eventapp.main.model.entity.TaskObject;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
-import org.itmo.eventapp.main.model.mapper.TaskObjectMapper;
 import org.itmo.eventapp.main.service.TaskService;
 import org.itmo.eventapp.main.service.UserService;
 import org.springframework.data.domain.Page;
@@ -32,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor

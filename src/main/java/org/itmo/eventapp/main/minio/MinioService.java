@@ -99,11 +99,11 @@ public class MinioService {
     public void copyImagesWithPrefix(String sourceBucket, String destinationBucket, String sourcePrefix, String destinationPrefix) {
         try {
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(sourceBucket).build())) {
-                throw new MinioException("Source bucket does not exist");
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(sourceBucket).build());
             }
 
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(destinationBucket).build())) {
-                throw new MinioException("Destination bucket does not exist");
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(destinationBucket).build());
             }
         } catch (Exception ex) {
             throw new MinioException(ex.getMessage());

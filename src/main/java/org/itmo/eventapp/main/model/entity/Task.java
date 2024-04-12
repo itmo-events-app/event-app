@@ -49,6 +49,4 @@ public class Task {
 
     private LocalDateTime reminder;
 
-    @OneToMany(mappedBy = "task")
-    List<TaskObject> taskObjects;
 }
