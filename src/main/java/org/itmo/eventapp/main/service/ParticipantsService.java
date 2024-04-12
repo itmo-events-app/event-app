@@ -98,7 +98,7 @@ public class ParticipantsService {
         }
     }
 
-    public File getParticipantsXlsx(Integer eventId) throws IOException {
+    public String getParticipantsXlsx(Integer eventId) throws IOException {
         List<Participant> participants = getParticipants(eventId);
         Workbook book = new XSSFWorkbook();
         Sheet sheet = book.createSheet("Участники");
@@ -147,7 +147,7 @@ public class ParticipantsService {
         book.write(outputStream);
         book.close();
 
-        return list;
+        return list.getAbsolutePath();
 
     }
 
