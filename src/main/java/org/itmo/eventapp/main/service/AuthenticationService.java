@@ -188,7 +188,8 @@ public class AuthenticationService {
         UserPasswordRecoveryInfo info = userPasswordRecoveryInfoService.findByToken(token);
 
         if (info.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Время запроса истекло");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Время запроса истекло. Отправьте запро на восстановление ещё раз.");
         }
     }
 

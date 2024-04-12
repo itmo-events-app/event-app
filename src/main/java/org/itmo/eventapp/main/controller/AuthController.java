@@ -64,19 +64,24 @@ public class AuthController {
                 .body(authenticationService.listRegisterRequestsCallback());
     }
 
+    @Operation(summary = "Отправка запроса на восстановление пароля")
     @PostMapping("/recoveryPassword")
     ResponseEntity<Void> recoveryPassword(@Valid @RequestBody RecoveryPasswordRequest request) {
         authenticationService.recoverPassword(request.email(), request.returnUrl());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "Запрос на валидацию токена")
     @PostMapping("/validateRecoveryToken")
-    ResponseEntity<Void> validateRecoveryToken(@RequestParam
-                                               @NotBlank(message = "Токен отсутствует") String token) {
+    ResponseEntity<Void> validateRecoveryToken(@NotBlank(message = "Токен отсутствует")
+                                               @RequestParam
+                                               @Parameter(name = "token", description = "Токен восстановления пароля", example = "c5b7bcc0-cffe-4f57-853c-7fa18e56b36d")
+                                               String token) {
         authenticationService.validateRecoveryToken(token);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "Запрос на смену пароля")
     @PostMapping("/newPassword")
     ResponseEntity<Void> newPassword(@Valid @RequestBody NewPasswordRequest request) {
         authenticationService.newPassword(request);
