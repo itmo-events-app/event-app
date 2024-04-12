@@ -122,7 +122,7 @@ public class EventRoleService {
         eventRoleRepository.deleteByEventId(eventId);
     }
 
-    public List<Event> getEventsByRole(Integer userId, Integer roleId){
+    public List<Event> getEventsByRole(Integer userId, Integer roleId) {
         return EventMapper.eventRolesToEvents(eventRoleRepository.findAllByUserIdAndRoleId(userId, roleId));
     }
 }

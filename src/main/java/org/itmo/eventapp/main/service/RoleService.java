@@ -27,7 +27,6 @@ public class RoleService {
     private final UserService userService;
     private final List<String> basicRoles = Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
     private final EventRoleRepository eventRoleRepository;
-    private final UserLoginInfoService userLoginInfoService;
 
     @Transactional
     public Role createRole(RoleRequest roleRequest) {
@@ -73,8 +72,12 @@ public class RoleService {
         roleRepository.deleteById(id);
     }
 
-    public List<Role> getAll() {
-        return roleRepository.findAll();
+    public List<Role> getRoles(RoleType type) {
+        if (type == null) {
+            return roleRepository.findAll();
+        } else {
+            return roleRepository.findAllByType(type);
+        }
     }
 
     public Role findRoleById(Integer id) {
@@ -91,19 +94,14 @@ public class RoleService {
         return role;
     }
 
-    public List<Role> getOrganizational() {
-        return roleRepository.findAllByType(RoleType.EVENT);
-    }
-
     public List<Role> searchByName(String name) {
         return roleRepository.findByNameContainingIgnoreCase(name);
     }
 
-    public void assignSystemRole(String login, Integer userId, Integer roleId) {
-        var user = userService.findById(userId);
-        var userWithEmail = userLoginInfoService.findByLogin(login);
-        if (userWithEmail.getUser().getId().equals(userId))
+    public void assignSystemRole(Integer currentPrincipalId, Integer userId, Integer roleId) {
+        if (currentPrincipalId.equals(userId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ASSIGN_SELF_ROLE_FORBIDDEN_MESSAGE);
+        var user = userService.findById(userId);
         var role = findRoleById(roleId);
         if (role.getType().equals(RoleType.EVENT))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_ROLE_TYPE.formatted("системная"));
@@ -111,11 +109,10 @@ public class RoleService {
         userService.save(user);
     }
 
-    public void revokeSystemRole(String login, Integer userId) {
-        var user = userService.findById(userId);
-        var userWithEmail = userLoginInfoService.findByLogin(login);
-        if (userWithEmail.getUser().getId().equals(userId))
+    public void revokeSystemRole(Integer currentPrincipalId, Integer userId) {
+        if (currentPrincipalId.equals(userId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.REVOKE_SELF_ROLE_FORBIDDEN_MESSAGE);
+        var user = userService.findById(userId);
         user.setRole(getReaderRole());
         userService.save(user);
     }

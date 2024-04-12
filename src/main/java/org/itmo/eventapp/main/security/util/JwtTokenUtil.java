@@ -1,6 +1,8 @@
 package org.itmo.eventapp.main.security.util;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,15 +18,15 @@ import java.util.function.Function;
 @Component
 public class JwtTokenUtil {
 
-    private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final int MINUTES = 60;
+    private static final String SECRET = "HellMegaSecretKeyForItmoEventAppNoOneShouldKnowItKeepYourMouthShut";
+    private static final Key SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET));
+    private static final int MINUTES = 60 * 24 * 365;
 
     private Claims extractAllClaims(String token) {
         try {
             return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build()
-                    .parseClaimsJws(token).getBody();
-        }
-        catch (Exception ex) {
+                .parseClaimsJws(token).getBody();
+        } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка валидации токена");
         }
     }
@@ -56,10 +58,10 @@ public class JwtTokenUtil {
         var now = Instant.now();
 
         return Jwts.builder()
-                .setSubject(login)
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plus(MINUTES, ChronoUnit.MINUTES)))
-                .signWith(SECRET_KEY)
-                .compact();
+            .setSubject(login)
+            .setIssuedAt(Date.from(now))
+            .setExpiration(Date.from(now.plus(MINUTES, ChronoUnit.MINUTES)))
+            .signWith(SECRET_KEY)
+            .compact();
     }
 }
