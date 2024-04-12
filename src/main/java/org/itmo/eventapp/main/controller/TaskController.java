@@ -73,7 +73,7 @@ public class TaskController {
 
 
     @Operation(summary = "Добавление файлов к задаче")
-    @PreAuthorize("@taskSecurityExpression.canEditTask(#id)")
+    @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
     @PutMapping("/{id}/files")
     public ResponseEntity<List<TaskObjectResponse>> uploadFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                                 @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
@@ -85,7 +85,7 @@ public class TaskController {
     }
 
     @Operation(summary = "Удаление файлов из задачи")
-    @PreAuthorize("@taskSecurityExpression.canEditTask(#id)")
+    @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
     @DeleteMapping("/{id}/files")
     public ResponseEntity<Void> deleteFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                          @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
