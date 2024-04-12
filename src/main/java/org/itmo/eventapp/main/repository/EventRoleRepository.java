@@ -14,6 +14,8 @@ public interface EventRoleRepository extends JpaRepository<EventRole, Integer> {
 
     List<EventRole> findByUserIdAndEventId(int userId, int eventId);
 
+    boolean existsByUserId(int userId);
+
     List<EventRole> findAllByRoleIdAndEventId(Integer roleId, Integer eventId);
 
     Optional<EventRole> findByUserIdAndRoleIdAndEventId(Integer userId, Integer roleId, Integer eventId);

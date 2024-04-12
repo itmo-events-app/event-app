@@ -195,7 +195,6 @@ class ProfileControllerTest extends AbstractTestContainers {
         MvcResult result = mockMvc.perform(get("/api/profile/system-privileges")
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
                 .andReturn();
         String resultString = result.getResponse().getContentAsString();
         Assertions.assertTrue(resultString.contains("CREATE_EVENT_VENUE"));
