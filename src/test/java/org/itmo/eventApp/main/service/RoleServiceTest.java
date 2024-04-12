@@ -325,7 +325,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         final int ROLES_COUNT = BASIC_ROLES_COUNT + FAKE_ROLES_COUNT;
 
         // ==========----  Execution  ----==========
-        List<Role> allRoles = roleService.getAll();
+        List<Role> allRoles = roleService.getRoles(null);
 
         // ==========---- Assertions  ----==========
         assertNotNull(allRoles,
@@ -343,7 +343,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         cleanRolesPrivileges();
 
         // ==========----  Execution  ----==========
-        List<Role> allRoles = roleService.getAll();
+        List<Role> allRoles = roleService.getRoles(null);
 
         // ==========---- Assertions  ----==========
         assertNotNull(allRoles,
@@ -368,7 +368,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
         // ==========---- Assertions  ----==========
         assertEquals(BASIC_ROLES_COUNT + FAKE_ROLES_COUNT - 1,
-                roleService.getAll().size(),
+                roleService.getRoles(null).size(),
                 "Returned role list size should be less by 1 than originally");
         ResponseStatusException exception =
                 assertThrows(ResponseStatusException.class,
@@ -496,7 +496,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         insertFakeFilling();
 
         // ==========----  Execution  ----==========
-        List<Role> allEventRoles = roleService.getOrganizational();
+        List<Role> allEventRoles = roleService.getRoles(RoleType.EVENT);
 
         // ==========---- Assertions  ----==========
         assertNotNull(allEventRoles,
@@ -512,7 +512,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         cleanRolesPrivileges();
 
         // ==========----  Execution  ----==========
-        List<Role> allEventRoles = roleService.getOrganizational();
+        List<Role> allEventRoles = roleService.getRoles(RoleType.EVENT);
 
         // ==========---- Assertions  ----==========
         assertNotNull(allEventRoles,

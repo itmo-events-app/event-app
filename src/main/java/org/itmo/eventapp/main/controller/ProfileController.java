@@ -12,13 +12,16 @@ import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
 import org.itmo.eventapp.main.model.dto.response.ProfileResponse;
 import org.itmo.eventapp.main.model.dto.response.UserInfoResponse;
+import org.itmo.eventapp.main.model.dto.response.UserSystemRoleResponse;
 import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
+import org.itmo.eventapp.main.model.mapper.UserMapper;
 import org.itmo.eventapp.main.service.EventRoleService;
 import org.itmo.eventapp.main.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -101,5 +104,13 @@ public class ProfileController {
         Set<Privilege> privilegeSet = userService.getUserSystemPrivileges(userId);
         return ResponseEntity.ok().body(
                 PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeSet));
+    }
+
+    @Operation(summary = "Получение списка пользователей в системе")
+    @GetMapping("/all-system-users")
+    public ResponseEntity<List<UserSystemRoleResponse>> getAllUsers() {
+        List<User> allUsers = userService.getAllUsers();
+        return ResponseEntity.ok().body(
+                UserMapper.usersToUserSystemRoleResponses(allUsers));
     }
 }
