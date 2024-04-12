@@ -23,4 +23,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
 
     void deleteNotificationsBySentTimeBefore(LocalDateTime time);
 
+    Long countByUserId(Integer userId);
 }

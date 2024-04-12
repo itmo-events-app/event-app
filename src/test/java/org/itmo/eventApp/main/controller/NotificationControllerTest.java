@@ -47,10 +47,10 @@ class NotificationControllerTest extends AbstractTestContainers{
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id").value("1"))
-                .andExpect(jsonPath("$[1].id").value("2"));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].id").value("1"))
+                .andExpect(jsonPath("$.content[1].id").value("2"));
     }
 
     @Test

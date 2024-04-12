@@ -1,0 +1,10 @@
+INSERT INTO notification(user_id, title, description, seen, sent_time) VALUES (1, '10 Welcome!', 'Thank you for joining us!', FALSE, '2023-04-05 10:00:00');
+INSERT INTO notification(user_id, title, description, seen, sent_time) VALUES (1, '9 Discount Offer', 'Get 20% off on your next purchase!', TRUE, '2023-04-06 12:00:00');
+INSERT INTO notification(user_id, title, description, seen, sent_time) VALUES (1, '8 New Features', 'Explore the new features now available!', FALSE, '2023-04-07 15:30:00');
+INSERT INTO notification(user_id, title, description, seen, sent_time) VALUES (1, '7 Reminder', 'Dont forget your weekly plan!', TRUE, '2023-04-08 09:00:00');
+INSERT INTO notification(user_id, title, description, seen, sent_time) VALUES (1, '6 Update', 'Important app update available!', FALSE, '2023-04-09 20:00:00');
+INSERT INTO notification(user_id, title, description, seen, sent_time) VALUES (1, '5 Survey', 'Help us improve by completing this short survey!', TRUE, '2023-04-10 18:45:00');
+INSERT INTO notification(user_id, title, description, seen, sent_time) VALUES (1, '4 Daily Tip', 'Your daily wellness tip!', FALSE, '2023-04-11 11:11:00');
+INSERT INTO notification(user_id, title, description, seen, sent_time) VALUES (1, '3 Subscription Update', 'Your subscription has been updated.', TRUE, '2023-04-12 16:30:00');
+INSERT INTO notification(user_id, title, description, seen, sent_time) VALUES (1, '2 Product Launch', 'Check out our newest product release!', FALSE, '2023-04-13 14:00:00');
+INSERT INTO notification(user_id, title, description, seen, sent_time) VALUES (1, '1 Event Invitation', 'You are invited to our annual event!', TRUE, '2023-04-14 19:30:00');
