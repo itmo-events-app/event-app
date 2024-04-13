@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.model.mapper;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
+import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
@@ -17,7 +18,7 @@ public final class TaskMapper {
 
     public static TaskResponse taskToTaskResponse(Task task, TaskService taskService) {
 
-        List<String> filenames = taskService.getFileNames(task.getId());
+        List<FileDataResponse> fileData = taskService.getFileData(task.getId());
 
         return new TaskResponse(
                 task.getId(),
@@ -30,7 +31,7 @@ public final class TaskMapper {
                 task.getCreationTime(),
                 task.getDeadline(),
                 task.getReminder(),
-                filenames
+                fileData
         );
     }
 

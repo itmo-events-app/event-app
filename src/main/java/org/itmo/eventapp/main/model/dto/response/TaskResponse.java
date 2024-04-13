@@ -20,6 +20,6 @@ public record TaskResponse(
         LocalDateTime creationTime,
         LocalDateTime deadline,
         LocalDateTime reminder,
-        List<String> filenames
+        List<FileDataResponse> fileData
 ) {
 }

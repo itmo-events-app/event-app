@@ -2,9 +2,11 @@ package org.itmo.eventapp.main.minio;
 
 import io.minio.*;
 import io.minio.errors.*;
+import io.minio.http.Method;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -88,6 +90,33 @@ public class MinioService {
             Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(bucket).prefix(prefix).build());
             for (Result<Item> result : results) {
                 filenames.add(result.get().objectName());
+            }
+        } catch (Exception e) {
+            throw new MinioException("Error getting filenames: " + e.getMessage());
+        }
+        return filenames;
+    }
+
+
+    @SneakyThrows
+    public List<FileDataResponse> getFileDataByPrefix(String bucket, String prefix) {
+        List<FileDataResponse> filenames = new ArrayList<>();
+        boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+        if (!found) {
+            return filenames;
+        }
+        try {
+            Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(bucket).prefix(prefix).build());
+            for (Result<Item> result : results) {
+                String filename = result.get().objectName();
+                String presignedUrl = minioClient.getPresignedObjectUrl(
+                        GetPresignedObjectUrlArgs.builder()
+                                .method(Method.GET)
+                                .bucket(bucket)
+                                .object(filename)
+                                .expiry(60 * 60 * 24)
+                                .build());
+                filenames.add(new FileDataResponse(filename, presignedUrl));
             }
         } catch (Exception e) {
             throw new MinioException("Error getting filenames: " + e.getMessage());

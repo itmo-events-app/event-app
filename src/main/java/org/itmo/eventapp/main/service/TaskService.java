@@ -5,6 +5,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
+import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
@@ -185,6 +186,11 @@ public class TaskService {
 
     public List<String> getFileNames(Integer taskId) {
         return minioService.getFileNamesByPrefix(BUCKET_NAME, taskId.toString());
+    }
+
+
+    public List<FileDataResponse> getFileData(Integer taskId) {
+        return minioService.getFileDataByPrefix(BUCKET_NAME, taskId.toString());
     }
 
 
