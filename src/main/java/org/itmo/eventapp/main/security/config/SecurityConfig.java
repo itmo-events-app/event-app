@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.security.config;
 
 import lombok.RequiredArgsConstructor;
+import org.itmo.eventapp.main.security.filter.JwtFilter;
 import org.itmo.eventapp.main.security.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,17 +28,19 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 
-//@EnableWebSecurity
+@EnableWebSecurity
 @RequiredArgsConstructor
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final PasswordEncoder passwordEncoder;
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     private final UserDetailsServiceImpl userDetailsServiceImpl;
-
-    private final JwtDecoder jwtDecoder;
+    private final JwtFilter jwtFilter;
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
@@ -51,7 +55,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
         throws Exception {
         return http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -61,23 +65,24 @@ public class SecurityConfig {
                 .requestMatchers("/register").permitAll()
                 .anyRequest().authenticated())
                 //.anyRequest().permitAll())
-                .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationManager(authenticationManager)
-                .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))
+                .authenticationProvider(authenticationProvider())
+                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
     }
 
     @Bean
-    public AuthenticationProvider daoAuthProvider(AuthenticationManagerBuilder authenticationManagerBuilder) {
-        var provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsServiceImpl);
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsServiceImpl);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class).build();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+            throws Exception {
+        return configuration.getAuthenticationManager();
     }
 }
