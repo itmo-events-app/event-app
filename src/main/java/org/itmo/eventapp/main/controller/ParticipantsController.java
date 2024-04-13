@@ -81,7 +81,7 @@ public class ParticipantsController {
             })
     @PreAuthorize("@participantsSecurityExpression.canImportList(#id)")
     @PostMapping("/{id}/participants")
-    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id, @Valid @RequestPart MultipartFile participantsFile) throws IOException {
+    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id, @RequestPart MultipartFile participantsFile) throws IOException {
         List<Participant> participants = participantsService.setParticipants(id, participantsFile);
         return ResponseEntity.status(HttpStatus.CREATED).body(ParticipantMapper.participantsToResponseList(participants));
     }

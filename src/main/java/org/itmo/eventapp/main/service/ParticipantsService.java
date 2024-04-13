@@ -29,11 +29,11 @@ public class ParticipantsService {
     private static final String BUCKET_NAME = "event-participants";
 
     public List<Participant> getParticipants(Integer id) {
-        return participantsRepository.findAllByEventId(id);
+        return participantsRepository.findAllByEventId(id).get();
     }
 
     public Participant changePresence(Integer eventId, ParticipantPresenceRequest participantPresenceRequest){
-        Participant participant = participantsRepository.findByIdAndEventId(participantPresenceRequest.participantId(), eventId);
+        Participant participant = participantsRepository.findByIdAndEventId(participantPresenceRequest.participantId(), eventId).get();
         participant.setVisited(participantPresenceRequest.isVisited());
         participantsRepository.save(participant);
         return participant;
@@ -43,6 +43,7 @@ public class ParticipantsService {
         //File list = new File("D:/eventapptest/participants.xlsx");
         savetoMinio(participantsListFile, eventId);
         List<Participant> participants = new ArrayList<>();
+
         try{
         InputStream list = participantsListFile.getInputStream();
         Workbook workbook = new XSSFWorkbook(list);
@@ -51,7 +52,6 @@ public class ParticipantsService {
         int counter = 0;
         for(int y = 0; y < data.size(); y++){
             Participant participant = new Participant();
-            participant.setId(counter + 1);
             participant.setName(data.get(counter).get("ФИО").toString());
             participant.setEmail(data.get(counter).get("Email").toString());
             participant.setAdditionalInfo(data.get(counter).get("Телефон").toString() + ". " + data.get(y).get("Должность"));
@@ -60,8 +60,7 @@ public class ParticipantsService {
             participantsRepository.save(participant);
             participants.add(participant);
             counter++;
-        }
-        }
+        }}
         catch(IOException e){
             throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ExceptionConst.PARTICIPANTS_LIST_PARSING_ERROR);
         }
@@ -115,6 +114,7 @@ public class ParticipantsService {
     public String getParticipantsXlsx(Integer eventId) throws IOException {
         List<Participant> participants = getParticipants(eventId);
         Workbook book = new XSSFWorkbook();
+
         Sheet sheet = book.createSheet("Участники");
         sheet.setColumnWidth(0, 10000);
         sheet.setColumnWidth(1, 10000);

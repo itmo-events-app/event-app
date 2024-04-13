@@ -5,10 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ParticipantsRepository extends JpaRepository<Participant, Integer> {
-    List<Participant> findAllByEventId(Integer eventId);
-    Participant findByIdAndEventId(Integer id, Integer eventId);
+    Optional<List<Participant>> findAllByEventId(Integer eventId);
+    Optional<Participant> findByIdAndEventId(Integer id, Integer eventId);
 
 }
