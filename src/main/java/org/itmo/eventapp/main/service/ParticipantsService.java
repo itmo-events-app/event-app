@@ -33,7 +33,8 @@ public class ParticipantsService {
 
     public List<Participant> getParticipants(Integer id) {
         Optional<List<Participant>> foundParticipants = participantsRepository.findAllByEventId(id);
-        List<Participant> participants = foundParticipants.get();
+        List<Participant> participants= new ArrayList<>();
+        if(!foundParticipants.isEmpty()) return  participants = foundParticipants.get();
         return participants;
     }
 
@@ -97,11 +98,10 @@ public class ParticipantsService {
             if(row.getRowNum() != 0) {
                 Map<String, Object> participant = new HashMap<>();
                 for (Cell cell : row) {
-                    participant = parseCell(excelSheet, cell);
+                    participant = parseCell(excelSheet, cell, participant);
                     if(cell.getCellType() == Cell.CELL_TYPE_BLANK && cell.getColumnIndex() == 0) {
                         break outerLoop;
                     }
-
                 }
                 if (participant.isEmpty()) break;
                 data.add(participant);
@@ -112,8 +112,7 @@ public class ParticipantsService {
 
     }
 
-    private Map<String, Object> parseCell(Sheet excelSheet, Cell cell){
-        Map<String, Object> participant = new HashMap<>();
+    private Map<String, Object> parseCell(Sheet excelSheet, Cell cell, Map<String, Object> participant){
         String columnName = excelSheet.getRow(0).getCell(cell.getColumnIndex()).getStringCellValue();
         if (cell.getCellType() == Cell.CELL_TYPE_STRING){
             participant.put(columnName, cell.getStringCellValue());
