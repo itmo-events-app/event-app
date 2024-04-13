@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.itmo.eventapp.main.model.validation.annotation.PasswordMatching;
 import org.itmo.eventapp.main.model.validation.annotation.StrongPassword;
 
+@SuppressWarnings("java:S2068")
 @PasswordMatching(
         password = "newPassword",
         confirmPassword = "confirmNewPassword"
