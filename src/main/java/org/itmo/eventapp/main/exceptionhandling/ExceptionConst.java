@@ -39,6 +39,8 @@ public class ExceptionConst {
 
     public static final String INVALID_TYPE = "Invalid type";
 
+    public static final String EMAIL_NOT_APPROVED = "Невозможно восстановить пароль без подтвержденной почты";
+
 
     private ExceptionConst() {
     }

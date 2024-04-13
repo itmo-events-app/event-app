@@ -163,17 +163,14 @@ public class AuthenticationService {
 
     public void recoverPassword(String email, String returnUrl) {
 
+        UserLoginInfo info = userLoginInfoService.findByLogin(email);
+
+        if (info.getLoginStatus() != LoginStatus.APPROVED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.EMAIL_NOT_APPROVED);
+        }
+
         User user = userService.findByLogin(email);
-
-        String token = UUID.randomUUID().toString();
-
-        UserPasswordRecoveryInfo info = UserPasswordRecoveryInfo.builder()
-                .token(token)
-                .user(user)
-                .expiryDate(LocalDateTime.now().plusDays(1))
-                .build();
-
-        userPasswordRecoveryInfoService.save(info);
+        String token = userPasswordRecoveryInfoService.updateUserToken(user);
 
         String url = returnUrl + "?token=" + token;
 
