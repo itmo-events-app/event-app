@@ -6,6 +6,7 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Privilege;
+import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
@@ -124,5 +125,9 @@ public class EventRoleService {
 
     public List<Event> getEventsByRole(Integer userId, Integer roleId) {
         return EventMapper.eventRolesToEvents(eventRoleRepository.findAllByUserIdAndRoleId(userId, roleId));
+    }
+
+    public boolean userHasOrganizerRoles(Integer userId) {
+        return eventRoleRepository.existsByUserId(userId);
     }
 }
