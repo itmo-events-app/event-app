@@ -164,6 +164,12 @@ public class AuthenticationService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         var email = authentication.getName();
 
+        UserLoginInfo info = userLoginInfoService.findByLogin(email);
+
+        if (info.getLoginStatus() == LoginStatus.APPROVED){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.EMAIL_ALREADY_APPROVED);
+        }
+
         User user = userService.findByLogin(email);
         String token = userEmailVerificationInfoService.updateUserToken(user);
 

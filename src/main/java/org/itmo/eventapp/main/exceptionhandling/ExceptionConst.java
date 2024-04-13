@@ -39,6 +39,8 @@ public class ExceptionConst {
 
     public static final String INVALID_TYPE = "Invalid type";
 
+    public static final String EMAIL_ALREADY_APPROVED = "Email уже подтвержден";
+
 
     private ExceptionConst() {
     }
