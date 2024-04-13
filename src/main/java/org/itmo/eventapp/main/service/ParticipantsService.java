@@ -27,9 +27,14 @@ public class ParticipantsService {
     private final EventService eventService;
     private final MinioService minioService;
     private static final String BUCKET_NAME = "event-participants";
+    private static final String name = "ФИО";
+    private static final String email = "Email";
+    private static final String phone = "Телефон";
 
     public List<Participant> getParticipants(Integer id) {
-        return participantsRepository.findAllByEventId(id).get();
+        Optional<List<Participant>> foundParticipants = participantsRepository.findAllByEventId(id);
+        List<Participant> participants = foundParticipants.get();
+        return participants;
     }
 
     public Participant changePresence(Integer eventId, ParticipantPresenceRequest participantPresenceRequest){
@@ -54,9 +59,9 @@ public class ParticipantsService {
         int counter = 0;
         for(int y = 0; y < data.size(); y++){
             Participant participant = new Participant();
-            participant.setName(data.get(counter).get("ФИО").toString());
-            participant.setEmail(data.get(counter).get("Email").toString());
-            participant.setAdditionalInfo(data.get(counter).get("Телефон").toString() + ". " + data.get(y).get("Должность"));
+            participant.setName(data.get(counter).get(name).toString());
+            participant.setEmail(data.get(counter).get(email).toString());
+            participant.setAdditionalInfo(data.get(counter).get(phone).toString());
             participant.setEvent(eventService.findById(eventId));
             participant.setVisited(false);
             participantsRepository.save(participant);
@@ -75,7 +80,7 @@ public class ParticipantsService {
 
         int exist = 0;
         for (Cell cell : row) {
-            if (cell.getStringCellValue().equals("ФИО") || cell.getStringCellValue().equals("Email") || cell.getStringCellValue().equals("Телефон")) {
+            if (cell.getStringCellValue().equals(name) || cell.getStringCellValue().equals(email) || cell.getStringCellValue().equals(phone)) {
                 exist++;
             }
         }
