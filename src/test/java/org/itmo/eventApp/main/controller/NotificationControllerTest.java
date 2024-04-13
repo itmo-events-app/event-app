@@ -4,6 +4,7 @@ import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.repository.NotificationRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -35,7 +36,6 @@ class NotificationControllerTest extends AbstractTestContainers{
         userDetails.setUser(dummyUser);
         return userDetails;
     }
-
 
     @Test
     @WithMockUser(username = "test_mail@itmo.ru")

@@ -1,9 +1,6 @@
 package org.itmo.eventapp.main.repository;
 
-import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.EventRole;
-import org.itmo.eventapp.main.model.entity.Role;
-import org.itmo.eventapp.main.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,21 +10,19 @@ import java.util.Optional;
 @Repository
 public interface EventRoleRepository extends JpaRepository<EventRole, Integer> {
 
-    boolean existsByRole(Role role);
-
-    Optional<EventRole> findByUserAndEvent(User user, Event event);
+    boolean existsByRoleId(Integer roleId);
 
     List<EventRole> findByUserIdAndEventId(int userId, int eventId);
 
-    Optional<EventRole> findByUserIdAndEventId(Integer userId, Integer eventId);
+    boolean existsByUserId(int userId);
 
-    List<EventRole> findAllByRoleAndEvent(Role role, Event event);
+    List<EventRole> findAllByRoleIdAndEventId(Integer roleId, Integer eventId);
 
-    Optional<EventRole> findByUserAndRoleAndEvent(User user, Role role, Event event);
-
-    List<EventRole> findAllByUserId(Integer userId);
+    Optional<EventRole> findByUserIdAndRoleIdAndEventId(Integer userId, Integer roleId, Integer eventId);
 
     List<EventRole> findAllByEventId(Integer eventId);
+
+    boolean existsByUserIdAndRoleIdAndEventId(Integer userId, Integer roleId, Integer eventId);
 
     long deleteByEventId(int eventId);
 

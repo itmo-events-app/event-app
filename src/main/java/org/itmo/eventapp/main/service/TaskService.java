@@ -1,12 +1,11 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
+import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
-import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.Place;
-import org.itmo.eventapp.main.model.entity.Task;
-import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.repository.TaskRepository;
@@ -20,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -30,17 +31,28 @@ import java.util.Objects;
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @Service
 public class TaskService {
+
+    private static final String BUCKET_NAME = "task-objects";
+
     @Lazy
     private final EventService eventService;
     private final UserService userService;
     private final PlaceService placeService;
     private final TaskRepository taskRepository;
     private final TaskNotificationUtils taskNotificationUtils;
+    private final TaskReminderTriggerService taskReminderTriggerService;
+    private final TaskDeadlineTriggerService taskDeadlineTriggerService;
+    private final MinioService minioService;
 
     public Task findById(int id) {
-        return taskRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+        return taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
     }
 
+    public List<Task> findAllById(List<Integer> ids) {
+        return taskRepository.findAllById(ids);
+    }
+
+    @Transactional
     public Task save(TaskRequest taskRequest) {
 
         Event event = eventService.findById(taskRequest.eventId());
@@ -51,12 +63,12 @@ public class TaskService {
 
 
         User assignee = null;
-        if (taskRequest.assignee() != null) {
-            assignee = userService.findById(taskRequest.assignee().id());
+        if (taskRequest.assigneeId() != null) {
+            assignee = userService.findById(taskRequest.assigneeId());
         }
         Place place = null;
-        if (taskRequest.place() != null) {
-            place = placeService.findById(taskRequest.place().id());
+        if (taskRequest.placeId() != null) {
+            place = placeService.findById(taskRequest.placeId());
         }
 
         Task newTask = TaskMapper.taskRequestToTask(taskRequest, event, assignee, assigner, place);
@@ -73,11 +85,14 @@ public class TaskService {
 
         if (assignee != null) {
             taskNotificationUtils.createIncomingTaskNotification(newTask);
+            taskDeadlineTriggerService.createNewDeadlineTrigger(newTask);
+            taskReminderTriggerService.createNewReminderTrigger(newTask);
         }
 
         return newTask;
     }
 
+    @Transactional
     public Task edit(Integer id, TaskRequest taskRequest) {
 
         Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
@@ -88,13 +103,13 @@ public class TaskService {
         User prevAssignee = task.getAssignee();
 
         User assignee = null;
-        if (taskRequest.assignee() != null) {
-            assignee = userService.findById(taskRequest.assignee().id());
+        if (taskRequest.assigneeId() != null) {
+            assignee = userService.findById(taskRequest.assigneeId());
 
         }
         Place place = null;
-        if (taskRequest.place() != null) {
-            place = placeService.findById(taskRequest.place().id());
+        if (taskRequest.placeId() != null) {
+            place = placeService.findById(taskRequest.placeId());
         }
 
         Task newTaskData = TaskMapper.taskRequestToTask(taskRequest, event, assignee, assigner, place);
@@ -109,17 +124,71 @@ public class TaskService {
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(newTaskData);
+            taskDeadlineTriggerService.createNewDeadlineTrigger(newTaskData);
+            taskReminderTriggerService.createNewReminderTrigger(newTaskData);
 
         }
 
         return newTaskData;
     }
 
+    @Transactional
     public void delete(Integer id) {
+
+        minioService.deleteImageByPrefix(BUCKET_NAME, id.toString());
         taskRepository.deleteById(id);
     }
 
 
+    public List<String> addFiles(Integer id, List<MultipartFile> files) {
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+
+        List<String> filenames = new ArrayList<>();
+
+        if (!Objects.isNull(files)) {
+
+            for (MultipartFile file : files) {
+
+                String modifiedFileName = task.getId().toString()
+                        + "_"
+                        + FilenameUtils.getBaseName(file.getOriginalFilename())
+                        + "_"
+                        + System.currentTimeMillis()
+                        + "."
+                        + FilenameUtils.getExtension(file.getOriginalFilename());
+                minioService.uploadWithModifiedFileName(file, BUCKET_NAME, modifiedFileName);
+                filenames.add(modifiedFileName);
+            }
+
+        }
+
+        return filenames;
+
+    }
+
+
+    public void deleteFiles(Integer id, List<String> fileNamesInMinio) {
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+
+        boolean allBelong = fileNamesInMinio.stream().allMatch(filename -> filename.startsWith(task.getId().toString()));
+        if (!allBelong) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TASK_FILE_NAMES_MESSAGE);
+        }
+
+        for (String filename : fileNamesInMinio) {
+            minioService.delete(BUCKET_NAME, filename);
+        }
+
+    }
+
+    public List<String> getFileNames(Integer taskId) {
+        return minioService.getFileNamesByPrefix(BUCKET_NAME, taskId.toString());
+    }
+
+
+    @Transactional
     public Task setAssignee(Integer taskId, Integer assigneeId) {
 
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
@@ -137,6 +206,8 @@ public class TaskService {
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(task);
+            taskDeadlineTriggerService.createNewDeadlineTrigger(task);
+            taskReminderTriggerService.createNewReminderTrigger(task);
 
         }
 
@@ -178,6 +249,8 @@ public class TaskService {
         List<Task> tasks = taskRepository.findAllById(taskIds);
 
         List<Task> newTasks = new ArrayList<>();
+        List<String> prefixes = new ArrayList<>();
+
         for (Task task : tasks) {
 
             Task newTask = new Task();
@@ -188,7 +261,7 @@ public class TaskService {
             newTask.setAssigner(task.getAssigner());
             newTask.setAssignee(null);
             newTask.setDeadline(task.getDeadline());
-            newTask.setNotificationDeadline(task.getNotificationDeadline());
+            newTask.setReminder(task.getReminder());
 
             newTask.setCreationTime(LocalDateTime.now());
             TaskStatus status = TaskStatus.NEW;
@@ -198,9 +271,16 @@ public class TaskService {
             newTask.setStatus(status);
 
             newTasks.add(newTask);
+            prefixes.add(task.getId().toString());
         }
 
         newTasks = taskRepository.saveAll(newTasks);
+
+        for (int i = 0; i < newTasks.size(); i++) {
+
+            minioService.copyImagesWithPrefix(BUCKET_NAME, BUCKET_NAME, prefixes.get(i), newTasks.get(i).getId().toString());
+
+        }
 
         return newTasks;
     }
@@ -273,12 +353,5 @@ public class TaskService {
         return taskRepository.findAll(taskSpecification, pageRequest);
     }
 
-    public List<Task> getTasksWithDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByDeadlineBetween(startTime, endTime);
-    }
-
-    public List<Task> getTasksWithNotificationDeadlineBetween(LocalDateTime startTime, LocalDateTime endTime){
-        return taskRepository.findAllByNotificationDeadlineBetween(startTime, endTime);
-    }
 
 }

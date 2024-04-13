@@ -102,7 +102,7 @@ class EventServiceTest {
         when(eventRepository.existsById(eventId)).thenReturn(true);
         when(eventRepository.save(any())).thenReturn(new Event());
         when(placeService.findById(anyInt())).thenReturn(new Place());
-        doNothing().when(minioService).deleteImageByEvent(anyString(), any());
+        doNothing().when(minioService).deleteImageByPrefix(anyString(), any());
         Event updatedEvent = eventService.updateEvent(eventId, eventRequest);
 
         assertAll(
