@@ -10,7 +10,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.ParticipantPresenceRequest;
-import org.itmo.eventapp.main.model.dto.request.ParticipantsListRequest;
 import org.itmo.eventapp.main.model.entity.Participant;
 import org.itmo.eventapp.main.repository.ParticipantsRepository;
 import org.springframework.http.HttpStatus;
@@ -30,11 +29,11 @@ public class ParticipantsService {
     private static final String BUCKET_NAME = "event-participants";
 
     public List<Participant> getParticipants(Integer id) {
-        return participantsRepository.findAllByEvent(id);
+        return participantsRepository.findAllByEventId(id);
     }
 
     public Participant changePresence(Integer eventId, ParticipantPresenceRequest participantPresenceRequest){
-        Participant participant = participantsRepository.findByIdAndEvent(participantPresenceRequest.participantId(), eventId);
+        Participant participant = participantsRepository.findByIdAndEventId(participantPresenceRequest.participantId(), eventId);
         participant.setVisited(participantPresenceRequest.isVisited());
         participantsRepository.save(participant);
         return participant;
