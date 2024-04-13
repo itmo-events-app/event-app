@@ -27,9 +27,9 @@ public class ParticipantsService {
     private final EventService eventService;
     private final MinioService minioService;
     private static final String BUCKET_NAME = "event-participants";
-    private static final String name = "ФИО";
-    private static final String email = "Email";
-    private static final String phone = "Телефон";
+    private static final String NAME = "ФИО";
+    private static final String EMAIL = "Email";
+    private static final String PHONE = "Телефон";
 
     public List<Participant> getParticipants(Integer id) {
         Optional<List<Participant>> foundParticipants = participantsRepository.findAllByEventId(id);
@@ -59,9 +59,9 @@ public class ParticipantsService {
         int counter = 0;
         for(int y = 0; y < data.size(); y++){
             Participant participant = new Participant();
-            participant.setName(data.get(counter).get(name).toString());
-            participant.setEmail(data.get(counter).get(email).toString());
-            participant.setAdditionalInfo(data.get(counter).get(phone).toString());
+            participant.setName(data.get(counter).get(NAME).toString());
+            participant.setEmail(data.get(counter).get(EMAIL).toString());
+            participant.setAdditionalInfo(data.get(counter).get(PHONE).toString());
             participant.setEvent(eventService.findById(eventId));
             participant.setVisited(false);
             participantsRepository.save(participant);
@@ -80,7 +80,7 @@ public class ParticipantsService {
 
         int exist = 0;
         for (Cell cell : row) {
-            if (cell.getStringCellValue().equals(name) || cell.getStringCellValue().equals(email) || cell.getStringCellValue().equals(phone)) {
+            if (cell.getStringCellValue().equals(NAME) || cell.getStringCellValue().equals(EMAIL) || cell.getStringCellValue().equals(PHONE)) {
                 exist++;
             }
         }
@@ -97,20 +97,8 @@ public class ParticipantsService {
             if(row.getRowNum() != 0) {
                 Map<String, Object> participant = new HashMap<>();
                 for (Cell cell : row) {
-                    String columnName = excelSheet.getRow(0).getCell(cell.getColumnIndex()).getStringCellValue();
-                    if (cell.getCellType() == Cell.CELL_TYPE_STRING){
-                        participant.put(columnName, cell.getStringCellValue());
-                        if(cell.getColumnIndex() == 0 && cell.getStringCellValue().trim().isEmpty()){
-                            break outerLoop;
-                        }
-                    }
-                    else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
-                        participant.put(columnName, cell.getNumericCellValue());
-                    }
-                    else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA){
-                        participant.put(columnName, cell.getCellFormula());
-                    }
-                    else if(cell.getCellType() == Cell.CELL_TYPE_BLANK && cell.getColumnIndex() == 0) {
+                    participant = parseCell(excelSheet, cell);
+                    if(cell.getCellType() == Cell.CELL_TYPE_BLANK && cell.getColumnIndex() == 0) {
                         break outerLoop;
                     }
 
@@ -122,6 +110,24 @@ public class ParticipantsService {
 
         return data;
 
+    }
+
+    private Map<String, Object> parseCell(Sheet excelSheet, Cell cell){
+        Map<String, Object> participant = new HashMap<>();
+        String columnName = excelSheet.getRow(0).getCell(cell.getColumnIndex()).getStringCellValue();
+        if (cell.getCellType() == Cell.CELL_TYPE_STRING){
+            participant.put(columnName, cell.getStringCellValue());
+            if(cell.getColumnIndex() == 0 && cell.getStringCellValue().trim().isEmpty()){
+                return participant;
+            }
+        }
+        else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+            participant.put(columnName, cell.getNumericCellValue());
+        }
+        else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA){
+            participant.put(columnName, cell.getCellFormula());
+        }
+        return participant;
     }
 
     private void savetoMinio(MultipartFile file, Integer id){
@@ -144,9 +150,9 @@ public class ParticipantsService {
 
         Row header = sheet.createRow(0);
         Cell headerCell = header.createCell(0);
-        headerCell.setCellValue("ФИО");
+        headerCell.setCellValue(NAME);
         headerCell = header.createCell(1);
-        headerCell.setCellValue("Email");
+        headerCell.setCellValue(EMAIL);
         headerCell = header.createCell(2);
         headerCell.setCellValue("Дополнительная информация");
         headerCell = header.createCell(3);
