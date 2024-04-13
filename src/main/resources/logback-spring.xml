@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="/org/springframework/boot/logging/logback/base.xml"/>
-    <appender name="DEBUG" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %magenta(event-app service %d{HH:mm:ss.SSS} [%thread] %-5level %logger{50}.%M - %msg%n)
+                %yellow(event-app: %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n)
             </pattern>
         </encoder>
     </appender>
+    <appender name="DEBUG" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %magenta(event-app: %d{HH:mm:ss.SSS} [%thread] %-5level %logger{50}.%M - %msg%n)
+            </pattern>
+        </encoder>
+    </appender>
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
     <logger name="org.itmo.eventapp.main" level="debug" additivity="false">
         <appender-ref ref="DEBUG"/>
     </logger>
