@@ -89,7 +89,7 @@ public class UserService {
         UserPasswordRecoveryInfo info = userPasswordRecoveryInfoService.findByToken(request.token());
 
         if (!request.newPassword().equals(request.confirmNewPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.USER_PASSWORD_MISMATCH);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.USER_PASSWORD_MISMATCH_MESSAGE);
         }
 
         userLoginInfoService.setPassword(info.getUser().getUserLoginInfo(), request.newPassword());
