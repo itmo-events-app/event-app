@@ -147,6 +147,7 @@ public class AuthenticationService {
         return registrationRequestService.getByStatus(RegistrationRequestStatus.NEW)
                 .stream()
                 .map((request) -> new RegistrationRequestForAdmin(
+                        request.getId(),
                         request.getEmail(),
                         request.getName(),
                         request.getSurname(),
