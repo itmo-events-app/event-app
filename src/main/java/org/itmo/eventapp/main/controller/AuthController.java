@@ -58,15 +58,21 @@ public class AuthController {
                 .body(authenticationService.listRegisterRequestsCallback());
     }
 
-    @PostMapping("/verifyEmail")
-    ResponseEntity<Void> verifyEmail(@RequestParam String returnUrl) {
-        authenticationService.verifyEmail(returnUrl);
+    @PostMapping("/sendVerificationEmail")
+    ResponseEntity<Void> sendVerificationEmail(@RequestParam String returnUrl) {
+        authenticationService.sendVerificationEmail(returnUrl);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/validateEmailVerificationToken")
     ResponseEntity<Void> validateEmailVerificationToken(@RequestParam String token) {
         authenticationService.validateEmailVerificationToken(token);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/verifyEmail")
+    ResponseEntity<Void> verifyEmail() {
+        authenticationService.verifyEmail();
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

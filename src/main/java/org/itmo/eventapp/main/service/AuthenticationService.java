@@ -118,7 +118,7 @@ public class AuthenticationService {
                 .passwordHash(request.getPasswordHash())
                 .lastLoginDate(LocalDateTime.now())
                 .user(user)
-                .loginStatus(LoginStatus.APPROVED)
+                .loginStatus(LoginStatus.UNAPPROVED)
                 .build();
 
         userLoginInfoService.save(loginInfo);
@@ -159,7 +159,7 @@ public class AuthenticationService {
                 .toList();
     }
 
-    public void verifyEmail(String returnUrl) {
+    public void sendVerificationEmail(String returnUrl) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         var email = authentication.getName();
@@ -181,5 +181,15 @@ public class AuthenticationService {
         if (info.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Время запроса истекло. Отправьте запрос ещё раз");
         }
+    }
+
+    public void verifyEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var email = authentication.getName();
+
+        UserLoginInfo userLoginInfo = userLoginInfoService.findByLogin(email);
+        userLoginInfo.setLoginStatus(LoginStatus.APPROVED);
+
+        userLoginInfoService.save(userLoginInfo);
     }
 }
