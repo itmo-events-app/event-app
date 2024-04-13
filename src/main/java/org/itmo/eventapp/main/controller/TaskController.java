@@ -54,7 +54,7 @@ public class TaskController {
                                                 @Parameter(name = "id", description = "ID задачи", example = "1") Integer id) {
         Task task = taskService.findById(id);
 
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(task));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(task, taskService));
     }
 
     @Operation(summary = "Редактирование задачи")
@@ -64,7 +64,7 @@ public class TaskController {
                                                  @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
                                                  @Valid @RequestBody TaskRequest taskRequest) {
         Task edited = taskService.edit(id, taskRequest);
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(edited));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(edited, taskService));
     }
 
 
@@ -120,7 +120,7 @@ public class TaskController {
             @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId
     ) {
         Task updatedTask = taskService.setAssignee(id, userId);
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
     }
 
     /*TODO: TEST*/
@@ -138,7 +138,7 @@ public class TaskController {
         Integer userId = userService.findByLogin(currentPrincipalName).getId();
 
         Task updatedTask = taskService.setAssignee(id, userId);
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
     }
 
     // p35 && also delete yourself as privilege 41
@@ -150,7 +150,7 @@ public class TaskController {
             @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id
     ) {
         Task updatedTask = taskService.setAssignee(id, -1);
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
     }
 
     //privilege 32 && privilege 39
@@ -164,7 +164,7 @@ public class TaskController {
             @RequestBody @Parameter(name = "newStatus", description = "Новый статус задачи", example = "EXPIRED") TaskStatus newStatus
     ) {
         Task updatedTask = taskService.setStatus(id, newStatus);
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
     }
 
 
@@ -180,7 +180,7 @@ public class TaskController {
             @RequestBody List<Integer> taskIds
     ) {
         List<Task> updTasks = taskService.moveTasks(dstEventId, taskIds);
-        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(updTasks));
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(updTasks, taskService));
     }
 
     @Operation(summary = "Копирование списка задач")
@@ -194,7 +194,7 @@ public class TaskController {
     ) {
         List<Task> newTasks = taskService.copyTasks(dstEventId, taskIds);
         // src == dst - ?
-        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(newTasks));
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(newTasks, taskService));
     }
 
     @Operation(summary = "Получение списка задач мероприятия")
@@ -262,7 +262,7 @@ public class TaskController {
 
         return ResponseEntity.ok()
                 .headers(responseHeaders)
-                .body(TaskMapper.tasksToTaskResponseList(eventTasks.toList()));
+                .body(TaskMapper.tasksToTaskResponseList(eventTasks.toList(), taskService));
     }
 
     @Operation(summary = "Получение списка задач где пользователь является исполнителем")
@@ -316,7 +316,7 @@ public class TaskController {
 
         return ResponseEntity.ok()
                 .headers(responseHeaders)
-                .body(TaskMapper.tasksToTaskResponseList(userTasks.toList()));
+                .body(TaskMapper.tasksToTaskResponseList(userTasks.toList(), taskService));
     }
 
 

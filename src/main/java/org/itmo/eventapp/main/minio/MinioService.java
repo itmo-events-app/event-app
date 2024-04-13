@@ -64,12 +64,12 @@ public class MinioService {
     }
 
     @SneakyThrows
-    public void deleteImageByEvent(String bucket, String eventId) {
+    public void deleteImageByPrefix(String bucket, String prefix) {
         boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!found) {
             return;
         }
-        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(bucket).prefix(eventId).build());
+        Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(bucket).prefix(prefix).build());
         Iterator<Result<Item>> iterator = results.iterator();
         while (iterator.hasNext()) {
             Item item = iterator.next().get();

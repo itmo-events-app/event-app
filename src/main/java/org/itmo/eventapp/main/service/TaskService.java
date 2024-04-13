@@ -135,6 +135,7 @@ public class TaskService {
     @Transactional
     public void delete(Integer id) {
 
+        minioService.deleteImageByPrefix(BUCKET_NAME, id.toString());
         taskRepository.deleteById(id);
     }
 
