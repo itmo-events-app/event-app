@@ -85,9 +85,9 @@ public class ParticipantsController {
             })
     @PreAuthorize("@participantsSecurityExpression.canImportList(#id)")
     @PostMapping
-    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id, @Valid @RequestBody ParticipantsListRequest participantsListRequest) throws IOException {
-        List<Participant> participants = participantsService.setParticipants(id, participantsListRequest);
-        return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
+    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id, @Valid @RequestPart MultipartFile participantsFile) throws IOException {
+        List<Participant> participants = participantsService.setParticipants(id, participantsFile);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ParticipantMapper.participantsToResponseList(participants));
     }
 
     @Operation(summary = "Экспорт списка участников мероприятия")

@@ -41,6 +41,8 @@ public class ExceptionConst {
 
     public static final String INVALID_LOGIN_TYPE = "Неерный тип логина";
 
+    public static final String PARTICIPANTS_LIST_PARSING_ERROR = "Ошибка парсинга списка участников";
+
     private ExceptionConst() {
     }
 }

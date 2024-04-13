@@ -7,13 +7,16 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.ParticipantPresenceRequest;
 import org.itmo.eventapp.main.model.dto.request.ParticipantsListRequest;
 import org.itmo.eventapp.main.model.entity.Participant;
 import org.itmo.eventapp.main.repository.ParticipantsRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.*;
 import java.util.*;
@@ -27,21 +30,47 @@ public class ParticipantsService {
     private static final String BUCKET_NAME = "event-participants";
 
     public List<Participant> getParticipants(Integer id) {
-        return participantsRepository.findAllByEvent(eventService.findById(id));
+        return participantsRepository.findAllByEvent(id);
     }
 
     public Participant changePresence(Integer eventId, ParticipantPresenceRequest participantPresenceRequest){
-        Participant participant = participantsRepository.findByIdAndEvent(participantPresenceRequest.participantId(), eventService.findById(eventId));
+        Participant participant = participantsRepository.findByIdAndEvent(participantPresenceRequest.participantId(), eventId);
         participant.setVisited(participantPresenceRequest.isVisited());
         participantsRepository.save(participant);
         return participant;
     }
 
-    public List<Participant> setParticipants(Integer eventId, ParticipantsListRequest participantsListRequest) throws IOException {
+    public List<Participant> setParticipants(Integer eventId, MultipartFile participantsListFile) throws IOException {
         //File list = new File("D:/eventapptest/participants.xlsx");
-        savetoMinio(participantsListRequest.participantsListFile(), eventId);
-        InputStream list = participantsListRequest.participantsListFile().getInputStream();
+        savetoMinio(participantsListFile, eventId);
+        List<Participant> participants = new ArrayList<>();
+        try{
+        InputStream list = participantsListFile.getInputStream();
         Workbook workbook = new XSSFWorkbook(list);
+        List<Map<String, Object>> data = excelParsing(workbook);
+
+        int counter = 0;
+        for(int y = 0; y < data.size(); y++){
+            Participant participant = new Participant();
+            participant.setId(counter + 1);
+            participant.setName(data.get(counter).get("ФИО").toString());
+            participant.setEmail(data.get(counter).get("Email").toString());
+            participant.setAdditionalInfo(data.get(counter).get("Телефон").toString() + ". " + data.get(y).get("Должность"));
+            participant.setEvent(eventService.findById(eventId));
+            participant.setVisited(false);
+            participantsRepository.save(participant);
+            participants.add(participant);
+            counter++;
+        }
+        }
+        catch(IOException e){
+            throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ExceptionConst.PARTICIPANTS_LIST_PARSING_ERROR);
+        }
+        return participants;
+    }
+
+    private List<Map<String, Object>> excelParsing(Workbook workbook){
+
         Sheet excelSheet = workbook.getSheetAt(0);
         List<Map<String, Object>> data = new ArrayList<>();
 
@@ -73,22 +102,8 @@ public class ParticipantsService {
             }
         }
 
-        List<Participant> participants = new ArrayList<>();
-        int counter = 0;
-        for(int y = 0; y < data.size(); y++){
-            Participant participant = new Participant();
-            participant.setId(counter + 1);
-            participant.setName(data.get(counter).get("ФИО").toString());
-            participant.setEmail(data.get(counter).get("Email").toString());
-            participant.setAdditionalInfo(data.get(counter).get("Телефон").toString() + ". " + data.get(y).get("Должность"));
-            participant.setEvent(eventService.findById(eventId));
-            participant.setVisited(false);
-            participantsRepository.save(participant);
-            participants.add(participant);
-            counter++;
-        }
+        return data;
 
-        return participants;
     }
 
     private void savetoMinio(MultipartFile file, Integer id){
