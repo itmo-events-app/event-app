@@ -34,6 +34,10 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-security")
 
+    //implementation("org.springframework:spring-web:4.3.11.RELEASE")
+    //implementation("commons-fileupload:commons-fileupload:1.5")
+
+
     compileOnly("io.jsonwebtoken:jjwt-api:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
@@ -48,6 +52,10 @@ dependencies {
 
     // minio
     implementation("io.minio:minio:8.5.9")
+
+    //xlsx parser
+    implementation("org.apache.poi:poi:3.12")
+    implementation("org.apache.poi:poi-ooxml:3.12")
 
     // tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")

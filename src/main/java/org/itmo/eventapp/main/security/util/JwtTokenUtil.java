@@ -20,11 +20,15 @@ public class JwtTokenUtil {
 
     private static final String SECRET = "HellMegaSecretKeyForItmoEventAppNoOneShouldKnowItKeepYourMouthShut";
     private static final Key SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET));
-    private static final int MINUTES = 60;
+    private static final int MINUTES = 60 * 24 * 365;
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build()
+        try {
+            return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build()
                 .parseClaimsJws(token).getBody();
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка валидации токена");
+        }
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -54,10 +58,10 @@ public class JwtTokenUtil {
         var now = Instant.now();
 
         return Jwts.builder()
-                .setSubject(login)
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plus(MINUTES, ChronoUnit.MINUTES)))
-                .signWith(SECRET_KEY)
-                .compact();
+            .setSubject(login)
+            .setIssuedAt(Date.from(now))
+            .setExpiration(Date.from(now.plus(MINUTES, ChronoUnit.MINUTES)))
+            .signWith(SECRET_KEY)
+            .compact();
     }
 }
