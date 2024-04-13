@@ -133,9 +133,7 @@ public class TaskService {
         return newTaskData;
     }
 
-    @Transactional
     public void delete(Integer id) {
-
         minioService.deleteImageByPrefix(BUCKET_NAME, id.toString());
         taskRepository.deleteById(id);
     }
@@ -152,12 +150,12 @@ public class TaskService {
             for (MultipartFile file : files) {
 
                 String modifiedFileName = task.getId().toString()
-                        + "_"
-                        + FilenameUtils.getBaseName(file.getOriginalFilename())
-                        + "_"
-                        + System.currentTimeMillis()
-                        + "."
-                        + FilenameUtils.getExtension(file.getOriginalFilename());
+                    + "_"
+                    + FilenameUtils.getBaseName(file.getOriginalFilename())
+                    + "_"
+                    + System.currentTimeMillis()
+                    + "."
+                    + FilenameUtils.getExtension(file.getOriginalFilename());
                 minioService.uploadWithModifiedFileName(file, BUCKET_NAME, modifiedFileName);
                 filenames.add(modifiedFileName);
             }
@@ -309,22 +307,22 @@ public class TaskService {
             idsWithParent.addAll(ids);
 
             Specification<Task> taskSpecification =
-                    TaskSpecification.filterByEventIdsListAndExtraParams(idsWithParent,
-                            assigneeId,
-                            assignerId,
-                            taskStatus,
-                            deadlineLowerLimit,
-                            deadlineUpperLimit);
+                TaskSpecification.filterByEventIdsListAndExtraParams(idsWithParent,
+                    assigneeId,
+                    assignerId,
+                    taskStatus,
+                    deadlineLowerLimit,
+                    deadlineUpperLimit);
             return taskRepository.findAll(taskSpecification, pageRequest);
 
         } else {
             Specification<Task> taskSpecification =
-                    TaskSpecification.filterByEventIdAndExtraParams(eventId,
-                            assigneeId,
-                            assignerId,
-                            taskStatus,
-                            deadlineLowerLimit,
-                            deadlineUpperLimit);
+                TaskSpecification.filterByEventIdAndExtraParams(eventId,
+                    assigneeId,
+                    assignerId,
+                    taskStatus,
+                    deadlineLowerLimit,
+                    deadlineUpperLimit);
             return taskRepository.findAll(taskSpecification, pageRequest);
         }
 
@@ -350,12 +348,12 @@ public class TaskService {
 
 
         Specification<Task> taskSpecification =
-                TaskSpecification.filterByEventIdAndExtraParams(eventId,
-                        userId,
-                        assignerId,
-                        taskStatus,
-                        deadlineLowerLimit,
-                        deadlineUpperLimit);
+            TaskSpecification.filterByEventIdAndExtraParams(eventId,
+                userId,
+                assignerId,
+                taskStatus,
+                deadlineLowerLimit,
+                deadlineUpperLimit);
         return taskRepository.findAll(taskSpecification, pageRequest);
     }
 
