@@ -47,6 +47,8 @@ public class ParticipantsService {
         try{
         InputStream list = participantsListFile.getInputStream();
         Workbook workbook = new XSSFWorkbook(list);
+        boolean correctColumns = checkColumns(workbook);
+        if (!correctColumns) throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, ExceptionConst.EXCEL_COLUMNS_ERROR);
         List<Map<String, Object>> data = excelParsing(workbook);
 
         int counter = 0;
@@ -67,6 +69,19 @@ public class ParticipantsService {
         return participants;
     }
 
+    private boolean checkColumns(Workbook workbook){
+        Sheet excelSheet = workbook.getSheetAt(0);
+        Row row = excelSheet.getRow(0);
+
+        int exist = 0;
+        for (Cell cell : row) {
+            if (cell.getStringCellValue().equals("ФИО") || cell.getStringCellValue().equals("Email") || cell.getStringCellValue().equals("Телефон")) {
+                exist++;
+            }
+        }
+
+        return exist == 3;
+    }
     private List<Map<String, Object>> excelParsing(Workbook workbook){
 
         Sheet excelSheet = workbook.getSheetAt(0);

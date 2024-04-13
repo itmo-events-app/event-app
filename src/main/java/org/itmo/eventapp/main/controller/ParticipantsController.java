@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +43,7 @@ public class ParticipantsController {
                             content = {
                                     @Content(
                                             mediaType = "application/json",
-                                            schema = @Schema(implementation = ParticipantResponse.class))
+                                            array = @ArraySchema(schema = @Schema( implementation = ParticipantResponse.class)))
                             })
             })
     @GetMapping("/{id}/participants")
@@ -76,7 +77,7 @@ public class ParticipantsController {
                             content = {
                                     @Content(
                                             mediaType = "application/json",
-                                            schema = @Schema(implementation = ParticipantResponse.class))
+                                            array = @ArraySchema(schema = @Schema( implementation = ParticipantResponse.class)))
                             })
             })
     @PreAuthorize("@participantsSecurityExpression.canImportList(#id)")

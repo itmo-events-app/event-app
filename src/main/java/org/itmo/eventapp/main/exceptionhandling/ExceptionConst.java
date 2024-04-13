@@ -42,6 +42,7 @@ public class ExceptionConst {
     public static final String INVALID_LOGIN_TYPE = "Неерный тип логина";
 
     public static final String PARTICIPANTS_LIST_PARSING_ERROR = "Ошибка парсинга списка участников";
+    public static final String EXCEL_COLUMNS_ERROR = "Ошибка парсинга списка участников. В файле не присутствуют столбцы: ФИО или Email или Телефон";
 
     private ExceptionConst() {
     }
