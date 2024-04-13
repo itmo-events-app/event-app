@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
+import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
@@ -81,10 +82,10 @@ public class TaskController {
     @Operation(summary = "Получение списка имен файлов задачи")
     @PreAuthorize("@taskSecurityExpression.canGetTask(#id)")
     @GetMapping("/{id}/files")
-    public ResponseEntity<List<String>> getFileNames(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+    public ResponseEntity<List<FileDataResponse>> getFileNames(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                     @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id) {
 
-        return ResponseEntity.ok().body(taskService.getFileNames(id));
+        return ResponseEntity.ok().body(taskService.getFileData(id));
     }
 
     @Operation(summary = "Удаление файлов из задачи")

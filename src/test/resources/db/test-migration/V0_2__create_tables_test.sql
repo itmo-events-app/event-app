@@ -52,7 +52,7 @@ create table if not exists user_login_info(
     reset_token varchar(512),
     last_login_date date,
     registration_id int not null references registration_request(id)
-    );
+);
 create table if not exists notification(
     id int generated always as identity primary key not null,
     user_id int not null references user_t(id),
@@ -61,7 +61,7 @@ create table if not exists notification(
     seen boolean not null default FALSE,
     sent_time timestamp not null,
     link text
-    );
+);
 create table if not exists place
 (
     id int generated always as identity primary key not null ,
@@ -87,7 +87,7 @@ create table if not exists event
     status varchar(64),
     registration_start timestamp,
     registration_end timestamp,
-    parent_id integer references event(id),
+    parent_id integer references event(id) on delete cascade,
     participant_limit int,
     participant_age_lowest int,
     participant_age_highest int,
@@ -100,18 +100,18 @@ create table if not exists participant(
     email varchar(256) not null ,
     additional_info text,
     visited boolean not null ,
-    event_id int references event(id) not null
+    event_id int references event(id) on delete cascade not null
 );
 create table if not exists event_role(
     id int generated always as identity primary key not null,
     user_id integer not null references user_t(id),
-    event_id integer not null references event(id),
+    event_id integer not null references event(id) on delete cascade,
     role_id integer not null references role(id)
 );
 create table if not exists task
 (
     id int generated always as identity primary key not null,
-    event_id integer not null references event(id),
+    event_id integer not null references event(id) on delete cascade,
     assignee_id integer references user_t(id),
     assigner_id integer not null references user_t(id),
     description text not null,
@@ -122,15 +122,16 @@ create table if not exists task
     place_id int references place(id),
     reminder timestamp not null
 );
+
 create table if not exists task_deadline_trigger
 (
     id int generated always as identity primary key not null,
-    task_id int references task(id),
+    task_id int references task(id) on delete cascade,
     trigger_time timestamp not null
-    );
+);
 create table if not exists task_reminder_trigger
 (
     id int generated always as identity primary key not null,
-    task_id int references task(id),
+    task_id int references task(id) on delete cascade,
     trigger_time timestamp not null
 );
