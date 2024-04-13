@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
+import org.itmo.eventapp.main.model.dto.response.PaginatedResponse;
 import org.itmo.eventapp.main.model.dto.response.UserRoleResponse;
+import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
@@ -77,20 +79,19 @@ public class EventController {
 
     @Operation(summary = "Фильрация мероприятий")
     @ApiResponses(
-        value = {
-            @ApiResponse(
-                responseCode = "200",
-                content = {
-                    @Content(
-                        mediaType = "application/json",
-                        array = @ArraySchema(schema = @Schema(implementation = EventResponse.class)))
-                })
-        })
-
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = PaginatedResponse.class))
+                            })
+            })
     @SuppressWarnings("java:S107")
     @PreAuthorize("@eventSecurityExpression.canGetEvents()")
     @GetMapping
-    public ResponseEntity<List<EventResponse>> getAllOrFilteredEvents(
+    public ResponseEntity<PaginatedResponse<EventResponse>> getAllOrFilteredEvents(
         @Min(0)
         @RequestParam(value = "page", defaultValue = "0")
         @Parameter(name = "page", description = "Номер страницы, с которой начать показ мероприятий", example = "0")
@@ -120,8 +121,9 @@ public class EventController {
         @RequestParam(required = false)
         @Parameter(name = "format", description = "Формат мероприятия", example = "OFFLINE")
         EventFormat format) {
-        return ResponseEntity.ok().body(EventMapper.eventsToEventResponseList(
-            eventService.getAllOrFilteredEvents(page, size, parentId, title, startDate, endDate, status, format)));
+        PaginatedResponse<Event> result = eventService.getAllOrFilteredEvents(page, size, parentId, title, startDate, endDate, status, format);
+        PaginatedResponse<EventResponse> response = new PaginatedResponse<>(result.total(),EventMapper.eventsToEventResponseList(result.items()));
+        return ResponseEntity.ok().body(response);
     }
 
     @Operation(summary = "Получение мероприятия по id")

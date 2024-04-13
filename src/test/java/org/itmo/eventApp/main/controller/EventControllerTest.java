@@ -201,11 +201,12 @@ class EventControllerTest extends AbstractTestContainers {
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isNotEmpty())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].title").value("party"))
-                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
-                .andExpect(jsonPath("$[0].status").value("PUBLISHED"));
+                .andExpect(jsonPath("$.total").exists())
+                .andExpect(jsonPath("$.total").isNumber())
+                .andExpect(jsonPath("$.items").isArray())
+                .andExpect(jsonPath("$.items[0].title").value("party"))
+                .andExpect(jsonPath("$.items[0].format").value("OFFLINE"))
+                .andExpect(jsonPath("$.items[0].status").value("PUBLISHED"));
     }
 
     @Test
@@ -218,11 +219,13 @@ class EventControllerTest extends AbstractTestContainers {
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isNotEmpty())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].title").value("partys activity"))
-                .andExpect(jsonPath("$[0].format").value("OFFLINE"))
-                .andExpect(jsonPath("$[0].status").value("PUBLISHED"));
+                .andExpect(jsonPath("$.total").exists())
+                .andExpect(jsonPath("$.total").isNumber())
+                .andExpect(jsonPath("$.items").isNotEmpty())
+                .andExpect(jsonPath("$.items").isArray())
+                .andExpect(jsonPath("$.items[0].title").value("partys activity"))
+                .andExpect(jsonPath("$.items[0].format").value("OFFLINE"))
+                .andExpect(jsonPath("$.items[0].status").value("PUBLISHED"));
     }
 
     @Test
@@ -234,10 +237,13 @@ class EventControllerTest extends AbstractTestContainers {
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isNotEmpty())
-                .andExpect(jsonPath("$").isArray())
-                // Two activities from setUpEventData
-                .andExpect(jsonPath("$.length()").value(2));
+                .andExpect(jsonPath("$.total").exists())
+                .andExpect(jsonPath("$.total").isNumber())
+                // Two activities from setUpEventData;
+                .andExpect(jsonPath("$.total").value(2))
+                .andExpect(jsonPath("$.items").isNotEmpty())
+                .andExpect(jsonPath("$.items").isArray());
+
     }
 
     @Test
@@ -249,7 +255,9 @@ class EventControllerTest extends AbstractTestContainers {
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$.total").exists())
+                .andExpect(jsonPath("$.total").isNumber())
+                .andExpect(jsonPath("$.items").isArray());
     }
 
     @Test

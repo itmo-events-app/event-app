@@ -13,6 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
+import org.itmo.eventapp.main.model.dto.response.PaginatedResponse;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
@@ -135,7 +136,7 @@ public class EventService {
     }
 
     @SuppressWarnings("java:S107")
-    public List<Event> getAllOrFilteredEvents(int page, int size, Integer parentId, String title,
+    public PaginatedResponse<Event> getAllOrFilteredEvents(int page, int size, Integer parentId, String title,
                                               LocalDateTime startDate, LocalDateTime endDate,
                                               EventStatus status, EventFormat format) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -168,14 +169,15 @@ public class EventService {
         if (format != null) {
             predicates.add(cb.equal(root.get("format"), format));
         }
-
         query.where(predicates.toArray(new Predicate[0]));
-        TypedQuery<Event> typedQuery = entityManager.createQuery(query);
 
+        TypedQuery<Event> typedQuery = entityManager.createQuery(query);
+        long totalCount = typedQuery.getResultList().size();
         typedQuery.setFirstResult(page * size);
         typedQuery.setMaxResults(size);
+        List<Event> resultList = typedQuery.getResultList();
 
-        return typedQuery.getResultList();
+        return new PaginatedResponse<>(totalCount, resultList);
     }
 
     public Event getEventById(Integer id) {
@@ -249,5 +251,4 @@ public class EventService {
         minioService.copyImagesWithPrefix(BUCKET_NAME,BUCKET_NAME,imagePrefix,newImagePrefix);
         return savedEvent;
     }
-
 }
