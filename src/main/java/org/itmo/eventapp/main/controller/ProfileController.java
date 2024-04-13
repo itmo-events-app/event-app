@@ -10,6 +10,7 @@ import org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
+import org.itmo.eventapp.main.model.dto.response.PrivilegeWithHasOrganizerRolesResponse;
 import org.itmo.eventapp.main.model.dto.response.ProfileResponse;
 import org.itmo.eventapp.main.model.dto.response.UserInfoResponse;
 import org.itmo.eventapp.main.model.dto.response.UserSystemRoleResponse;
@@ -98,12 +99,17 @@ public class ProfileController {
 
     @Operation(summary = "Получение списка системных привилегий пользователя")
     @GetMapping("/system-privileges")
-    public ResponseEntity<List<PrivilegeResponse>> getUserSystemPrivileges(
+    public ResponseEntity<PrivilegeWithHasOrganizerRolesResponse> getUserSystemPrivileges(
             @AuthenticationPrincipal UserLoginInfo userDetails) {
         Integer userId = userDetails.getUser().getId();
         Set<Privilege> privilegeSet = userService.getUserSystemPrivileges(userId);
+        boolean userHasOrganizerRoles = eventRoleService.userHasOrganizerRoles(userId);
+
         return ResponseEntity.ok().body(
-                PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeSet));
+                new PrivilegeWithHasOrganizerRolesResponse(
+                        PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeSet),
+                        userHasOrganizerRoles
+                ));
     }
 
     @Operation(summary = "Получение списка пользователей в системе")
