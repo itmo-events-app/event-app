@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,7 @@ public class AuthenticationService {
     private final UserNotificationInfoService userNotificationInfoService;
     private final RoleService roleService;
     private final RegistrationRequestService registrationRequestService;
+    private final UserEmailVerificationInfoService userEmailVerificationInfoService;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
@@ -155,7 +159,27 @@ public class AuthenticationService {
                 .toList();
     }
 
-    public void verifyEmail(String email) {
+    public void verifyEmail(String returnUrl) {
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var email = authentication.getName();
+
+        User user = userService.findByLogin(email);
+        String token = userEmailVerificationInfoService.updateUserToken(user);
+
+        String url = returnUrl + "?token=" + token;
+
+        try {
+            mailSenderService.sendEmailVerificationMessage(email, user.getName(), url);
+        }
+        catch (MessagingException | IOException e) {}
+    }
+
+    public void validateEmailVerificationToken(String token) {
+        UserEmailVerificationInfo info = userEmailVerificationInfoService.findByToken(token);
+
+        if (info.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Время запроса истекло. Отправьте запрос ещё раз");
+        }
     }
 }

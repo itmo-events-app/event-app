@@ -13,11 +13,7 @@ import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
 import org.itmo.eventapp.main.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -62,9 +58,15 @@ public class AuthController {
                 .body(authenticationService.listRegisterRequestsCallback());
     }
 
-    @PostMapping("verifyEmail")
-    ResponseEntity<Void> verifyEmail(@RequestBody String email) {
+    @PostMapping("/verifyEmail")
+    ResponseEntity<Void> verifyEmail(@RequestParam String returnUrl) {
+        authenticationService.verifyEmail(returnUrl);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
+    @PostMapping("/validateEmailVerificationToken")
+    ResponseEntity<Void> validateEmailVerificationToken(@RequestParam String token) {
+        authenticationService.validateEmailVerificationToken(token);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
