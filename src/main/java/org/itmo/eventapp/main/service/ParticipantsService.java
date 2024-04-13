@@ -40,7 +40,7 @@ public class ParticipantsService {
     }
 
     public List<Participant> setParticipants(Integer eventId, MultipartFile participantsListFile) throws IOException {
-        //File list = new File("D:/eventapptest/participants.xlsx");
+
         savetoMinio(participantsListFile, eventId);
         List<Participant> participants = new ArrayList<>();
 
