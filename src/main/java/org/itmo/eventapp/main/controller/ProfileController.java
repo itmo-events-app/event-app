@@ -10,15 +10,19 @@ import org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
+import org.itmo.eventapp.main.model.dto.response.PrivilegeWithHasOrganizerRolesResponse;
 import org.itmo.eventapp.main.model.dto.response.ProfileResponse;
 import org.itmo.eventapp.main.model.dto.response.UserInfoResponse;
+import org.itmo.eventapp.main.model.dto.response.UserSystemRoleResponse;
 import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
 import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
+import org.itmo.eventapp.main.model.mapper.UserMapper;
 import org.itmo.eventapp.main.service.EventRoleService;
 import org.itmo.eventapp.main.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -95,11 +99,24 @@ public class ProfileController {
 
     @Operation(summary = "Получение списка системных привилегий пользователя")
     @GetMapping("/system-privileges")
-    public ResponseEntity<List<PrivilegeResponse>> getUserSystemPrivileges(
+    public ResponseEntity<PrivilegeWithHasOrganizerRolesResponse> getUserSystemPrivileges(
             @AuthenticationPrincipal UserLoginInfo userDetails) {
         Integer userId = userDetails.getUser().getId();
         Set<Privilege> privilegeSet = userService.getUserSystemPrivileges(userId);
+        boolean userHasOrganizerRoles = eventRoleService.userHasOrganizerRoles(userId);
+
         return ResponseEntity.ok().body(
-                PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeSet));
+                new PrivilegeWithHasOrganizerRolesResponse(
+                        PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeSet),
+                        userHasOrganizerRoles
+                ));
+    }
+
+    @Operation(summary = "Получение списка пользователей в системе")
+    @GetMapping("/all-system-users")
+    public ResponseEntity<List<UserSystemRoleResponse>> getAllUsers() {
+        List<User> allUsers = userService.getAllUsers();
+        return ResponseEntity.ok().body(
+                UserMapper.usersToUserSystemRoleResponses(allUsers));
     }
 }

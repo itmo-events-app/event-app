@@ -15,6 +15,8 @@ truncate table registration_request cascade;
 
 -- reset id sequences
 alter sequence task_id_seq restart with 1;
+alter sequence task_deadline_trigger_id_seq restart with 1;
+alter sequence task_reminder_trigger_id_seq restart with 1;
 alter sequence event_role_id_seq restart with 1;
 alter sequence participant_id_seq restart with 1;
 alter sequence event_id_seq restart with 1;

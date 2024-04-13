@@ -48,7 +48,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         RoleRequest roleRequest = new RoleRequest(
                 "Новая_Фэйк_Роль",
                 "Фэйк_Описание",
-                true,
+                false,
                 privileges);
 
         // ==========----  Execution  ----==========
@@ -61,7 +61,7 @@ public class RoleServiceTest extends AbstractTestContainers {
                 "Role returned by createRole() is NOT equal role-request: %s".formatted(roleRequest.name()),
                 () -> assertEquals(roleRequest.name(), createdRole.getName()),
                 () -> assertEquals(roleRequest.description(), createdRole.getDescription()),
-                () -> assertEquals(RoleType.EVENT, createdRole.getType()),
+                () -> assertEquals(RoleType.SYSTEM, createdRole.getType()),
                 () -> assertEquals(privileges.size(), createdRole.getPrivileges().size())
         );
     }
@@ -177,7 +177,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         RoleRequest roleRequest = new RoleRequest(
                 "Новая_Фэйк_Роль",
                 "Фэйк_Описание",
-                true,
+                false,
                 privileges);
 
         final int editingRoleId = BASIC_ROLES_COUNT + 1;  // id of first fake role : Фэйк_Роль_1
@@ -192,7 +192,7 @@ public class RoleServiceTest extends AbstractTestContainers {
                 "Role returned by editRole() is NOT equal role-request: %s".formatted(roleRequest.name()),
                 () -> assertEquals(roleRequest.name(), editedRole.getName()),
                 () -> assertEquals(roleRequest.description(), editedRole.getDescription()),
-                () -> assertEquals(RoleType.EVENT, editedRole.getType()),
+                () -> assertEquals(RoleType.SYSTEM, editedRole.getType()),
                 () -> assertEquals(privileges.size(), editedRole.getPrivileges().size())
         );
     }
@@ -293,7 +293,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         RoleRequest roleRequest = new RoleRequest(
                 "Фэйк_Роль_1",
                 "Фэйк_Описание",
-                true,
+                false,
                 privileges);
 
         final int editingRoleId = BASIC_ROLES_COUNT + 1; // id of first fake role : Фэйк_Роль_1
@@ -308,7 +308,7 @@ public class RoleServiceTest extends AbstractTestContainers {
                 "Role returned by editRole() is NOT equal role-request: %s".formatted(roleRequest.name()),
                 () -> assertEquals(roleRequest.name(), editedRole.getName()),
                 () -> assertEquals(roleRequest.description(), editedRole.getDescription()),
-                () -> assertEquals(RoleType.EVENT, editedRole.getType()),
+                () -> assertEquals(RoleType.SYSTEM, editedRole.getType()),
                 () -> assertEquals(privileges.size(), editedRole.getPrivileges().size())
         );
     }
@@ -325,7 +325,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         final int ROLES_COUNT = BASIC_ROLES_COUNT + FAKE_ROLES_COUNT;
 
         // ==========----  Execution  ----==========
-        List<Role> allRoles = roleService.getAll();
+        List<Role> allRoles = roleService.getRoles(null);
 
         // ==========---- Assertions  ----==========
         assertNotNull(allRoles,
@@ -343,7 +343,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         cleanRolesPrivileges();
 
         // ==========----  Execution  ----==========
-        List<Role> allRoles = roleService.getAll();
+        List<Role> allRoles = roleService.getRoles(null);
 
         // ==========---- Assertions  ----==========
         assertNotNull(allRoles,
@@ -368,7 +368,7 @@ public class RoleServiceTest extends AbstractTestContainers {
 
         // ==========---- Assertions  ----==========
         assertEquals(BASIC_ROLES_COUNT + FAKE_ROLES_COUNT - 1,
-                roleService.getAll().size(),
+                roleService.getRoles(null).size(),
                 "Returned role list size should be less by 1 than originally");
         ResponseStatusException exception =
                 assertThrows(ResponseStatusException.class,
@@ -496,7 +496,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         insertFakeFilling();
 
         // ==========----  Execution  ----==========
-        List<Role> allEventRoles = roleService.getOrganizational();
+        List<Role> allEventRoles = roleService.getRoles(RoleType.EVENT);
 
         // ==========---- Assertions  ----==========
         assertNotNull(allEventRoles,
@@ -512,7 +512,7 @@ public class RoleServiceTest extends AbstractTestContainers {
         cleanRolesPrivileges();
 
         // ==========----  Execution  ----==========
-        List<Role> allEventRoles = roleService.getOrganizational();
+        List<Role> allEventRoles = roleService.getRoles(RoleType.EVENT);
 
         // ==========---- Assertions  ----==========
         assertNotNull(allEventRoles,

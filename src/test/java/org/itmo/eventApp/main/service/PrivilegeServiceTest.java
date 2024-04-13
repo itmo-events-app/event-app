@@ -33,7 +33,7 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
                     CHANGE_ASSIGNED_TASK_STATUS, ASSIGN_SELF_AS_TASK_EXECUTOR, DECLINE_TASK_EXECUTION,
                     IMPORT_PARTICIPANT_LIST_XLSX, EXPORT_PARTICIPANT_LIST_XLSX, WORK_WITH_PARTICIPANT_LIST);
 
-    final static int SYSTEM_PRIVILEGE_COUNT = basicSystemPrivileges.size() + 1;
+    final static int SYSTEM_PRIVILEGE_COUNT = basicSystemPrivileges.size();
     final static int EVENT_PRIVILEGE_COUNT = basicEventPrivileges.size();
 
     final static int PRIVILEGE_COUNT = basicSystemPrivileges.size() + basicEventPrivileges.size();
@@ -51,7 +51,7 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
         insertBasicFilling();
 
         // ==========----  Execution  ----==========
-        List<Privilege> privileges = privilegeService.getAll();
+        List<Privilege> privileges = privilegeService.getPrivileges(null);
 
         // ==========---- Assertions  ----==========
         assertNotNull(privileges,
@@ -69,7 +69,7 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
         cleanRolesPrivileges();
 
         // ==========----  Execution  ----==========
-        List<Privilege> privileges = privilegeService.getAll();
+        List<Privilege> privileges = privilegeService.getPrivileges(null);
 
         // ==========---- Assertions  ----==========
         assertNotNull(privileges,
@@ -129,7 +129,7 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
         insertBasicFilling();
 
         // ==========----  Execution  ----==========
-        List<Privilege> systemPrivileges = privilegeService.getPrivilegeByType(PrivilegeType.SYSTEM);
+        List<Privilege> systemPrivileges = privilegeService.getPrivileges(PrivilegeType.SYSTEM);
 
         // ==========---- Assertions  ----==========
         assertNotNull(systemPrivileges,
@@ -147,7 +147,7 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
         insertBasicFilling();
 
         // ==========----  Execution  ----==========
-        List<Privilege> eventPrivileges = privilegeService.getPrivilegeByType(PrivilegeType.EVENT);
+        List<Privilege> eventPrivileges = privilegeService.getPrivileges(PrivilegeType.EVENT);
 
         // ==========---- Assertions  ----==========
         assertNotNull(eventPrivileges,
@@ -164,8 +164,8 @@ public class PrivilegeServiceTest extends AbstractTestContainers {
         cleanRolesPrivileges();
 
         // ==========----  Execution  ----==========
-        List<Privilege> systemPrivileges = privilegeService.getPrivilegeByType(PrivilegeType.SYSTEM);
-        List<Privilege> eventPrivileges = privilegeService.getPrivilegeByType(PrivilegeType.EVENT);
+        List<Privilege> systemPrivileges = privilegeService.getPrivileges(PrivilegeType.SYSTEM);
+        List<Privilege> eventPrivileges = privilegeService.getPrivileges(PrivilegeType.EVENT);
 
         // ==========---- Assertions  ----==========
         assertNotNull(systemPrivileges,

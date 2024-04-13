@@ -3,7 +3,6 @@ package org.itmo.eventapp.main.service;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.Privilege;
-import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
 import org.itmo.eventapp.main.repository.PrivilegeRepository;
 import org.springframework.http.HttpStatus;
@@ -19,26 +18,15 @@ public class PrivilegeService {
 
     public Privilege findById(Integer id) {
         return privilegeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                ExceptionConst.PRIVILEGE_ID_NOT_FOUND_MESSAGE.formatted(id)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ExceptionConst.PRIVILEGE_ID_NOT_FOUND_MESSAGE.formatted(id)));
     }
 
-    public List<Privilege> getPrivilegeByType(PrivilegeType type) {
-        List<Privilege> privileges = privilegeRepository.findAllByType(type);
-
-        if (type.equals(PrivilegeType.SYSTEM)) {
-            Privilege assignOrganizerPrivilege =
-                    privilegeRepository.findByName(
-                            PrivilegeName.ASSIGN_ORGANIZER_ROLE);
-            if (null != assignOrganizerPrivilege)
-                privileges.add(assignOrganizerPrivilege);
+    public List<Privilege> getPrivileges(PrivilegeType type) {
+        if (type == null) {
+            return privilegeRepository.findAll();
+        } else {
+            return privilegeRepository.findAllByType(type);
         }
-
-        return privileges;
-    }
-
-    public List<Privilege> getAll() {
-        return privilegeRepository.findAll();
     }
 }

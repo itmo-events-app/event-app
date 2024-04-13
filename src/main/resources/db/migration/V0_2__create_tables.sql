@@ -59,7 +59,8 @@ create table if not exists notification(
     title varchar(256) not null,
     description text not null ,
     seen boolean not null default FALSE,
-    sent_time timestamp not null
+    sent_time timestamp not null,
+    link text
 );
 create table if not exists place
 (
@@ -119,12 +120,25 @@ create table if not exists task
     creation_time timestamp not null,
     deadline timestamp not null,
     place_id int references place(id),
-    notification_deadline timestamp not null
+    reminder timestamp not null
 );
 
 create table if not exists user_email_verification_info(
     id int generated always as identity primary key not null,
     token varchar(128) not null,
     user_id integer not null references user_t(id),
-    expiry_date timestamp not null
+    expiry_date timestamp not null  
+);
+
+create table if not exists task_deadline_trigger
+(
+    id int generated always as identity primary key not null,
+    task_id int references task(id),
+    trigger_time timestamp not null
+);
+create table if not exists task_reminder_trigger
+(
+    id int generated always as identity primary key not null,
+    task_id int references task(id),
+    trigger_time timestamp not null
 );
