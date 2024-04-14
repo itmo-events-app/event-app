@@ -77,7 +77,7 @@ create table if not exists place
 create table if not exists event
 (
     id int generated always as identity primary key not null,
-    place_id integer references place(id),
+    place_id integer references place(id) on delete set null,
     start_date timestamp,
     end_date timestamp,
     title varchar(256) not null,
@@ -119,7 +119,7 @@ create table if not exists task
     title varchar(128) not null,
     creation_time timestamp not null,
     deadline timestamp not null,
-    place_id int references place(id),
+    place_id int references place(id) on delete set null,
     reminder timestamp not null
 );
 
