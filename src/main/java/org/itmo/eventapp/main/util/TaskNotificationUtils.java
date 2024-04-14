@@ -26,8 +26,8 @@ public class TaskNotificationUtils {
     @SneakyThrows
     public void createIncomingTaskNotification(Task task){
         String notificationTitle = "Новая задача!";
-        String notificationDescription = "Вам назначена новая задача - " + task.getTitle()
-                + " в мероприятии " + task.getEvent().getTitle();
+        String notificationDescription = String.format("Вам назначена новая задача - %s в мероприятии %s.",
+                task.getTitle(), task.getEvent().getTitle());
 
         notificationService.createNotification(notificationTitle,
                 notificationDescription,
@@ -46,8 +46,8 @@ public class TaskNotificationUtils {
     @SneakyThrows
     public void createOverdueTaskNotification(Task task){
         String notificationTitle = "Просроченная задача!";
-        String notificationDescription = "Прошёл срок исполнения задачи - " + task.getTitle()
-                + " в мероприятии " + task.getEvent().getTitle();
+        String notificationDescription = String.format("Прошёл срок исполнения задачи - %s в мероприятии %s.",
+                task.getTitle(), task.getEvent().getTitle());
 
         notificationService.createNotification(notificationTitle,
                 notificationDescription,
@@ -77,8 +77,8 @@ public class TaskNotificationUtils {
     @SneakyThrows
     public void createReminderTaskNotification(Task task){
         String notificationTitle = "Не забудьте выполнить задачу!";
-        String notificationDescription = "Не забудьте выполнить задачу - " + task.getTitle()
-                + " в мероприятии " + task.getEvent().getTitle();
+        String notificationDescription = String.format("Не забудьте выполнить задачу - %s в мероприятии %s.",
+                task.getTitle(), task.getEvent().getTitle());
 
         notificationService.createNotification(notificationTitle,
                 notificationDescription,

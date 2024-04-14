@@ -16,7 +16,7 @@ import java.util.List;
 import static org.itmo.eventapp.main.model.entity.enums.PrivilegeName.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PrivilegeServiceTest extends AbstractTestContainers {
+class PrivilegeServiceTest extends AbstractTestContainers {
     // ASSIGN_ORGANIZER_ROLE is both SYSTEM & EVENT type privilege
     private static final List<PrivilegeName> basicSystemPrivileges =
             Arrays.asList(APPROVE_REGISTRATION_REQUEST, REJECT_REGISTRATION_REQUEST, MODIFY_PROFILE_DATA,
