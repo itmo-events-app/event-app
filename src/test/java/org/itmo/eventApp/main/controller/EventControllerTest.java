@@ -330,20 +330,20 @@ class EventControllerTest extends AbstractTestContainers {
             {
               "id": 1,
               "placeId": 1,
-              "startDate": "2030-03-30T21:32:23.536819",
-              "endDate": "2030-03-30T21:32:23.536819",
+              "startDate": "2100-03-30T21:32:23.536819",
+              "endDate": "2101-03-30T21:32:23.536819",
               "title": "party",
               "shortDescription": "cool party",
               "fullDescription": "very cool party",
               "format": "OFFLINE",
               "status": "PUBLISHED",
-              "registrationStart": "2030-03-30T21:32:23.536819",
-              "registrationEnd": "2030-03-30T21:32:23.536819",
+              "registrationStart": "2100-03-30T21:32:23.536819",
+              "registrationEnd": "2101-03-30T21:32:23.536819",
               "participantLimit": 10,
               "participantAgeLowest": 5,
               "participantAgeHighest": 7,
-              "preparingStart": "2030-03-30T21:32:23.536819",
-              "preparingEnd": "2030-03-30T21:32:23.536819"
+              "preparingStart": "2100-03-30T21:32:23.536819",
+              "preparingEnd": "2101-03-30T21:32:23.536819"
             }""";
 
         mockMvc.perform(get("/api/events/1")

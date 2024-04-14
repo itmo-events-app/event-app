@@ -80,7 +80,7 @@ class TaskControllerTest extends AbstractTestContainers {
                 "address": "itmo university"
               },
               "creationTime": "2025-03-10T21:32:23.536819",
-              "deadline": "2025-03-30T21:32:23.536819",
+              "deadline": "2026-03-30T21:32:23.536819",
               "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
@@ -121,7 +121,7 @@ class TaskControllerTest extends AbstractTestContainers {
         String newTitle = "CREATED";
         String newDescription = "created";
         TaskStatus newStatus = TaskStatus.NEW;
-        LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+        LocalDateTime newDeadline = LocalDateTime.of(2026, 4, 20, 21, 0, 0);
         LocalDateTime newreminder = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
         Integer assigneeId = 1;
         Integer assignerId = 1;
@@ -231,14 +231,6 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_event_role_1.sql");
         executeSqlScript("/sql/insert_task.sql");
 
-        String newTitle = "UPDATED";
-        String newDescription = "upd";
-        TaskStatus newStatus = TaskStatus.IN_PROGRESS;
-        LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
-        LocalDateTime newreminder = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
-        Integer assigneeId = 2;
-        Integer placeId = 1;
-
         String taskJson = """
             {
               "eventId": 1,
@@ -247,8 +239,8 @@ class TaskControllerTest extends AbstractTestContainers {
               "description": "upd",
               "taskStatus": "IN_PROGRESS",
               "placeId": 1,
-              "deadline": "2025-04-20T21:00:00",
-              "reminder": "2025-04-20T21:00:00"
+              "deadline": "2101-04-20T21:00:00",
+              "reminder": "2100-04-20T21:00:00"
             }
             """;
 
@@ -257,6 +249,14 @@ class TaskControllerTest extends AbstractTestContainers {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserLoginInfo())))
             .andExpect(status().isOk());
+
+        String newTitle = "UPDATED";
+        String newDescription = "upd";
+        TaskStatus newStatus = TaskStatus.IN_PROGRESS;
+        Integer assigneeId = 2;
+        Integer placeId = 1;
+        LocalDateTime newDeadline = LocalDateTime.of(2101, 4, 20, 21, 0, 0);
+        LocalDateTime newreminder = LocalDateTime.of(2100, 4, 20, 21, 0, 0);
 
         Task edited = taskRepository.findById(1).orElseThrow();
         Assertions.assertAll(
@@ -434,7 +434,7 @@ class TaskControllerTest extends AbstractTestContainers {
                 "address": "itmo university"
               },
               "creationTime": "2025-03-10T21:32:23.536819",
-              "deadline": "2025-03-30T21:32:23.536819",
+              "deadline": "2026-03-30T21:32:23.536819",
               "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
@@ -453,7 +453,7 @@ class TaskControllerTest extends AbstractTestContainers {
 
         Assertions.assertAll(
             () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
-            () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", deadlineTrigger.getTriggerTime().toString()),
+            () -> Assertions.assertEquals("2026-03-30T21:32:23.536819", deadlineTrigger.getTriggerTime().toString()),
             () -> Assertions.assertEquals(1, reminderTrigger.getId()),
             () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", reminderTrigger.getTriggerTime().toString())
         );
@@ -547,7 +547,7 @@ class TaskControllerTest extends AbstractTestContainers {
                 "address": "itmo university"
               },
               "creationTime": "2025-03-10T21:32:23.536819",
-              "deadline": "2025-03-30T21:32:23.536819",
+              "deadline": "2026-03-30T21:32:23.536819",
               "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
@@ -620,7 +620,7 @@ class TaskControllerTest extends AbstractTestContainers {
                 "address": "itmo university"
               },
               "creationTime": "2025-03-10T21:32:23.536819",
-              "deadline": "2025-03-30T21:32:23.536819",
+              "deadline": "2026-03-30T21:32:23.536819",
               "reminder": "2025-03-30T21:32:23.536819"
             }]
             """;
