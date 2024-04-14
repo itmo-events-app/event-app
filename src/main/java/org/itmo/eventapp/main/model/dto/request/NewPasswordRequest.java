@@ -17,10 +17,10 @@ public record NewPasswordRequest(
 
         @NotBlank(message = "Поле пароля не должно быть пустым")
         @StrongPassword
-        @Schema(example = "PaSsWoRd1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(example = "PaSsWoRd1", requiredMode = Schema.RequiredMode.REQUIRED)
         String newPassword,
 
         @NotBlank(message = "Поле подтверждения пароля не должно быть пустым")
-        @Schema(example = "PaSsWoRd1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(example = "PaSsWoRd1", requiredMode = Schema.RequiredMode.REQUIRED)
         String confirmNewPassword
 ) {}

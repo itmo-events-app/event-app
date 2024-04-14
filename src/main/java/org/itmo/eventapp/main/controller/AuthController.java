@@ -68,7 +68,7 @@ public class AuthController {
     @PostMapping("/recoveryPassword")
     ResponseEntity<Void> recoveryPassword(@Valid @RequestBody RecoveryPasswordRequest request) {
         authenticationService.recoverPassword(request.email(), request.returnUrl());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Запрос на валидацию токена")

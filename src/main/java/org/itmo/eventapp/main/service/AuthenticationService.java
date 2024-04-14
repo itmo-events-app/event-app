@@ -169,13 +169,12 @@ public class AuthenticationService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.EMAIL_NOT_APPROVED);
         }
 
-        User user = userService.findByLogin(email);
-        String token = userPasswordRecoveryInfoService.updateUserToken(user);
+        String token = userPasswordRecoveryInfoService.updateUserToken(info.getUser());
 
         String url = returnUrl + "?token=" + token;
 
         try {
-            mailSenderService.sendRecoveryPasswordMessage(email, user.getName(), url);
+            mailSenderService.sendRecoveryPasswordMessage(email, info.getUser().getName(), url);
         }
         catch (MessagingException | IOException e) {}
     }
