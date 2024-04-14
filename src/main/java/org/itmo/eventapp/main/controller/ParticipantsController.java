@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -8,10 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
 import org.itmo.eventapp.main.model.dto.request.ParticipantPresenceRequest;
-import org.itmo.eventapp.main.model.dto.request.ParticipantsListRequest;
-import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.dto.response.ParticipantResponse;
 import org.itmo.eventapp.main.model.entity.Participant;
 import org.itmo.eventapp.main.model.mapper.ParticipantMapper;
@@ -26,7 +24,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,7 +31,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/api/events/{id}/participants")
+@RequestMapping(value = "/api/events")
 @Validated
 public class ParticipantsController {
     private final ParticipantsService participantsService;
@@ -46,10 +43,10 @@ public class ParticipantsController {
                             content = {
                                     @Content(
                                             mediaType = "application/json",
-                                            schema = @Schema(implementation = ParticipantResponse.class))
+                                            array = @ArraySchema(schema = @Schema( implementation = ParticipantResponse.class)))
                             })
             })
-    @GetMapping
+    @GetMapping("/{id}/participants")
     public ResponseEntity<List<ParticipantResponse>> getParticipants(@Min(1) @PathVariable("id") Integer id) {
         List<Participant> participants = participantsService.getParticipants(id);
         return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
@@ -67,7 +64,7 @@ public class ParticipantsController {
                             })
             })
     @PreAuthorize("@participantsSecurityExpression.canWorkWithList(#id)")
-    @PutMapping
+    @PutMapping("/{id}/participants")
     public ResponseEntity<ParticipantResponse> changePresence(@PathVariable("id") Integer id, @Valid @RequestBody ParticipantPresenceRequest participantPresenceRequest) {
         Participant participant = participantsService.changePresence(id, participantPresenceRequest);
         return ResponseEntity.ok().body(ParticipantMapper.participantToResponse(participant));
@@ -80,19 +77,19 @@ public class ParticipantsController {
                             content = {
                                     @Content(
                                             mediaType = "application/json",
-                                            schema = @Schema(implementation = ParticipantResponse.class))
+                                            array = @ArraySchema(schema = @Schema( implementation = ParticipantResponse.class)))
                             })
             })
     @PreAuthorize("@participantsSecurityExpression.canImportList(#id)")
-    @PostMapping
-    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id, @Valid @RequestBody ParticipantsListRequest participantsListRequest) throws IOException {
-        List<Participant> participants = participantsService.setParticipants(id, participantsListRequest);
-        return ResponseEntity.ok().body(ParticipantMapper.participantsToResponseList(participants));
+    @PostMapping("/{id}/participants")
+    public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id, @RequestPart MultipartFile participantsFile) throws IOException {
+        List<Participant> participants = participantsService.setParticipants(id, participantsFile);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ParticipantMapper.participantsToResponseList(participants));
     }
 
     @Operation(summary = "Экспорт списка участников мероприятия")
     @PreAuthorize("@participantsSecurityExpression.canExportList(#id)")
-    @GetMapping("/file")
+    @GetMapping("/{id}/participants/file")
     public ResponseEntity<Resource> getParticipantsXlsxFile(@PathVariable("id") Integer id) throws IOException {
         String path = participantsService.getParticipantsXlsx(id);
         Path filePath = Paths.get(path);
