@@ -97,7 +97,8 @@ public class UserService {
         if (searchQuery.isEmpty()) {
             return userRepository.findAll(pageRequest);
         } else {
-            String rightPart, leftPart;
+            String rightPart;
+            String leftPart;
             String[] parts = searchQuery.split(" ", 2);
             rightPart = parts[0];
             if (parts.length == 2) {
