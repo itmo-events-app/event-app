@@ -24,21 +24,21 @@ public class UserLoginInfoService {
     private final UserLoginInfoRepository userLoginInfoRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserLoginInfo findByLogin(String login){
+    public UserLoginInfo findByLogin(String login) {
         return userLoginInfoRepository.getUserLoginInfoByLogin(login)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
-    public boolean existsByLogin(String email){
+    public boolean existsByLogin(String email) {
         return userLoginInfoRepository.existsByLogin(email);
     }
 
-    public void setEmail(UserLoginInfo userLoginInfo, String email){
+    public void setEmail(UserLoginInfo userLoginInfo, String email) {
         userLoginInfo.setLogin(email);
         userLoginInfoRepository.save(userLoginInfo);
     }
 
-    public void setPassword(UserLoginInfo userLoginInfo, String password){
+    public void setPassword(UserLoginInfo userLoginInfo, String password) {
         userLoginInfo.setPasswordHash(passwordEncoder.encode(password));
         userLoginInfoRepository.save(userLoginInfo);
     }

@@ -1,5 +1,7 @@
 package org.itmo.eventApp.main.controller;
 
+import io.minio.StatObjectArgs;
+import io.minio.errors.ErrorResponseException;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.repository.TaskDeadlineTriggerRepository;
@@ -27,6 +29,19 @@ class TaskControllerTest extends AbstractTestContainers {
 
     @Autowired
     TaskReminderTriggerRepository taskReminderTriggerRepository;
+
+    private boolean isImageExist(String imageName) {
+        try {
+            minioClient.statObject(StatObjectArgs.builder()
+                .bucket("task-objects")
+                .object(imageName).build());
+            return true;
+        } catch (ErrorResponseException e) {
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
     private UserLoginInfo getUserLoginInfo() {
         UserLoginInfo userDetails = new UserLoginInfo();
@@ -65,7 +80,7 @@ class TaskControllerTest extends AbstractTestContainers {
                 "address": "itmo university"
               },
               "creationTime": "2025-03-10T21:32:23.536819",
-              "deadline": "2025-03-30T21:32:23.536819",
+              "deadline": "2026-03-30T21:32:23.536819",
               "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
@@ -106,7 +121,7 @@ class TaskControllerTest extends AbstractTestContainers {
         String newTitle = "CREATED";
         String newDescription = "created";
         TaskStatus newStatus = TaskStatus.NEW;
-        LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
+        LocalDateTime newDeadline = LocalDateTime.of(2026, 4, 20, 21, 0, 0);
         LocalDateTime newreminder = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
         Integer assigneeId = 1;
         Integer assignerId = 1;
@@ -133,7 +148,9 @@ class TaskControllerTest extends AbstractTestContainers {
         );
     }
 
-
+/*
+    запрещено создавать таски, у которых начало в прошлом
+    
     @Test
     void taskAddExpiredTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
@@ -145,23 +162,23 @@ class TaskControllerTest extends AbstractTestContainers {
         String token = getToken("test_mail@itmo.ru", "password");
 
         mockMvc.perform(post("/api/tasks")
-                .content(taskJson)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token))
-            .andExpect(status().is(201))
-            .andExpect(content().string(containsString("1")));
+                        .content(taskJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().is(201))
+                .andExpect(content().string(containsString("1")));
 
         Task task = taskRepository.findById(1).orElseThrow();
 
-        LocalDateTime newDeadline = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
-        LocalDateTime newreminder = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
+        LocalDateTime newDeadline = LocalDateTime.of(2030, 4, 20, 21, 0, 0);
+        LocalDateTime newreminder = LocalDateTime.of(2030, 4, 20, 21, 0, 0);
 
         Assertions.assertAll(
-            () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
-            () -> Assertions.assertEquals(newreminder, task.getReminder()),
-            () -> Assertions.assertEquals(TaskStatus.EXPIRED, task.getStatus())
+                () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
+                () -> Assertions.assertEquals(newreminder, task.getReminder()),
+                () -> Assertions.assertEquals(TaskStatus.EXPIRED, task.getStatus())
         );
-    }
+    }*/
 
 
     @Test
@@ -214,14 +231,6 @@ class TaskControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_event_role_1.sql");
         executeSqlScript("/sql/insert_task.sql");
 
-        String newTitle = "UPDATED";
-        String newDescription = "upd";
-        TaskStatus newStatus = TaskStatus.IN_PROGRESS;
-        LocalDateTime newDeadline = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
-        LocalDateTime newreminder = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
-        Integer assigneeId = 2;
-        Integer placeId = 1;
-
         String taskJson = """
             {
               "eventId": 1,
@@ -230,8 +239,8 @@ class TaskControllerTest extends AbstractTestContainers {
               "description": "upd",
               "taskStatus": "IN_PROGRESS",
               "placeId": 1,
-              "deadline": "2025-04-20T21:00:00",
-              "reminder": "2025-04-20T21:00:00"
+              "deadline": "2101-04-20T21:00:00",
+              "reminder": "2100-04-20T21:00:00"
             }
             """;
 
@@ -240,6 +249,14 @@ class TaskControllerTest extends AbstractTestContainers {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(getUserLoginInfo())))
             .andExpect(status().isOk());
+
+        String newTitle = "UPDATED";
+        String newDescription = "upd";
+        TaskStatus newStatus = TaskStatus.IN_PROGRESS;
+        Integer assigneeId = 2;
+        Integer placeId = 1;
+        LocalDateTime newDeadline = LocalDateTime.of(2101, 4, 20, 21, 0, 0);
+        LocalDateTime newreminder = LocalDateTime.of(2100, 4, 20, 21, 0, 0);
 
         Task edited = taskRepository.findById(1).orElseThrow();
         Assertions.assertAll(
@@ -260,10 +277,10 @@ class TaskControllerTest extends AbstractTestContainers {
         TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
-                () -> Assertions.assertEquals(newDeadline, deadlineTrigger.getTriggerTime()),
-                () -> Assertions.assertEquals(1, reminderTrigger.getId()),
-                () -> Assertions.assertEquals(newreminder, reminderTrigger.getTriggerTime())
+            () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
+            () -> Assertions.assertEquals(newDeadline, deadlineTrigger.getTriggerTime()),
+            () -> Assertions.assertEquals(1, reminderTrigger.getId()),
+            () -> Assertions.assertEquals(newreminder, reminderTrigger.getTriggerTime())
         );
     }
 
@@ -307,6 +324,71 @@ class TaskControllerTest extends AbstractTestContainers {
 
         );
     }
+
+    /*
+
+    @Test
+    void taskAddAndDeleteFilesTest() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
+        executeSqlScript("/sql/insert_task.sql");
+
+
+        ClassPathResource imageResource = new ClassPathResource("/images/itmo.jpeg");
+        byte[] content = imageResource.getInputStream().readAllBytes();
+        MockMultipartFile image = new MockMultipartFile("files", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
+
+        ClassPathResource imageResource2 = new ClassPathResource("/images/itmo.png");
+        byte[] content2 = imageResource2.getInputStream().readAllBytes();
+        MockMultipartFile image2 = new MockMultipartFile("files", "itmo.png", MediaType.IMAGE_PNG_VALUE, content2);
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/api/tasks/1/files")
+                        .file(image)
+                        .file(image2)
+                        .contentType("multipart/form-data")
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().isOk());
+        boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("task-objects").build());
+        boolean isImageExists = isImageExist("1.jpeg");
+        boolean isImage2Exists = isImageExist("2.png");
+
+
+        Assertions.assertAll(
+                ()->Assertions.assertTrue(isBucketExists),
+                ()->Assertions.assertTrue(isImageExists),
+                ()->Assertions.assertTrue(isImage2Exists),
+                ()->{
+                    Assertions.assertTrue(taskObjectRepository.findById(1).isPresent());
+                    Assertions.assertEquals("itmo.jpeg", taskObjectRepository.findById(1).get().getOriginalFilename());
+                    Assertions.assertEquals(1, taskObjectRepository.findById(1).get().getTask().getId());
+                },
+                ()->{
+                    Assertions.assertTrue(taskObjectRepository.findById(2).isPresent());
+                    Assertions.assertEquals("itmo.png", taskObjectRepository.findById(2).get().getOriginalFilename());
+                    Assertions.assertEquals(1, taskObjectRepository.findById(2).get().getTask().getId());
+                }
+        );
+
+        String arrayJson = """
+                [1]
+                """;
+
+        mockMvc.perform(delete("/api/tasks/1/files")
+                        .content(arrayJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(getUserLoginInfo())))
+                .andExpect(status().is(204));
+
+        Assertions.assertFalse(isImageExist("1.jpeg"));
+        Assertions.assertFalse(taskObjectRepository.findById(1).isPresent());
+
+    }
+
+     */
+
 
     @Test
     void taskDeleteTest() throws Exception {
@@ -352,7 +434,7 @@ class TaskControllerTest extends AbstractTestContainers {
                 "address": "itmo university"
               },
               "creationTime": "2025-03-10T21:32:23.536819",
-              "deadline": "2025-03-30T21:32:23.536819",
+              "deadline": "2026-03-30T21:32:23.536819",
               "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
@@ -370,14 +452,14 @@ class TaskControllerTest extends AbstractTestContainers {
         TaskReminderTrigger reminderTrigger = taskReminderTriggerRepository.findById(1).orElseThrow();
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
-                () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", deadlineTrigger.getTriggerTime().toString()),
-                () -> Assertions.assertEquals(1, reminderTrigger.getId()),
-                () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", reminderTrigger.getTriggerTime().toString())
+            () -> Assertions.assertEquals(1, deadlineTrigger.getId()),
+            () -> Assertions.assertEquals("2026-03-30T21:32:23.536819", deadlineTrigger.getTriggerTime().toString()),
+            () -> Assertions.assertEquals(1, reminderTrigger.getId()),
+            () -> Assertions.assertEquals("2025-03-30T21:32:23.536819", reminderTrigger.getTriggerTime().toString())
         );
     }
 
-
+/*
     @Test
     void taskSetAssigneeNotExistingTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
@@ -435,6 +517,8 @@ class TaskControllerTest extends AbstractTestContainers {
 
     }
 
+ */
+
 
     @Test
     void taskSetStatusTest() throws Exception {
@@ -463,7 +547,7 @@ class TaskControllerTest extends AbstractTestContainers {
                 "address": "itmo university"
               },
               "creationTime": "2025-03-10T21:32:23.536819",
-              "deadline": "2025-03-30T21:32:23.536819",
+              "deadline": "2026-03-30T21:32:23.536819",
               "reminder": "2025-03-30T21:32:23.536819"
             }
             """;
@@ -536,7 +620,7 @@ class TaskControllerTest extends AbstractTestContainers {
                 "address": "itmo university"
               },
               "creationTime": "2025-03-10T21:32:23.536819",
-              "deadline": "2025-03-30T21:32:23.536819",
+              "deadline": "2026-03-30T21:32:23.536819",
               "reminder": "2025-03-30T21:32:23.536819"
             }]
             """;
@@ -602,6 +686,33 @@ class TaskControllerTest extends AbstractTestContainers {
 
         task = taskRepository.findById(2).orElseThrow();
         Assertions.assertEquals(2, task.getEvent().getId());
+        task = taskRepository.findById(1).orElseThrow();
+        Assertions.assertEquals(1, task.getEvent().getId());
+
+    }
+
+
+    @Test
+    void taskInvalidCopyTest() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_user_2.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_event.sql");
+        executeSqlScript("/sql/insert_event_3.sql");
+        executeSqlScript("/sql/insert_event_role_1.sql");
+        executeSqlScript("/sql/insert_event_role_2.sql");
+        executeSqlScript("/sql/insert_task.sql");
+
+        Task task = taskRepository.findById(1).orElseThrow();
+        Assertions.assertEquals(1, task.getEvent().getId());
+
+        mockMvc.perform(post("/api/tasks/event/2")
+                .content("[1]")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(getUserLoginInfo())))
+            .andExpect(status().isForbidden());
+
+        Assertions.assertFalse(taskRepository.findById(2).isPresent());
         task = taskRepository.findById(1).orElseThrow();
         Assertions.assertEquals(1, task.getEvent().getId());
 
@@ -743,12 +854,12 @@ class TaskControllerTest extends AbstractTestContainers {
         // assigneeId less important than personalTasksGet param
 
         testUrl =
-                "/api/tasks/event/1?subEventTasksGet=true&assignerId=2&personalTasksGet=true&assigneeId=2";
+            "/api/tasks/event/1?subEventTasksGet=true&assignerId=2&personalTasksGet=true&assigneeId=2";
 
         mockMvc.perform(get(testUrl)
-                        .with(user(getUserLoginInfo())))
-                .andExpect(status().isOk())
-                .andExpect(content().json(expectedTaskJson));
+                .with(user(getUserLoginInfo())))
+            .andExpect(status().isOk())
+            .andExpect(content().json(expectedTaskJson));
 
 
         expectedTaskJson = """

@@ -55,15 +55,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 if (jwtTokenUtil.isTokenValid(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, null);
+                        new UsernamePasswordAuthenticationToken(userDetails, null, null);
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource()
-                            .buildDetails(request));
+                        .buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
             filterChain.doFilter(request, response);
-        }
-        catch (ResponseStatusException ex) {
+        } catch (ResponseStatusException ex) {
             throw new ResponseStatusException(ex.getStatusCode(), ex.getMessage());
         }
     }

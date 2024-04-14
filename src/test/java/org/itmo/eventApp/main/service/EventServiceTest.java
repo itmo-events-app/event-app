@@ -2,20 +2,25 @@ package org.itmo.eventApp.main.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
+import org.itmo.eventapp.main.model.dto.response.PaginatedResponse;
 import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.repository.PlaceRepository;
-import org.itmo.eventapp.main.service.*;
-import org.junit.jupiter.api.Test;
+import org.itmo.eventapp.main.service.EventRoleService;
+import org.itmo.eventapp.main.service.EventService;
+import org.itmo.eventapp.main.service.PlaceService;
+import org.itmo.eventapp.main.service.TaskService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -28,7 +33,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -54,6 +58,8 @@ class EventServiceTest {
 
     @Mock
     private CriteriaQuery<Event> query;
+    @Mock
+    private CriteriaQuery<Long> countQuery;
 
     @Mock
     private Root<Event> root;
@@ -66,6 +72,9 @@ class EventServiceTest {
     private EventRoleService eventRoleService;
     @Mock
     private TypedQuery<Event> typedQuery;
+    @Mock
+    private TypedQuery<Long> countTypedQuery;
+
 
     @BeforeEach
     public void setup() {
@@ -78,36 +87,36 @@ class EventServiceTest {
     void testUpdateEvent() {
         Integer eventId = 1;
         EventRequest eventRequest = new EventRequest(
-                1,
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                "Circus",
-                "cool circus",
-                "very cool circus",
-                EventFormat.OFFLINE,
-                EventStatus.PUBLISHED,
-                LocalDateTime.parse("2024-03-30T21:18:23.536819"),
-                LocalDateTime.parse("2024-03-30T21:18:23.536819"),
-                null,
-                20,
-                18,
-                100,
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
+            1,
+            LocalDateTime.parse("2024-03-30T21:32:23.536819"),
+            LocalDateTime.parse("2024-03-30T21:32:23.536819"),
+            "Circus",
+            "cool circus",
+            "very cool circus",
+            EventFormat.OFFLINE,
+            EventStatus.PUBLISHED,
+            LocalDateTime.parse("2024-03-30T21:18:23.536819"),
+            LocalDateTime.parse("2024-03-30T21:18:23.536819"),
+            null,
+            20,
+            18,
+            100,
+            LocalDateTime.parse("2024-03-30T21:32:23.536819"),
 
-                LocalDateTime.parse("2024-03-30T21:32:23.536819"),
-                null
+            LocalDateTime.parse("2024-03-30T21:32:23.536819"),
+            null
         );
         Place place = new Place();
         when(placeRepository.findById(any())).thenReturn(Optional.of(place));
         when(eventRepository.existsById(eventId)).thenReturn(true);
         when(eventRepository.save(any())).thenReturn(new Event());
         when(placeService.findById(anyInt())).thenReturn(new Place());
-        doNothing().when(minioService).deleteImageByEvent(anyString(), any());
+        doNothing().when(minioService).deleteImageByPrefix(anyString(), any());
         Event updatedEvent = eventService.updateEvent(eventId, eventRequest);
 
         assertAll(
-                () -> assertNotNull(updatedEvent),
-                () -> assertEquals(EventMapper.eventRequestToEvent(1, eventRequest, place, null), updatedEvent)
+            () -> assertNotNull(updatedEvent),
+            () -> assertEquals(EventMapper.eventRequestToEvent(1, eventRequest, place, null), updatedEvent)
         );
     }
 
@@ -128,7 +137,7 @@ class EventServiceTest {
         when(entityManager.createQuery(query)).thenReturn(typedQuery);
         when(typedQuery.getResultList()).thenReturn(expectedEvents);
 
-        List<Event> result = eventService.getAllOrFilteredEvents(page, size, null, title, startDate, endDate, status, format);
+        PaginatedResponse<Event> result = eventService.getAllOrFilteredEvents(page, size, null, title, startDate, endDate, status, format);
 
         verify(criteriaBuilder).equal(root.get("title"), title);
         verify(criteriaBuilder).greaterThanOrEqualTo(root.get("startDate"), startDate);
@@ -136,7 +145,8 @@ class EventServiceTest {
         verify(criteriaBuilder).equal(root.get("status"), status);
         verify(criteriaBuilder).equal(root.get("format"), format);
 
-        assertEquals(expectedEvents, result);
+        assertEquals(2, result.total());
+        assertEquals(expectedEvents, result.items());
     }
 
     @Test
@@ -169,10 +179,10 @@ class EventServiceTest {
     @Test
     void testCopyEventNoChilds() {
         Event existingEvent = Event.builder()
-                .id(1).title("Existing event")
-                .startDate(LocalDateTime.of(2024, 4, 1, 10, 0))
-                .endDate(LocalDateTime.of(2024, 4, 2, 10, 0))
-                .build();
+            .id(1).title("Existing event")
+            .startDate(LocalDateTime.of(2024, 4, 1, 10, 0))
+            .endDate(LocalDateTime.of(2024, 4, 2, 10, 0))
+            .build();
         when(eventRepository.findById(1)).thenReturn(Optional.of(existingEvent));
         when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
             Event event = invocation.getArgument(0);
@@ -192,11 +202,11 @@ class EventServiceTest {
     void testCopyEvent() {
         int[] startingId = new int[]{1};
         Event existingEvent = Event.builder()
-                .id(startingId[0]++)
-                .build();
+            .id(startingId[0]++)
+            .build();
         Event childEvent = Event.builder()
-                .id(startingId[0]++)
-                .build();
+            .id(startingId[0]++)
+            .build();
         List<Event> childEvents = new ArrayList<>();
         childEvents.add(childEvent);
         when(eventRepository.findById(1)).thenReturn(Optional.of(existingEvent));

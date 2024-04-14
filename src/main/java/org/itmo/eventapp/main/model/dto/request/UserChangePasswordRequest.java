@@ -5,18 +5,17 @@ import jakarta.validation.constraints.NotBlank;
 import org.itmo.eventapp.main.model.validation.annotation.StrongPassword;
 
 public record UserChangePasswordRequest(
+    @NotBlank(message = "Поле обязательно для заполнения")
+    @Schema(example = "123password")
+    String oldPassword,
 
-        @NotBlank(message = "Поле обязательно для заполнения")
-        @Schema(example = "123password")
-        String oldPassword,
+    @NotBlank(message = "Поле обязательно для заполнения")
+    @StrongPassword
+    @Schema(example = "123passwordNEW")
+    String newPassword,
 
-        @NotBlank(message = "Поле обязательно для заполнения")
-        @StrongPassword
-        @Schema(example = "123passwordNEW")
-        String newPassword,
-
-        @NotBlank(message = "Поле обязательно для заполнения")
-        @Schema(example = "123passwordNEW")
-        String confirmNewPassword
+    @NotBlank(message = "Поле обязательно для заполнения")
+    @Schema(example = "123passwordNEW")
+    String confirmNewPassword
 ) {
 }

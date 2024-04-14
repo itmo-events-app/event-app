@@ -23,24 +23,24 @@ public final class RoleMapper {
         if (basicRoles.contains(role.getName()))
             isEditable = Boolean.FALSE;
         return new RoleResponse(role.getId(),
-                role.getName(),
-                role.getDescription(),
-                role.getType(),
-                PrivilegeMapper.privilegesToPrivilegeResponseList(role.getPrivileges()),
-                isEditable);
+            role.getName(),
+            role.getDescription(),
+            role.getType(),
+            PrivilegeMapper.privilegesToPrivilegeResponseList(role.getPrivileges()),
+            isEditable);
     }
 
     public static List<RoleResponse> rolesToRoleResponseList(Collection<Role> roles) {
         return roles.stream()
-                .map(RoleMapper::roleToRoleResponse)
-                .toList();
+            .map(RoleMapper::roleToRoleResponse)
+            .toList();
     }
 
     public static Role roleRequestToRole(RoleRequest roleRequest, Stream<Privilege> privileges) {
         return Role.builder()
-                .name(roleRequest.name())
-                .description(roleRequest.description())
-                .type(Boolean.TRUE.equals(roleRequest.isEvent()) ? RoleType.EVENT : RoleType.SYSTEM)
-                .privileges(PrivilegeMapper.privilegeStreamToPrivilegeSet(privileges, roleRequest.isEvent())).build();
+            .name(roleRequest.name())
+            .description(roleRequest.description())
+            .type(Boolean.TRUE.equals(roleRequest.isEvent()) ? RoleType.EVENT : RoleType.SYSTEM)
+            .privileges(PrivilegeMapper.privilegeStreamToPrivilegeSet(privileges, roleRequest.isEvent())).build();
     }
 }

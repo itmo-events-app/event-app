@@ -21,14 +21,14 @@ public final class PrivilegeMapper {
 
     public static PrivilegeResponse privilegeToPrivilegeResponse(Privilege privilege) {
         return new PrivilegeResponse(privilege.getId(),
-                privilege.getName(),
-                privilege.getDescription());
+            privilege.getName(),
+            privilege.getDescription());
     }
 
     public static List<PrivilegeResponse> privilegesToPrivilegeResponseList(Collection<Privilege> privileges) {
         return privileges.stream()
-                .map(PrivilegeMapper::privilegeToPrivilegeResponse)
-                .toList();
+            .map(PrivilegeMapper::privilegeToPrivilegeResponse)
+            .toList();
     }
 
     public static Set<Privilege> privilegeStreamToPrivilegeSet(Stream<Privilege> privileges, Boolean isEvent) {

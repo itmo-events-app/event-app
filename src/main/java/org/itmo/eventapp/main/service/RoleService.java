@@ -46,9 +46,12 @@ public class RoleService {
         if (role.isPresent() && !role.get().getId().equals(id)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.ROLE_EXIST_MESSAGE);
         }
+        var roleType = Boolean.TRUE.equals(roleRequest.isEvent()) ? RoleType.EVENT : RoleType.SYSTEM;
+        if (!editedRole.getType().equals(roleType)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.ROLE_TYPE_CHANGING_FORBIDDEN_MESSAGE);
+        }
         editedRole.setName(roleRequest.name());
         editedRole.setDescription(roleRequest.description());
-        editedRole.setType(roleRequest.isEvent() ? RoleType.EVENT : RoleType.SYSTEM);
         editedRole.setPrivileges(new HashSet<>());
         var privileges = roleRequest.privileges().stream().map(privilegeService::findById);
         editedRole.setPrivileges(PrivilegeMapper.privilegeStreamToPrivilegeSet(privileges, roleRequest.isEvent()));
@@ -82,15 +85,15 @@ public class RoleService {
 
     public Role findRoleById(Integer id) {
         return roleRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ExceptionConst.ROLE_ID_NOT_FOUND_MESSAGE.formatted(id)));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                ExceptionConst.ROLE_ID_NOT_FOUND_MESSAGE.formatted(id)));
     }
 
     public Role findOrganizationalRoleById(Integer id) {
         var role = findRoleById(id);
         if (role.getType().equals(RoleType.SYSTEM))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
+                ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
         return role;
     }
 
@@ -119,8 +122,8 @@ public class RoleService {
 
     public Role findByName(String name) {
         return roleRepository.findByName(name)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ExceptionConst.ROLE_NAME_NOT_FOUND_MESSAGE.formatted(name)));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                ExceptionConst.ROLE_NAME_NOT_FOUND_MESSAGE.formatted(name)));
     }
 
     public Role getReaderRole() {
