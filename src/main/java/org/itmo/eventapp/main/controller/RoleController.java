@@ -123,7 +123,7 @@ public class RoleController {
     }
 
     @Operation(summary = "Назначение пользователю организационной роли")
-    @PreAuthorize("@roleSecurityExpression.canAssignOrganizationalRole(#eventId)")
+    //@PreAuthorize("@roleSecurityExpression.canAssignOrganizationalRole(#eventId)")
     @PostMapping("/organizational/{userId}/{eventId}/{roleId}")
     public ResponseEntity<Void> assignOrganizationalRole(
             @Positive(message = "Параметр userId не может быть меньше 1!") @Parameter(name = "userId", description = "ID пользователя", example = "1") @PathVariable Integer userId,
@@ -134,7 +134,7 @@ public class RoleController {
     }
 
     @Operation(summary = "Назначение пользователю роли Организатор")
-    @PreAuthorize("@roleSecurityExpression.canAssignOrganizerRole(#eventId)")
+    //@PreAuthorize("@roleSecurityExpression.canAssignOrganizerRole(#eventId)")
     @PostMapping("/organizer/{userId}/{eventId}")
     public ResponseEntity<Void> assignOrganizerRole(
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
@@ -144,7 +144,7 @@ public class RoleController {
     }
 
     @Operation(summary = "Назначение пользователю роли Помощник")
-    @PreAuthorize("@roleSecurityExpression.canAssignAssistantRole(#eventId)")
+    //@PreAuthorize("@roleSecurityExpression.canAssignAssistantRole(#eventId)")
     @PostMapping("assistant/{userId}/{eventId}")
     public ResponseEntity<Void> assignAssistantRole(
             @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
