@@ -33,8 +33,6 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-security")
 
-    //implementation("org.springframework:spring-web:4.3.11.RELEASE")
-    //implementation("commons-fileupload:commons-fileupload:1.5")
 
 
     compileOnly("io.jsonwebtoken:jjwt-api:0.11.2")
