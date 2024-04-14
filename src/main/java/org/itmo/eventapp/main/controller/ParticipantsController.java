@@ -38,14 +38,14 @@ public class ParticipantsController {
 
     @Operation(summary = "Получение списка участников мероприятия")
     @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = "application/json",
-                                            array = @ArraySchema(schema = @Schema( implementation = ParticipantResponse.class)))
-                            })
-            })
+        value = {
+            @ApiResponse(
+                content = {
+                    @Content(
+                        mediaType = "application/json",
+                        array = @ArraySchema(schema = @Schema(implementation = ParticipantResponse.class)))
+                })
+        })
     @GetMapping("/{id}/participants")
     public ResponseEntity<List<ParticipantResponse>> getParticipants(@Min(1) @PathVariable("id") Integer id) {
         List<Participant> participants = participantsService.getParticipants(id);
@@ -55,14 +55,14 @@ public class ParticipantsController {
 
     @Operation(summary = "Изменения поля visited у участника мероприятия")
     @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = "application/json",
-                                            schema = @Schema(implementation = ParticipantResponse.class))
-                            })
-            })
+        value = {
+            @ApiResponse(
+                content = {
+                    @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ParticipantResponse.class))
+                })
+        })
     @PreAuthorize("@participantsSecurityExpression.canWorkWithList(#id)")
     @PutMapping("/{id}/participants")
     public ResponseEntity<ParticipantResponse> changePresence(@PathVariable("id") Integer id, @Valid @RequestBody ParticipantPresenceRequest participantPresenceRequest) {
@@ -72,14 +72,14 @@ public class ParticipantsController {
 
     @Operation(summary = "Импорт списка участников мероприятия")
     @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = "application/json",
-                                            array = @ArraySchema(schema = @Schema( implementation = ParticipantResponse.class)))
-                            })
-            })
+        value = {
+            @ApiResponse(
+                content = {
+                    @Content(
+                        mediaType = "application/json",
+                        array = @ArraySchema(schema = @Schema(implementation = ParticipantResponse.class)))
+                })
+        })
     @PreAuthorize("@participantsSecurityExpression.canImportList(#id)")
     @PostMapping("/{id}/participants")
     public ResponseEntity<List<ParticipantResponse>> setPartisipantsList(@PathVariable("id") Integer id, @RequestPart MultipartFile participantsFile) throws IOException {
@@ -97,12 +97,12 @@ public class ParticipantsController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + filePath.getFileName().toString() + "\"");
-        headers.set("Content-Type","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            "attachment; filename=\"" + filePath.getFileName().toString() + "\"");
+        headers.set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         return ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(filePath.toFile().length())
-                .body(fileResource);
+            .headers(headers)
+            .contentLength(filePath.toFile().length())
+            .body(fileResource);
     }
 
 }
