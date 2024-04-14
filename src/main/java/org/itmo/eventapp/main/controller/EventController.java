@@ -79,15 +79,15 @@ public class EventController {
 
     @Operation(summary = "Фильрация мероприятий")
     @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = {
-                                    @Content(
-                                            mediaType = "application/json",
-                                            schema = @Schema(implementation = PaginatedResponse.class))
-                            })
-            })
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                content = {
+                    @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = PaginatedResponse.class))
+                })
+        })
     @SuppressWarnings("java:S107")
     @PreAuthorize("@eventSecurityExpression.canGetEvents()")
     @GetMapping
@@ -122,7 +122,7 @@ public class EventController {
         @Parameter(name = "format", description = "Формат мероприятия", example = "OFFLINE")
         EventFormat format) {
         PaginatedResponse<Event> result = eventService.getAllOrFilteredEvents(page, size, parentId, title, startDate, endDate, status, format);
-        PaginatedResponse<EventResponse> response = new PaginatedResponse<>(result.total(),EventMapper.eventsToEventResponseList(result.items()));
+        PaginatedResponse<EventResponse> response = new PaginatedResponse<>(result.total(), EventMapper.eventsToEventResponseList(result.items()));
         return ResponseEntity.ok().body(response);
     }
 

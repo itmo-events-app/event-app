@@ -17,12 +17,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsByRoleId(Integer roleId);
 
     @Query("SELECT u FROM User u " +
-            "WHERE LOWER(u.name) LIKE LOWER(concat('%', :rightPart,'%')) " +
-            "OR LOWER(u.name) LIKE LOWER(concat('%', :leftPart,'%')) " +
-            "OR LOWER(u.surname) LIKE LOWER(concat('%', :rightPart,'%')) " +
-            "OR LOWER(u.surname) LIKE LOWER(concat('%', :leftPart,'%'))")
+        "WHERE LOWER(u.name) LIKE LOWER(concat('%', :rightPart,'%')) " +
+        "OR LOWER(u.name) LIKE LOWER(concat('%', :leftPart,'%')) " +
+        "OR LOWER(u.surname) LIKE LOWER(concat('%', :rightPart,'%')) " +
+        "OR LOWER(u.surname) LIKE LOWER(concat('%', :leftPart,'%'))")
     Page<User> findByFullName(
-            @Param("rightPart") String rightPart,
-            @Param("leftPart") String leftPart,
-            Pageable pageable);
+        @Param("rightPart") String rightPart,
+        @Param("leftPart") String leftPart,
+        Pageable pageable);
 }

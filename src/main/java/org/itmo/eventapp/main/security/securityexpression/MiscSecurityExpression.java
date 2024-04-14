@@ -46,8 +46,8 @@ public class MiscSecurityExpression {
         List<EventRole> eventRoles = eventRoleService.findByUserIdAndEventId(userId, eventId);
 
         return eventRoles.stream()
-                .map(it -> it.getRole().getPrivileges())
-                .flatMap(Collection::stream);
+            .map(it -> it.getRole().getPrivileges())
+            .flatMap(Collection::stream);
     }
 
     public boolean checkEventPrivilege(int eventId, PrivilegeName privilegeName) {
@@ -62,16 +62,16 @@ public class MiscSecurityExpression {
 
     public boolean checkSystemPrivilege(PrivilegeName privilegeName) {
         return getUserSystemPrivileges(getCurrentUserId())
-                .stream()
-                .map(Privilege::getName)
-                .anyMatch(it -> it.equals(privilegeName));
+            .stream()
+            .map(Privilege::getName)
+            .anyMatch(it -> it.equals(privilegeName));
     }
 
     public boolean checkSystemPrivileges(List<PrivilegeName> privilegeNames) {
         Set<PrivilegeName> names = getUserSystemPrivileges(getCurrentUserId())
-                .stream()
-                .map(Privilege::getName)
-                .collect(Collectors.toSet());
+            .stream()
+            .map(Privilege::getName)
+            .collect(Collectors.toSet());
         for (PrivilegeName privilegeName : privilegeNames) {
             if (!names.contains(privilegeName)) {
                 return false;

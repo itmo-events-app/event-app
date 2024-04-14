@@ -22,8 +22,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidLogin {
     String login() default "login";
+
     LoginType type() default LoginType.EMAIL;
+
     String message() default "Недопустимый логин";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

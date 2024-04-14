@@ -4,10 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-
-import org.springframework.web.multipart.MultipartFile;
 
 // TODO: Add correct annotations
 public record EventRequest(

@@ -1,7 +1,6 @@
 package org.itmo.eventApp.main.service;
 
 import org.itmo.eventApp.main.controller.AbstractTestContainers;
-import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.TaskDeadlineTrigger;
 import org.itmo.eventapp.main.model.entity.TaskReminderTrigger;
 import org.itmo.eventapp.main.repository.TaskDeadlineTriggerRepository;
@@ -15,7 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TaskTriggerServicesTest extends AbstractTestContainers {
     @Autowired
@@ -34,7 +34,7 @@ class TaskTriggerServicesTest extends AbstractTestContainers {
     private TaskRepository taskRepository;
 
 
-    private void databaseFilling(){
+    private void databaseFilling() {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -48,28 +48,30 @@ class TaskTriggerServicesTest extends AbstractTestContainers {
     }
 
     @Test
-    void updateAndRetrieveTaskOnDeadlineTest(){
+    void updateAndRetrieveTaskOnDeadlineTest() {
         databaseFilling();
         LocalDateTime triggerTime = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
         taskDeadlineTriggerService.updateAndRetrieveTaskOnDeadline(triggerTime);
         List<TaskDeadlineTrigger> triggers = taskDeadlineTriggerRepository.findAll();
         assertTrue(triggers.isEmpty());
         assertDoesNotThrow(() -> {
-            taskRepository.findById(1).orElseThrow();
-            taskRepository.findById(2).orElseThrow();}
+                taskRepository.findById(1).orElseThrow();
+                taskRepository.findById(2).orElseThrow();
+            }
         );
     }
 
     @Test
-    void retrieveTasksOnReminderTest(){
+    void retrieveTasksOnReminderTest() {
         databaseFilling();
         LocalDateTime triggerTime = LocalDateTime.of(2025, 4, 20, 21, 0, 0);
         taskReminderTriggerService.retrieveTasksOnReminder(triggerTime);
         List<TaskReminderTrigger> triggers = taskReminderTriggerRepository.findAll();
         assertTrue(triggers.isEmpty());
         assertDoesNotThrow(() -> {
-            taskRepository.findById(1).orElseThrow();
-            taskRepository.findById(2).orElseThrow();}
+                taskRepository.findById(1).orElseThrow();
+                taskRepository.findById(2).orElseThrow();
+            }
         );
     }
 }

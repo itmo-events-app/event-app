@@ -21,10 +21,10 @@ public class TestController {
 
     @PutMapping(value = "/upload/{bucket}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> upload(
-            @RequestPart
-            MultipartFile multipartFile,
-            @PathVariable
-            String bucket
+        @RequestPart
+        MultipartFile multipartFile,
+        @PathVariable
+        String bucket
     ) {
         minioService.upload(multipartFile, bucket);
         return ResponseEntity.ok().build();
@@ -32,10 +32,10 @@ public class TestController {
 
     @DeleteMapping("/delete/{bucket}/{object}")
     ResponseEntity<Void> delete(
-            @PathVariable
-            String bucket,
-            @PathVariable
-            String object
+        @PathVariable
+        String bucket,
+        @PathVariable
+        String object
     ) {
         minioService.delete(bucket, object);
         return new ResponseEntity<>(HttpStatusCode.valueOf(204));

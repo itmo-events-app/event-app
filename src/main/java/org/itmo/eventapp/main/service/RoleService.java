@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.entity.Role;
-import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.model.mapper.RoleMapper;
@@ -86,15 +85,15 @@ public class RoleService {
 
     public Role findRoleById(Integer id) {
         return roleRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ExceptionConst.ROLE_ID_NOT_FOUND_MESSAGE.formatted(id)));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                ExceptionConst.ROLE_ID_NOT_FOUND_MESSAGE.formatted(id)));
     }
 
     public Role findOrganizationalRoleById(Integer id) {
         var role = findRoleById(id);
         if (role.getType().equals(RoleType.SYSTEM))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
+                ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
         return role;
     }
 
@@ -123,8 +122,8 @@ public class RoleService {
 
     public Role findByName(String name) {
         return roleRepository.findByName(name)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ExceptionConst.ROLE_NAME_NOT_FOUND_MESSAGE.formatted(name)));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                ExceptionConst.ROLE_NAME_NOT_FOUND_MESSAGE.formatted(name)));
     }
 
     public Role getReaderRole() {

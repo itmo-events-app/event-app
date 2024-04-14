@@ -21,7 +21,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EmailServiceTest extends AbstractTestContainers {
     @Autowired
@@ -29,8 +29,8 @@ class EmailServiceTest extends AbstractTestContainers {
 
     @RegisterExtension
     static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
-            .withConfiguration(GreenMailConfiguration.aConfig().withUser("sender@test", "passwd"))
-            .withPerMethodLifecycle(true);
+        .withConfiguration(GreenMailConfiguration.aConfig().withUser("sender@test", "passwd"))
+        .withPerMethodLifecycle(true);
 
     @Test
     void testIncomingTaskMessageSending() throws IOException, MessagingException {
@@ -44,7 +44,7 @@ class EmailServiceTest extends AbstractTestContainers {
         String expectedMessage = readMessage("email-templates/incoming-task-filled.html");
 
         mailSenderService.sendIncomingTaskMessage(expectedUserEmail, expectedUserName,
-                expectedEventName, expectedTaskName, expectedTaskLink);
+            expectedEventName, expectedTaskName, expectedTaskLink);
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
 
@@ -69,7 +69,7 @@ class EmailServiceTest extends AbstractTestContainers {
         String expectedMessage = readMessage("email-templates/overdue-task-filled.html");
 
         mailSenderService.sendOverdueTaskMessage(expectedUserEmail, expectedUserName,
-                    expectedEventName, expectedTaskName, expectedTaskLink);
+            expectedEventName, expectedTaskName, expectedTaskLink);
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
 
@@ -94,7 +94,7 @@ class EmailServiceTest extends AbstractTestContainers {
         String expectedMessage = readMessage("email-templates/reminder-task-filled.html");
 
         mailSenderService.sendReminderTaskMessage(expectedUserEmail, expectedUserName,
-                    expectedEventName, expectedTaskName, expectedTaskLink);
+            expectedEventName, expectedTaskName, expectedTaskLink);
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length == 1);
 

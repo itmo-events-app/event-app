@@ -6,13 +6,16 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
-import org.itmo.eventapp.main.model.entity.*;
+import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.Place;
+import org.itmo.eventapp.main.model.entity.Task;
+import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.repository.TaskRepository;
+import org.itmo.eventapp.main.service.specification.TaskSpecification;
 import org.itmo.eventapp.main.util.TaskNotificationUtils;
 import org.springframework.context.annotation.Lazy;
-import org.itmo.eventapp.main.service.specification.TaskSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,9 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})

@@ -17,7 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -35,7 +38,7 @@ public class ParticipantsService {
         return participantsRepository.findAllByEventId(id);
     }
 
-    public Participant changePresence(Integer eventId, ParticipantPresenceRequest participantPresenceRequest){
+    public Participant changePresence(Integer eventId, ParticipantPresenceRequest participantPresenceRequest) {
         Participant participant = participantsRepository.findByIdAndEventId(participantPresenceRequest.participantId(), eventId).get();
         participant.setVisited(participantPresenceRequest.isVisited());
         participantsRepository.save(participant);
@@ -47,32 +50,33 @@ public class ParticipantsService {
         savetoMinio(participantsListFile, eventId);
         List<Participant> participants = new ArrayList<>();
 
-        try{
-        InputStream list = participantsListFile.getInputStream();
-        Workbook workbook = new XSSFWorkbook(list);
-        boolean correctColumns = checkColumns(workbook);
-        if (!correctColumns) throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, ExceptionConst.EXCEL_COLUMNS_ERROR);
-        List<Map<String, Object>> data = excelParsing(workbook);
+        try {
+            InputStream list = participantsListFile.getInputStream();
+            Workbook workbook = new XSSFWorkbook(list);
+            boolean correctColumns = checkColumns(workbook);
+            if (!correctColumns)
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, ExceptionConst.EXCEL_COLUMNS_ERROR);
+            List<Map<String, Object>> data = excelParsing(workbook);
 
-        int counter = 0;
-        for(int y = 0; y < data.size(); y++){
-            Participant participant = new Participant();
-            participant.setName(data.get(counter).get(NAME).toString());
-            participant.setEmail(data.get(counter).get(EMAIL).toString());
-            participant.setAdditionalInfo(data.get(counter).get(PHONE).toString());
-            participant.setEvent(eventService.findById(eventId));
-            participant.setVisited(false);
-            participantsRepository.save(participant);
-            participants.add(participant);
-            counter++;
-        }}
-        catch(IOException e){
+            int counter = 0;
+            for (int y = 0; y < data.size(); y++) {
+                Participant participant = new Participant();
+                participant.setName(data.get(counter).get(NAME).toString());
+                participant.setEmail(data.get(counter).get(EMAIL).toString());
+                participant.setAdditionalInfo(data.get(counter).get(PHONE).toString());
+                participant.setEvent(eventService.findById(eventId));
+                participant.setVisited(false);
+                participantsRepository.save(participant);
+                participants.add(participant);
+                counter++;
+            }
+        } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ExceptionConst.PARTICIPANTS_LIST_PARSING_ERROR);
         }
         return participants;
     }
 
-    private boolean checkColumns(Workbook workbook){
+    private boolean checkColumns(Workbook workbook) {
         Sheet excelSheet = workbook.getSheetAt(0);
         Row row = excelSheet.getRow(0);
 
@@ -85,18 +89,19 @@ public class ParticipantsService {
 
         return exist == 3;
     }
-    private List<Map<String, Object>> excelParsing(Workbook workbook){
+
+    private List<Map<String, Object>> excelParsing(Workbook workbook) {
 
         Sheet excelSheet = workbook.getSheetAt(0);
         List<Map<String, Object>> data = new ArrayList<>();
 
         for (Row row : excelSheet) {
             outerLoop:
-            if(row.getRowNum() != 0) {
+            if (row.getRowNum() != 0) {
                 Map<String, Object> participant = new HashMap<>();
                 for (Cell cell : row) {
                     participant = parseCell(excelSheet, cell, participant);
-                    if(cell.getCellType() == Cell.CELL_TYPE_BLANK && cell.getColumnIndex() == 0) {
+                    if (cell.getCellType() == Cell.CELL_TYPE_BLANK && cell.getColumnIndex() == 0) {
                         break outerLoop;
                     }
                 }
@@ -109,24 +114,22 @@ public class ParticipantsService {
 
     }
 
-    private Map<String, Object> parseCell(Sheet excelSheet, Cell cell, Map<String, Object> participant){
+    private Map<String, Object> parseCell(Sheet excelSheet, Cell cell, Map<String, Object> participant) {
         String columnName = excelSheet.getRow(0).getCell(cell.getColumnIndex()).getStringCellValue();
-        if (cell.getCellType() == Cell.CELL_TYPE_STRING){
+        if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
             participant.put(columnName, cell.getStringCellValue());
-            if(cell.getColumnIndex() == 0 && cell.getStringCellValue().trim().isEmpty()){
+            if (cell.getColumnIndex() == 0 && cell.getStringCellValue().trim().isEmpty()) {
                 return participant;
             }
-        }
-        else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+        } else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
             participant.put(columnName, cell.getNumericCellValue());
-        }
-        else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA){
+        } else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
             participant.put(columnName, cell.getCellFormula());
         }
         return participant;
     }
 
-    private void savetoMinio(MultipartFile file, Integer id){
+    private void savetoMinio(MultipartFile file, Integer id) {
         if (!Objects.isNull(file)) {
             String modifiedFileName = id.toString() + "." + FilenameUtils.getExtension(file.getName());
             minioService.uploadWithModifiedFileName(file, BUCKET_NAME, modifiedFileName);
@@ -157,7 +160,7 @@ public class ParticipantsService {
         headerCell.setCellValue("Посещение");
 
         int index = 1;
-        for(Participant participant : participants){
+        for (Participant participant : participants) {
             Row row = sheet.createRow(index);
             Cell cell = row.createCell(0);
             cell.setCellValue(participant.getName());
@@ -168,10 +171,9 @@ public class ParticipantsService {
             cell = row.createCell(3);
             cell.setCellValue(participant.getEvent().getTitle());
             cell = row.createCell(4);
-            if(participant.isVisited()) {
+            if (participant.isVisited()) {
                 cell.setCellValue("Присутствовал(-а)");
-            }
-            else{
+            } else {
                 cell.setCellValue("Не присутствовал(-а)");
             }
             index++;

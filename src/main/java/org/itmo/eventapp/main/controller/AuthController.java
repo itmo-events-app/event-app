@@ -53,7 +53,7 @@ public class AuthController {
     ResponseEntity<List<RegistrationRequestForAdmin>> listRegisterRequests() {
         // TODO: check for administrator
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(authenticationService.listRegisterRequestsCallback());
+            .status(HttpStatus.OK)
+            .body(authenticationService.listRegisterRequestsCallback());
     }
 }

@@ -19,19 +19,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class PrivilegeServiceTest extends AbstractTestContainers {
     // ASSIGN_ORGANIZER_ROLE is both SYSTEM & EVENT type privilege
     private static final List<PrivilegeName> basicSystemPrivileges =
-            Arrays.asList(APPROVE_REGISTRATION_REQUEST, REJECT_REGISTRATION_REQUEST, MODIFY_PROFILE_DATA,
-                    VIEW_OTHER_USERS_PROFILE, VIEW_ALL_EVENTS, SEARCH_EVENTS_AND_ACTIVITIES, CREATE_EVENT,
-                    VIEW_EVENT_PLACE, VIEW_ROUTE_BETWEEN_ROOMS, REVOKE_ORGANIZER_ROLE, CREATE_EVENT_VENUE,
-                    DELETE_EVENT_VENUE, EDIT_EVENT_VENUE, CREATE_ROLE, DELETE_ROLE, EDIT_ROLE,
-                    ASSIGN_SYSTEM_ROLE, REVOKE_SYSTEM_ROLE);
+        Arrays.asList(APPROVE_REGISTRATION_REQUEST, REJECT_REGISTRATION_REQUEST, MODIFY_PROFILE_DATA,
+            VIEW_OTHER_USERS_PROFILE, VIEW_ALL_EVENTS, SEARCH_EVENTS_AND_ACTIVITIES, CREATE_EVENT,
+            VIEW_EVENT_PLACE, VIEW_ROUTE_BETWEEN_ROOMS, REVOKE_ORGANIZER_ROLE, CREATE_EVENT_VENUE,
+            DELETE_EVENT_VENUE, EDIT_EVENT_VENUE, CREATE_ROLE, DELETE_ROLE, EDIT_ROLE,
+            ASSIGN_SYSTEM_ROLE, REVOKE_SYSTEM_ROLE);
     private static final List<PrivilegeName> basicEventPrivileges =
-            Arrays.asList(ASSIGN_ORGANIZER_ROLE, EDIT_EVENT_INFO, ASSIGN_ASSISTANT_ROLE, REVOKE_ASSISTANT_ROLE,
-                    VIEW_ORGANIZER_USERS, VIEW_ASSISTANT_USERS, CREATE_EVENT_ACTIVITIES, DELETE_EVENT_ACTIVITIES,
-                    EDIT_EVENT_ACTIVITIES, VIEW_EVENT_ACTIVITIES, CREATE_TASK, DELETE_TASK, EDIT_TASK,
-                    CHANGE_TASK_STATUS, ASSIGN_TASK_EXECUTOR, REPLACE_TASK_EXECUTOR, DELETE_TASK_EXECUTOR,
-                    ASSIGN_ORGANIZATIONAL_ROLE, REVOKE_ORGANIZATIONAL_ROLE, VIEW_ALL_EVENT_TASKS,
-                    CHANGE_ASSIGNED_TASK_STATUS, ASSIGN_SELF_AS_TASK_EXECUTOR, DECLINE_TASK_EXECUTION,
-                    IMPORT_PARTICIPANT_LIST_XLSX, EXPORT_PARTICIPANT_LIST_XLSX, WORK_WITH_PARTICIPANT_LIST);
+        Arrays.asList(ASSIGN_ORGANIZER_ROLE, EDIT_EVENT_INFO, ASSIGN_ASSISTANT_ROLE, REVOKE_ASSISTANT_ROLE,
+            VIEW_ORGANIZER_USERS, VIEW_ASSISTANT_USERS, CREATE_EVENT_ACTIVITIES, DELETE_EVENT_ACTIVITIES,
+            EDIT_EVENT_ACTIVITIES, VIEW_EVENT_ACTIVITIES, CREATE_TASK, DELETE_TASK, EDIT_TASK,
+            CHANGE_TASK_STATUS, ASSIGN_TASK_EXECUTOR, REPLACE_TASK_EXECUTOR, DELETE_TASK_EXECUTOR,
+            ASSIGN_ORGANIZATIONAL_ROLE, REVOKE_ORGANIZATIONAL_ROLE, VIEW_ALL_EVENT_TASKS,
+            CHANGE_ASSIGNED_TASK_STATUS, ASSIGN_SELF_AS_TASK_EXECUTOR, DECLINE_TASK_EXECUTION,
+            IMPORT_PARTICIPANT_LIST_XLSX, EXPORT_PARTICIPANT_LIST_XLSX, WORK_WITH_PARTICIPANT_LIST);
 
     final static int SYSTEM_PRIVILEGE_COUNT = basicSystemPrivileges.size();
     final static int EVENT_PRIVILEGE_COUNT = basicEventPrivileges.size();
@@ -55,11 +55,11 @@ class PrivilegeServiceTest extends AbstractTestContainers {
 
         // ==========---- Assertions  ----==========
         assertNotNull(privileges,
-                "Got NULL after calling getAll()");
+            "Got NULL after calling getAll()");
         assertFalse(privileges.isEmpty(),
-                "Got EMPTY list after calling getAll()");
+            "Got EMPTY list after calling getAll()");
         assertEquals(PRIVILEGE_COUNT, privileges.size(),
-                "Returned privileges list size [%d] does not match expected [%d]".formatted(privileges.size(), PRIVILEGE_COUNT));
+            "Returned privileges list size [%d] does not match expected [%d]".formatted(privileges.size(), PRIVILEGE_COUNT));
     }
 
     @Test
@@ -73,9 +73,9 @@ class PrivilegeServiceTest extends AbstractTestContainers {
 
         // ==========---- Assertions  ----==========
         assertNotNull(privileges,
-                "Got NULL after calling getAll()");
+            "Got NULL after calling getAll()");
         assertTrue(privileges.isEmpty(),
-                "Returned privileges list size is [%d] but expected to be empty".formatted(privileges.size()));
+            "Returned privileges list size is [%d] but expected to be empty".formatted(privileges.size()));
     }
 
 
@@ -94,11 +94,11 @@ class PrivilegeServiceTest extends AbstractTestContainers {
 
             // ==========---- Assertions  ----==========
             assertNotNull(privilege,
-                    "Got NULL after calling findById() for an EXISTING privilege id: %d"
-                            .formatted(privilegeId));
+                "Got NULL after calling findById() for an EXISTING privilege id: %d"
+                    .formatted(privilegeId));
             assertEquals(privilegeId, privilege.getId(),
-                    "Returned privileges id [%d] does not match expected [%d]"
-                            .formatted(privilege.getId(), privilegeId));
+                "Returned privileges id [%d] does not match expected [%d]"
+                    .formatted(privilege.getId(), privilegeId));
         }
     }
 
@@ -113,11 +113,11 @@ class PrivilegeServiceTest extends AbstractTestContainers {
 
         // ====----  Execution & Assertions ----====
         ResponseStatusException exception =
-                assertThrows(ResponseStatusException.class,
-                        () -> privilegeService.findById(nonExistPrivilegeId),
-                        "NON-existing role can not be accessed");
+            assertThrows(ResponseStatusException.class,
+                () -> privilegeService.findById(nonExistPrivilegeId),
+                "NON-existing role can not be accessed");
         assertTrue(exception.getMessage().contains("не найдена"),
-                exception.getReason());
+            exception.getReason());
     }
 
 
@@ -133,10 +133,10 @@ class PrivilegeServiceTest extends AbstractTestContainers {
 
         // ==========---- Assertions  ----==========
         assertNotNull(systemPrivileges,
-                "Got NULL after calling getPrivilegeByType()");
+            "Got NULL after calling getPrivilegeByType()");
         assertEquals(SYSTEM_PRIVILEGE_COUNT, systemPrivileges.size(),
-                "Returned SYSTEM privileges list size [%d] in NOT equal expected [%d]"
-                        .formatted(systemPrivileges.size(), SYSTEM_PRIVILEGE_COUNT));
+            "Returned SYSTEM privileges list size [%d] in NOT equal expected [%d]"
+                .formatted(systemPrivileges.size(), SYSTEM_PRIVILEGE_COUNT));
     }
 
     @Test
@@ -151,10 +151,10 @@ class PrivilegeServiceTest extends AbstractTestContainers {
 
         // ==========---- Assertions  ----==========
         assertNotNull(eventPrivileges,
-                "Got NULL after calling getPrivilegeByType()");
+            "Got NULL after calling getPrivilegeByType()");
         assertEquals(EVENT_PRIVILEGE_COUNT, eventPrivileges.size(),
-                "Returned EVENT privileges list size [%d] in NOT equal expected [%d]"
-                        .formatted(eventPrivileges.size(), EVENT_PRIVILEGE_COUNT));
+            "Returned EVENT privileges list size [%d] in NOT equal expected [%d]"
+                .formatted(eventPrivileges.size(), EVENT_PRIVILEGE_COUNT));
     }
 
     @Test
@@ -169,14 +169,14 @@ class PrivilegeServiceTest extends AbstractTestContainers {
 
         // ==========---- Assertions  ----==========
         assertNotNull(systemPrivileges,
-                "Got NULL after calling getPrivilegeByType() for type %s".formatted(PrivilegeType.SYSTEM));
+            "Got NULL after calling getPrivilegeByType() for type %s".formatted(PrivilegeType.SYSTEM));
         assertNotNull(eventPrivileges,
-                "Got NULL after calling getPrivilegeByType() for type %s".formatted(PrivilegeType.EVENT));
+            "Got NULL after calling getPrivilegeByType() for type %s".formatted(PrivilegeType.EVENT));
 
         assertTrue(systemPrivileges.isEmpty(),
-                "Returned SYSTEM privilege list is NOT EMPTY but it IS EXPECTED");
+            "Returned SYSTEM privilege list is NOT EMPTY but it IS EXPECTED");
         assertTrue(eventPrivileges.isEmpty(),
-                "Returned EVENT privilege list is NOT EMPTY but it IS EXPECTED");
+            "Returned EVENT privilege list is NOT EMPTY but it IS EXPECTED");
     }
 
 

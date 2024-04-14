@@ -1,8 +1,8 @@
 package org.itmo.eventapp.main.model.dto.response;
 
-import java.time.LocalDateTime;
-
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
+
+import java.time.LocalDateTime;
 
 public record RegistrationRequestForAdmin(
     Integer id,

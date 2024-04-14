@@ -45,14 +45,14 @@ public class ProfileController {
         User user = userService.findByLogin(login);
 
         return ResponseEntity.ok(new ProfileResponse(
-                user.getId(),
-                user.getName(),
-                user.getSurname(),
-                Collections.singletonList(new UserInfoResponse(login, user.getUserLoginInfo().getLoginType())),
-                user.getUserLoginInfo().getLastLoginDate(),
-                user.getUserNotificationInfo().isEnablePushNotifications(),
-                user.getUserNotificationInfo().isEnableEmailNotifications(),
-                user.getUserNotificationInfo().getDevices()
+            user.getId(),
+            user.getName(),
+            user.getSurname(),
+            Collections.singletonList(new UserInfoResponse(login, user.getUserLoginInfo().getLoginType())),
+            user.getUserLoginInfo().getLastLoginDate(),
+            user.getUserNotificationInfo().isEnablePushNotifications(),
+            user.getUserNotificationInfo().isEnableEmailNotifications(),
+            user.getUserNotificationInfo().getDevices()
         ));
     }
 
@@ -87,54 +87,54 @@ public class ProfileController {
     @Operation(summary = "Получение списка всех привилегий пользователя в данном мероприятии")
     @GetMapping("/event-privileges/{id}")
     public ResponseEntity<List<PrivilegeResponse>> getUserEventPrivileges(
-            @AuthenticationPrincipal UserLoginInfo userDetails,
-            @Min(value = 1, message = "Поле eventId не может быть меньше 1!") @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id) {
+        @AuthenticationPrincipal UserLoginInfo userDetails,
+        @Min(value = 1, message = "Поле eventId не может быть меньше 1!") @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id) {
         Integer userId = userDetails.getUser().getId();
         return ResponseEntity.ok(
-                PrivilegeMapper.privilegesToPrivilegeResponseList(eventRoleService.getUserEventPrivileges(userId, id)));
+            PrivilegeMapper.privilegesToPrivilegeResponseList(eventRoleService.getUserEventPrivileges(userId, id)));
     }
 
     @Operation(summary = "Получение списка системных привилегий пользователя")
     @GetMapping("/system-privileges")
     public ResponseEntity<PrivilegeWithHasOrganizerRolesResponse> getUserSystemPrivileges(
-            @AuthenticationPrincipal UserLoginInfo userDetails) {
+        @AuthenticationPrincipal UserLoginInfo userDetails) {
         Integer userId = userDetails.getUser().getId();
         Set<Privilege> privilegeSet = userService.getUserSystemPrivileges(userId);
         boolean userHasOrganizerRoles = eventRoleService.userHasOrganizerRoles(userId);
 
         return ResponseEntity.ok().body(
-                new PrivilegeWithHasOrganizerRolesResponse(
-                        PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeSet),
-                        userHasOrganizerRoles
-                ));
+            new PrivilegeWithHasOrganizerRolesResponse(
+                PrivilegeMapper.privilegesToPrivilegeResponseList(privilegeSet),
+                userHasOrganizerRoles
+            ));
     }
 
     @Operation(summary = "Получение списка пользователей в системе")
     @GetMapping("/all-system-users")
     public ResponseEntity<PaginatedResponse<UserSystemRoleResponse>> getAllUsers(
-            @RequestParam(name = "searchQuery", defaultValue = "")
-                @Parameter(name = "searchQuery",
-                        description = "Строка для поиска по имени и фамилии",
-                        example = "Иван Иванов")
-                String searchQuery,
-            @RequestParam(name = "page", defaultValue = "0")
-                @Min(0)
-                @Parameter(name = "page",
-                        description = "Номер страницы, с которой начать показ пользователей",
-                        example = "0")
-                Integer page,
-            @RequestParam(name = "size", defaultValue = "10")
-                @Min(1)
-                @Max(25)
-                @Parameter(name = "size",
-                        description = "Число пользователей на странице",
-                        example = "15")
-                Integer size
+        @RequestParam(name = "searchQuery", defaultValue = "")
+        @Parameter(name = "searchQuery",
+            description = "Строка для поиска по имени и фамилии",
+            example = "Иван Иванов")
+        String searchQuery,
+        @RequestParam(name = "page", defaultValue = "0")
+        @Min(0)
+        @Parameter(name = "page",
+            description = "Номер страницы, с которой начать показ пользователей",
+            example = "0")
+        Integer page,
+        @RequestParam(name = "size", defaultValue = "10")
+        @Min(1)
+        @Max(25)
+        @Parameter(name = "size",
+            description = "Число пользователей на странице",
+            example = "15")
+        Integer size
     ) {
         Page<User> pages = userService.getAllFilteredUsers(searchQuery, page, size);
         PaginatedResponse<UserSystemRoleResponse> response =
-                new PaginatedResponse<>(pages.getTotalElements(), pages.getContent()
-                        .stream().map(UserMapper::userToUserSystemRoleResponse).toList());
+            new PaginatedResponse<>(pages.getTotalElements(), pages.getContent()
+                .stream().map(UserMapper::userToUserSystemRoleResponse).toList());
         return ResponseEntity.ok().body(response);
     }
 }
