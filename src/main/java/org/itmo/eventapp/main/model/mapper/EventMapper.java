@@ -17,23 +17,23 @@ public final class EventMapper {
         Integer parent = (event.getParent() != null) ? event.getParent().getId() : null;
         Integer placeId = event.getPlace() != null ? event.getPlace().getId() : null;
         return new EventResponse(
-                event.getId(),
-                placeId,
-                event.getStartDate(),
-                event.getEndDate(),
-                event.getTitle(),
-                event.getShortDescription(),
-                event.getFullDescription(),
-                event.getFormat(),
-                event.getStatus(),
-                event.getRegistrationStart(),
-                event.getRegistrationEnd(),
-                parent,
-                event.getParticipantLimit(),
-                event.getParticipantAgeLowest(),
-                event.getParticipantAgeHighest(),
-                event.getPreparingStart(),
-                event.getPreparingEnd()
+            event.getId(),
+            placeId,
+            event.getStartDate(),
+            event.getEndDate(),
+            event.getTitle(),
+            event.getShortDescription(),
+            event.getFullDescription(),
+            event.getFormat(),
+            event.getStatus(),
+            event.getRegistrationStart(),
+            event.getRegistrationEnd(),
+            parent,
+            event.getParticipantLimit(),
+            event.getParticipantAgeLowest(),
+            event.getParticipantAgeHighest(),
+            event.getPreparingStart(),
+            event.getPreparingEnd()
         );
     }
 
@@ -41,46 +41,46 @@ public final class EventMapper {
         boolean isActivity = event.getParent() != null;
         if (isActivity) {
             return new EventShortDataResponse(
-                    event.getParent().getId(),
-                    event.getId(),
-                    event.getParent().getTitle(),
-                    event.getTitle()
+                event.getParent().getId(),
+                event.getId(),
+                event.getParent().getTitle(),
+                event.getTitle()
             );
         }
         return new EventShortDataResponse(
-                event.getId(),
-                null,
-                event.getTitle(),
-                null
+            event.getId(),
+            null,
+            event.getTitle(),
+            null
         );
     }
 
     public static Event eventRequestToEvent(Integer id, EventRequest eventRequest, Place place, Event parent) {
         return Event.builder()
-                .id(id)
-                .place(place)
-                .startDate(eventRequest.startDate())
-                .endDate(eventRequest.endDate())
-                .title(eventRequest.title())
-                .shortDescription(eventRequest.shortDescription())
-                .fullDescription(eventRequest.fullDescription())
-                .format(eventRequest.format())
-                .status(eventRequest.status())
-                .registrationStart(eventRequest.registrationStart())
-                .registrationEnd(eventRequest.registrationEnd())
-                .parent(parent)
-                .participantLimit(eventRequest.participantLimit())
-                .participantAgeLowest(eventRequest.participantAgeLowest())
-                .participantAgeHighest(eventRequest.participantAgeHighest())
-                .preparingStart(eventRequest.preparingStart())
-                .preparingEnd(eventRequest.preparingEnd())
-                .build();
+            .id(id)
+            .place(place)
+            .startDate(eventRequest.startDate())
+            .endDate(eventRequest.endDate())
+            .title(eventRequest.title())
+            .shortDescription(eventRequest.shortDescription())
+            .fullDescription(eventRequest.fullDescription())
+            .format(eventRequest.format())
+            .status(eventRequest.status())
+            .registrationStart(eventRequest.registrationStart())
+            .registrationEnd(eventRequest.registrationEnd())
+            .parent(parent)
+            .participantLimit(eventRequest.participantLimit())
+            .participantAgeLowest(eventRequest.participantAgeLowest())
+            .participantAgeHighest(eventRequest.participantAgeHighest())
+            .preparingStart(eventRequest.preparingStart())
+            .preparingEnd(eventRequest.preparingEnd())
+            .build();
     }
 
     public static List<EventResponse> eventsToEventResponseList(List<Event> events) {
         return events.stream()
-                .map(EventMapper::eventToEventResponse)
-                .toList();
+            .map(EventMapper::eventToEventResponse)
+            .toList();
     }
 
     public static Event eventToEvent(Event source, Event parentEvent) {
@@ -88,50 +88,50 @@ public final class EventMapper {
             return null;
         }
         return Event.builder()
-                .place(source.getPlace())
-                .startDate(source.getStartDate())
-                .endDate(source.getEndDate())
-                .title(source.getTitle())
-                .shortDescription(source.getShortDescription())
-                .fullDescription(source.getFullDescription())
-                .format(source.getFormat())
-                .status(source.getStatus())
-                .registrationStart(source.getRegistrationStart())
-                .registrationEnd(source.getRegistrationEnd())
-                .parent(parentEvent)
-                .participantLimit(source.getParticipantLimit())
-                .participantAgeLowest(source.getParticipantAgeLowest())
-                .participantAgeHighest(source.getParticipantAgeHighest())
-                .preparingStart(source.getPreparingStart())
-                .preparingEnd(source.getPreparingEnd())
-                .build();
+            .place(source.getPlace())
+            .startDate(source.getStartDate())
+            .endDate(source.getEndDate())
+            .title(source.getTitle())
+            .shortDescription(source.getShortDescription())
+            .fullDescription(source.getFullDescription())
+            .format(source.getFormat())
+            .status(source.getStatus())
+            .registrationStart(source.getRegistrationStart())
+            .registrationEnd(source.getRegistrationEnd())
+            .parent(parentEvent)
+            .participantLimit(source.getParticipantLimit())
+            .participantAgeLowest(source.getParticipantAgeLowest())
+            .participantAgeHighest(source.getParticipantAgeHighest())
+            .preparingStart(source.getPreparingStart())
+            .preparingEnd(source.getPreparingEnd())
+            .build();
     }
 
     public static List<Event> eventRolesToEvents(List<EventRole> eventRoles) {
         return eventRoles.stream()
-                .map(EventMapper::eventRoleToEvent)
-                .toList();
+            .map(EventMapper::eventRoleToEvent)
+            .toList();
     }
 
     public static Event eventRoleToEvent(EventRole eventRole) {
         return Event.builder()
-                .id(eventRole.getEvent().getId())
-                .place(eventRole.getEvent().getPlace())
-                .startDate(eventRole.getEvent().getStartDate())
-                .endDate(eventRole.getEvent().getEndDate())
-                .title(eventRole.getEvent().getTitle())
-                .shortDescription(eventRole.getEvent().getShortDescription())
-                .fullDescription(eventRole.getEvent().getFullDescription())
-                .format(eventRole.getEvent().getFormat())
-                .status(eventRole.getEvent().getStatus())
-                .registrationStart(eventRole.getEvent().getRegistrationStart())
-                .registrationEnd(eventRole.getEvent().getRegistrationEnd())
-                .parent(eventRole.getEvent().getParent())
-                .participantLimit(eventRole.getEvent().getParticipantLimit())
-                .participantAgeLowest(eventRole.getEvent().getParticipantAgeLowest())
-                .participantAgeHighest(eventRole.getEvent().getParticipantAgeHighest())
-                .preparingStart(eventRole.getEvent().getPreparingStart())
-                .preparingEnd(eventRole.getEvent().getPreparingEnd())
-                .build();
+            .id(eventRole.getEvent().getId())
+            .place(eventRole.getEvent().getPlace())
+            .startDate(eventRole.getEvent().getStartDate())
+            .endDate(eventRole.getEvent().getEndDate())
+            .title(eventRole.getEvent().getTitle())
+            .shortDescription(eventRole.getEvent().getShortDescription())
+            .fullDescription(eventRole.getEvent().getFullDescription())
+            .format(eventRole.getEvent().getFormat())
+            .status(eventRole.getEvent().getStatus())
+            .registrationStart(eventRole.getEvent().getRegistrationStart())
+            .registrationEnd(eventRole.getEvent().getRegistrationEnd())
+            .parent(eventRole.getEvent().getParent())
+            .participantLimit(eventRole.getEvent().getParticipantLimit())
+            .participantAgeLowest(eventRole.getEvent().getParticipantAgeLowest())
+            .participantAgeHighest(eventRole.getEvent().getParticipantAgeHighest())
+            .preparingStart(eventRole.getEvent().getPreparingStart())
+            .preparingEnd(eventRole.getEvent().getPreparingEnd())
+            .build();
     }
 }

@@ -1,5 +1,5 @@
 package org.itmo.eventapp.main.model.mapper;
-import org.itmo.eventapp.main.minio.MinioService;
+
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
 import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
@@ -21,44 +21,44 @@ public final class TaskMapper {
         List<FileDataResponse> fileData = taskService.getFileData(task.getId());
 
         return new TaskResponse(
-                task.getId(),
-                EventMapper.eventToEventShortDataResponse(task.getEvent()),
-                task.getTitle(),
-                task.getDescription(),
-                task.getStatus(),
-                UserMapper.userToUserShortResponse(task.getAssignee()),
-                PlaceMapper.placeToPlaceShortResponse(task.getPlace()),
-                task.getCreationTime(),
-                task.getDeadline(),
-                task.getReminder(),
-                fileData
+            task.getId(),
+            EventMapper.eventToEventShortDataResponse(task.getEvent()),
+            task.getTitle(),
+            task.getDescription(),
+            task.getStatus(),
+            UserMapper.userToUserShortResponse(task.getAssignee()),
+            PlaceMapper.placeToPlaceShortResponse(task.getPlace()),
+            task.getCreationTime(),
+            task.getDeadline(),
+            task.getReminder(),
+            fileData
         );
     }
 
     public static Task taskRequestToTask(
-            TaskRequest taskRequest,
-            Event event,
-            User assignee,
-            User assigner,
-            Place place
+        TaskRequest taskRequest,
+        Event event,
+        User assignee,
+        User assigner,
+        Place place
     ) {
         return Task.builder()
-                .event(event)
-                .assignee(assignee)
-                .assigner(assigner)
-                .title(taskRequest.title())
-                .description(taskRequest.description())
-                .status(taskRequest.taskStatus())
-                .place(place)
-                .deadline(taskRequest.deadline())
-                .reminder(taskRequest.reminder())
-                .build();
+            .event(event)
+            .assignee(assignee)
+            .assigner(assigner)
+            .title(taskRequest.title())
+            .description(taskRequest.description())
+            .status(taskRequest.taskStatus())
+            .place(place)
+            .deadline(taskRequest.deadline())
+            .reminder(taskRequest.reminder())
+            .build();
     }
 
 
     public static List<TaskResponse> tasksToTaskResponseList(List<Task> tasks, TaskService taskService) {
         return tasks.stream()
-                .map((task) -> TaskMapper.taskToTaskResponse(task, taskService))
-                .toList();
+            .map((task) -> TaskMapper.taskToTaskResponse(task, taskService))
+            .toList();
     }
 }

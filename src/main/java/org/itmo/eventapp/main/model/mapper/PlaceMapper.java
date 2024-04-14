@@ -9,40 +9,40 @@ import java.util.List;
 
 public class PlaceMapper {
 
-    private PlaceMapper(){
+    private PlaceMapper() {
     }
 
     public static PlaceResponse placeToPlaceResponse(Place place) {
         return new PlaceResponse(
-                place.getId(),
-                place.getName(),
-                place.getAddress(),
-                place.getFormat(),
-                place.getRoom(),
-                place.getDescription(),
-                place.getLatitude(),
-                place.getLongitude(),
-                place.getRenderInfo()
+            place.getId(),
+            place.getName(),
+            place.getAddress(),
+            place.getFormat(),
+            place.getRoom(),
+            place.getDescription(),
+            place.getLatitude(),
+            place.getLongitude(),
+            place.getRenderInfo()
         );
     }
 
     public static Place placeRequestToPlace(PlaceRequest placeRequest) {
         return Place.builder()
-                .name(placeRequest.name())
-                .address(placeRequest.address())
-                .format(placeRequest.format())
-                .room(placeRequest.room())
-                .description(placeRequest.description())
-                .latitude(placeRequest.latitude())
-                .longitude(placeRequest.longitude())
-                .build();
+            .name(placeRequest.name())
+            .address(placeRequest.address())
+            .format(placeRequest.format())
+            .room(placeRequest.room())
+            .description(placeRequest.description())
+            .latitude(placeRequest.latitude())
+            .longitude(placeRequest.longitude())
+            .build();
     }
 
 
     public static List<PlaceResponse> placesToPlaceResponseList(List<Place> places) {
         return places.stream()
-                .map(PlaceMapper::placeToPlaceResponse)
-                .toList();
+            .map(PlaceMapper::placeToPlaceResponse)
+            .toList();
     }
 
     public static PlaceShortDataResponse placeToPlaceShortResponse(Place place) {
@@ -50,9 +50,9 @@ public class PlaceMapper {
             return null;
         }
         return new PlaceShortDataResponse(
-                place.getId(),
-                place.getName(),
-                place.getAddress()
+            place.getId(),
+            place.getName(),
+            place.getAddress()
         );
     }
 }

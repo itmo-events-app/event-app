@@ -12,4 +12,5 @@ public record LoginRequest(
     @NotBlank(message = "Поле обязательно для заполнения")
     @Schema(example = "PaSsWoRd1!", requiredMode = Schema.RequiredMode.REQUIRED)
     String password
-) {}
+) {
+}

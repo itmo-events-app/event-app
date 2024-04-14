@@ -24,72 +24,72 @@ public class TaskNotificationUtils {
 
     @Async
     @SneakyThrows
-    public void createIncomingTaskNotification(Task task){
+    public void createIncomingTaskNotification(Task task) {
         String notificationTitle = "Новая задача!";
         String notificationDescription = String.format("Вам назначена новая задача - %s в мероприятии %s.",
-                task.getTitle(), task.getEvent().getTitle());
+            task.getTitle(), task.getEvent().getTitle());
 
         notificationService.createNotification(notificationTitle,
-                notificationDescription,
-                task.getAssignee().getId(),
-                taskFullUrl + task.getId().toString());
+            notificationDescription,
+            task.getAssignee().getId(),
+            taskFullUrl + task.getId().toString());
 
         mailSenderService.sendIncomingTaskMessage(
-                task.getAssignee().getUserLoginInfo().getLogin(),
-                task.getAssignee().getName(),
-                task.getEvent().getTitle(),
-                task.getTitle(),
-                taskFullUrl + task.getId().toString());
+            task.getAssignee().getUserLoginInfo().getLogin(),
+            task.getAssignee().getName(),
+            task.getEvent().getTitle(),
+            task.getTitle(),
+            taskFullUrl + task.getId().toString());
     }
 
     @Async
     @SneakyThrows
-    public void createOverdueTaskNotification(Task task){
+    public void createOverdueTaskNotification(Task task) {
         String notificationTitle = "Просроченная задача!";
         String notificationDescription = String.format("Прошёл срок исполнения задачи - %s в мероприятии %s.",
-                task.getTitle(), task.getEvent().getTitle());
+            task.getTitle(), task.getEvent().getTitle());
 
         notificationService.createNotification(notificationTitle,
-                notificationDescription,
-                task.getAssignee().getId(),
-                taskFullUrl + task.getId().toString());
+            notificationDescription,
+            task.getAssignee().getId(),
+            taskFullUrl + task.getId().toString());
         notificationService.createNotification(notificationTitle,
-                notificationDescription,
-                task.getAssigner().getId(),
-                taskFullUrl + task.getId().toString());
+            notificationDescription,
+            task.getAssigner().getId(),
+            taskFullUrl + task.getId().toString());
 
         mailSenderService.sendOverdueTaskMessage(
-                task.getAssignee().getUserLoginInfo().getLogin(),
-                task.getAssignee().getName(),
-                task.getEvent().getTitle(),
-                task.getTitle(),
-                taskFullUrl + task.getId().toString());
+            task.getAssignee().getUserLoginInfo().getLogin(),
+            task.getAssignee().getName(),
+            task.getEvent().getTitle(),
+            task.getTitle(),
+            taskFullUrl + task.getId().toString());
 
         mailSenderService.sendOverdueTaskMessage(
-                task.getAssigner().getUserLoginInfo().getLogin(),
-                task.getAssigner().getName(),
-                task.getEvent().getTitle(),
-                task.getTitle(),
-                taskFullUrl + task.getId().toString());
+            task.getAssigner().getUserLoginInfo().getLogin(),
+            task.getAssigner().getName(),
+            task.getEvent().getTitle(),
+            task.getTitle(),
+            taskFullUrl + task.getId().toString());
     }
 
     @Async
     @SneakyThrows
-    public void createReminderTaskNotification(Task task){
+    public void createReminderTaskNotification(Task task) {
         String notificationTitle = "Не забудьте выполнить задачу!";
         String notificationDescription = String.format("Не забудьте выполнить задачу - %s в мероприятии %s.",
-                task.getTitle(), task.getEvent().getTitle());
+            task.getTitle(), task.getEvent().getTitle());
 
         notificationService.createNotification(notificationTitle,
-                notificationDescription,
-                task.getAssignee().getId(),
-                taskFullUrl + task.getId().toString());
+            notificationDescription,
+            task.getAssignee().getId(),
+            taskFullUrl + task.getId().toString());
 
         mailSenderService.sendReminderTaskMessage(
-                task.getAssignee().getUserLoginInfo().getLogin(),
-                task.getAssignee().getName(),
-                task.getEvent().getTitle(),
-                task.getTitle(),
-                taskFullUrl + task.getId().toString());
+            task.getAssignee().getUserLoginInfo().getLogin(),
+            task.getAssignee().getName(),
+            task.getEvent().getTitle(),
+            task.getTitle(),
+            taskFullUrl + task.getId().toString());
     }
 }

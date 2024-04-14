@@ -18,8 +18,8 @@ public class PrivilegeService {
 
     public Privilege findById(Integer id) {
         return privilegeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ExceptionConst.PRIVILEGE_ID_NOT_FOUND_MESSAGE.formatted(id)));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                ExceptionConst.PRIVILEGE_ID_NOT_FOUND_MESSAGE.formatted(id)));
     }
 
     public List<Privilege> getPrivileges(PrivilegeType type) {

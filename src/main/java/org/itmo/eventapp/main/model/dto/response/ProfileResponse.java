@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Objects;
 
 public record ProfileResponse(
-        Integer userId,
-        String name,
-        String surname,
-        List<UserInfoResponse> userInfo,
-        LocalDateTime lastLoginDate,
-        boolean enablePushNotifications,
-        boolean enableEmailNotifications,
-        String[] devices
+    Integer userId,
+    String name,
+    String surname,
+    List<UserInfoResponse> userInfo,
+    LocalDateTime lastLoginDate,
+    boolean enablePushNotifications,
+    boolean enableEmailNotifications,
+    String[] devices
 
 ) {
     @Override
@@ -22,13 +22,13 @@ public record ProfileResponse(
         if (o == null || getClass() != o.getClass()) return false;
         ProfileResponse that = (ProfileResponse) o;
         return enablePushNotifications == that.enablePushNotifications &&
-                enableEmailNotifications == that.enableEmailNotifications &&
-                Objects.equals(userId, that.userId) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(surname, that.surname) &&
-                Objects.equals(userInfo, that.userInfo) &&
-                Objects.equals(lastLoginDate, that.lastLoginDate) &&
-                Arrays.equals(devices, that.devices);
+            enableEmailNotifications == that.enableEmailNotifications &&
+            Objects.equals(userId, that.userId) &&
+            Objects.equals(name, that.name) &&
+            Objects.equals(surname, that.surname) &&
+            Objects.equals(userInfo, that.userInfo) &&
+            Objects.equals(lastLoginDate, that.lastLoginDate) &&
+            Arrays.equals(devices, that.devices);
     }
 
     @Override
@@ -39,14 +39,14 @@ public record ProfileResponse(
     @Override
     public String toString() {
         return "ProfileResponse{" +
-                "userId=" + userId +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", userInfo=" + userInfo +
-                ", lastLoginDate=" + lastLoginDate +
-                ", enablePushNotifications=" + enablePushNotifications +
-                ", enableEmailNotifications=" + enableEmailNotifications +
-                ", devices=" + Arrays.toString(devices) +
-                '}';
+            "userId=" + userId +
+            ", name='" + name + '\'' +
+            ", surname='" + surname + '\'' +
+            ", userInfo=" + userInfo +
+            ", lastLoginDate=" + lastLoginDate +
+            ", enablePushNotifications=" + enablePushNotifications +
+            ", enableEmailNotifications=" + enableEmailNotifications +
+            ", devices=" + Arrays.toString(devices) +
+            '}';
     }
 }

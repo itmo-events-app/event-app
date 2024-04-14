@@ -2,7 +2,6 @@ package org.itmo.eventapp.main.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Not;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.User;
@@ -32,20 +31,20 @@ public class NotificationService {
         }
 
         notificationRepository.save(Notification.builder()
-                .user(user)
-                .title(title)
-                .description(description)
-                .seen(false)
-                .sentTime(LocalDateTime.now())
-                .link(link)
-                .build());
+            .user(user)
+            .title(title)
+            .description(description)
+            .seen(false)
+            .sentTime(LocalDateTime.now())
+            .link(link)
+            .build());
     }
 
     public Notification updateToSeen(Integer notificationId, Integer userId) {
 
         Notification notification = notificationRepository
-                .findById(notificationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.NOTIFICATION_ERROR_MESSAGE));
+            .findById(notificationId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.NOTIFICATION_ERROR_MESSAGE));
 
         if (!notification.getUser().getId().equals(userId)) {
             // abort operation if user id mismatch

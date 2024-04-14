@@ -25,24 +25,24 @@ class TaskNotificationUtilsTest extends AbstractTestContainers {
 
     @RegisterExtension
     static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
-            .withConfiguration(GreenMailConfiguration.aConfig().withUser("sender@test", "passwd"))
-            .withPerMethodLifecycle(true);
+        .withConfiguration(GreenMailConfiguration.aConfig().withUser("sender@test", "passwd"))
+        .withPerMethodLifecycle(true);
 
-    private void databaseFilling(){
+    private void databaseFilling() {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
     }
 
-    private Task createTaskForNotification(){
+    private Task createTaskForNotification() {
         return Task.builder()
-                .id(1)
-                .title("TestTask")
-                .event(Event.builder().title("EventTitle").build())
-                .assignee(User.builder().id(1).name("HelperName")
-                        .userLoginInfo(UserLoginInfo.builder().login("test_mail@itmo.ru").build()).build())
-                .assigner(User.builder().id(2).name("OrganizerName")
-                        .userLoginInfo(UserLoginInfo.builder().login("test_mail1@itmo.ru").build()).build())
-                .build();
+            .id(1)
+            .title("TestTask")
+            .event(Event.builder().title("EventTitle").build())
+            .assignee(User.builder().id(1).name("HelperName")
+                .userLoginInfo(UserLoginInfo.builder().login("test_mail@itmo.ru").build()).build())
+            .assigner(User.builder().id(2).name("OrganizerName")
+                .userLoginInfo(UserLoginInfo.builder().login("test_mail1@itmo.ru").build()).build())
+            .build();
     }
 
     @Test
@@ -58,7 +58,7 @@ class TaskNotificationUtilsTest extends AbstractTestContainers {
 
         assertEquals(1, greenMail.getReceivedMessages().length);
 
-        Notification notification = notificationRepository.findById(1).orElseThrow(() ->new Exception("NotificationNotFound"));
+        Notification notification = notificationRepository.findById(1).orElseThrow(() -> new Exception("NotificationNotFound"));
 
         assertEquals(expectedTitle, notification.getTitle());
         assertEquals(expectedDescription, notification.getDescription());
@@ -80,7 +80,7 @@ class TaskNotificationUtilsTest extends AbstractTestContainers {
 
         assertEquals(1, greenMail.getReceivedMessages().length);
 
-        Notification notification = notificationRepository.findById(1).orElseThrow(() ->new Exception("NotificationNotFound"));
+        Notification notification = notificationRepository.findById(1).orElseThrow(() -> new Exception("NotificationNotFound"));
 
         assertEquals(expectedTitle, notification.getTitle());
         assertEquals(expectedDescription, notification.getDescription());
@@ -102,7 +102,7 @@ class TaskNotificationUtilsTest extends AbstractTestContainers {
 
         assertEquals(2, greenMail.getReceivedMessages().length);
 
-        Notification notificationAssignee = notificationRepository.findById(1).orElseThrow(() ->new Exception("NotificationNotFound"));
+        Notification notificationAssignee = notificationRepository.findById(1).orElseThrow(() -> new Exception("NotificationNotFound"));
 
         assertEquals(expectedTitle, notificationAssignee.getTitle());
         assertEquals(expectedDescription, notificationAssignee.getDescription());
@@ -110,7 +110,7 @@ class TaskNotificationUtilsTest extends AbstractTestContainers {
         assertFalse(notificationAssignee.isSeen());
         assertEquals(1, notificationAssignee.getUser().getId());
 
-        Notification notificationAssigner = notificationRepository.findById(2).orElseThrow(() ->new Exception("NotificationNotFound"));
+        Notification notificationAssigner = notificationRepository.findById(2).orElseThrow(() -> new Exception("NotificationNotFound"));
 
         assertEquals(expectedTitle, notificationAssigner.getTitle());
         assertEquals(expectedDescription, notificationAssigner.getDescription());
