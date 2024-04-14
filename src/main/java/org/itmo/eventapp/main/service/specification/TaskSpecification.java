@@ -1,7 +1,6 @@
 package org.itmo.eventapp.main.service.specification;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
-import org.itmo.eventapp.main.model.dto.request.TaskFilterRequest;
 import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.springframework.data.jpa.domain.Specification;

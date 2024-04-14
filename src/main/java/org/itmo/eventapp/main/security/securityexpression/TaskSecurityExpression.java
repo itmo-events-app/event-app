@@ -2,18 +2,14 @@ package org.itmo.eventapp.main.security.securityexpression;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.dto.request.UserShortDataRequest;
-import org.itmo.eventapp.main.model.entity.*;
+import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.Privilege;
+import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
-import org.itmo.eventapp.main.service.EventRoleService;
-import org.itmo.eventapp.main.service.EventService;
 import org.itmo.eventapp.main.service.TaskService;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
