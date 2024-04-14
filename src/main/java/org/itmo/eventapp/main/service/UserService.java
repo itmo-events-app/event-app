@@ -11,11 +11,12 @@ import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserNotificationInfo;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.repository.UserRepository;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -91,7 +92,20 @@ public class UserService {
         return user.getRole().getPrivileges();
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getAllFilteredUsers(String searchQuery, Integer page, Integer size){
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("id").ascending());
+        if (searchQuery.isEmpty()) {
+            return userRepository.findAll(pageRequest);
+        } else {
+            String rightPart, leftPart;
+            String[] parts = searchQuery.split(" ", 2);
+            rightPart = parts[0];
+            if (parts.length == 2) {
+                leftPart = parts[1];
+            } else {
+                leftPart = parts [0];
+            }
+            return userRepository.findByFullName(rightPart, leftPart, pageRequest);
+        }
     }
 }
