@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TaskNotificationUtilsTest extends AbstractTestContainers {
+class TaskNotificationUtilsTest extends AbstractTestContainers {
     @Autowired
     private TaskNotificationUtils taskNotificationUtils;
 
@@ -52,7 +52,7 @@ public class TaskNotificationUtilsTest extends AbstractTestContainers {
         taskNotificationUtils.createIncomingTaskNotification(createTaskForNotification());
 
         String expectedTitle = "Новая задача!";
-        String expectedDescription = "Вам назначена новая задача - TestTask в мероприятии EventTitle";
+        String expectedDescription = "Вам назначена новая задача - TestTask в мероприятии EventTitle.";
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length > 0);
 
@@ -74,7 +74,7 @@ public class TaskNotificationUtilsTest extends AbstractTestContainers {
         taskNotificationUtils.createReminderTaskNotification(createTaskForNotification());
 
         String expectedTitle = "Не забудьте выполнить задачу!";
-        String expectedDescription = "Не забудьте выполнить задачу - TestTask в мероприятии EventTitle";
+        String expectedDescription = "Не забудьте выполнить задачу - TestTask в мероприятии EventTitle.";
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length > 0);
 
@@ -96,7 +96,7 @@ public class TaskNotificationUtilsTest extends AbstractTestContainers {
         taskNotificationUtils.createOverdueTaskNotification(createTaskForNotification());
 
         String expectedTitle = "Просроченная задача!";
-        String expectedDescription = "Прошёл срок исполнения задачи - TestTask в мероприятии EventTitle";
+        String expectedDescription = "Прошёл срок исполнения задачи - TestTask в мероприятии EventTitle.";
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> greenMail.getReceivedMessages().length > 1);
 

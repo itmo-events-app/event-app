@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TaskTriggerServicesTest extends AbstractTestContainers {
+class TaskTriggerServicesTest extends AbstractTestContainers {
     @Autowired
     private TaskReminderTriggerService taskReminderTriggerService;
 

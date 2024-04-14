@@ -3,17 +3,14 @@ package org.itmo.eventapp.main.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.NotificationSettingsRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
-import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
-import org.itmo.eventapp.main.model.dto.response.PrivilegeWithHasOrganizerRolesResponse;
-import org.itmo.eventapp.main.model.dto.response.ProfileResponse;
-import org.itmo.eventapp.main.model.dto.response.UserInfoResponse;
-import org.itmo.eventapp.main.model.dto.response.UserSystemRoleResponse;
+import org.itmo.eventapp.main.model.dto.response.*;
 import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
@@ -21,6 +18,7 @@ import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.model.mapper.UserMapper;
 import org.itmo.eventapp.main.service.EventRoleService;
 import org.itmo.eventapp.main.service.UserService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -114,9 +112,30 @@ public class ProfileController {
 
     @Operation(summary = "Получение списка пользователей в системе")
     @GetMapping("/all-system-users")
-    public ResponseEntity<List<UserSystemRoleResponse>> getAllUsers() {
-        List<User> allUsers = userService.getAllUsers();
-        return ResponseEntity.ok().body(
-                UserMapper.usersToUserSystemRoleResponses(allUsers));
+    public ResponseEntity<PaginatedResponse<UserSystemRoleResponse>> getAllUsers(
+            @RequestParam(name = "searchQuery", defaultValue = "")
+                @Parameter(name = "searchQuery",
+                        description = "Строка для поиска по имени и фамилии",
+                        example = "Иван Иванов")
+                String searchQuery,
+            @RequestParam(name = "page", defaultValue = "0")
+                @Min(0)
+                @Parameter(name = "page",
+                        description = "Номер страницы, с которой начать показ пользователей",
+                        example = "0")
+                Integer page,
+            @RequestParam(name = "size", defaultValue = "10")
+                @Min(1)
+                @Max(25)
+                @Parameter(name = "size",
+                        description = "Число пользователей на странице",
+                        example = "15")
+                Integer size
+    ) {
+        Page<User> pages = userService.getAllFilteredUsers(searchQuery, page, size);
+        PaginatedResponse<UserSystemRoleResponse> response =
+                new PaginatedResponse<>(pages.getTotalElements(), pages.getContent()
+                        .stream().map(UserMapper::userToUserSystemRoleResponse).toList());
+        return ResponseEntity.ok().body(response);
     }
 }

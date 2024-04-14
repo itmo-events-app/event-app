@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 // TODO - test revokeSystemRole
 
 
-public class RoleServiceTest extends AbstractTestContainers {
+class RoleServiceTest extends AbstractTestContainers {
     private static final List<String> basicRolesNames =
             Arrays.asList("Администратор", "Читатель", "Организатор", "Помощник");
     private static final List<String> fakeRolesNames =
