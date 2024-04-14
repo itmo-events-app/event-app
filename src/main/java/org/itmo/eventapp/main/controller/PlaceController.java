@@ -32,7 +32,7 @@ public class PlaceController {
                                                                       @Min(0) @Max(50) @RequestParam(value = "size", defaultValue = "5") @Parameter(name = "size", description = "Число площадок на странице", example = "15") int size,
                                                                       @RequestParam(required = false) @Parameter(name = "name", description = "Имя площадки", example = "Университет ИТМО") String name) {
         return ResponseEntity.ok().body(PlaceMapper.placesToPlaceResponseList(
-                placeService.getAllOrFilteredPlaces(page, size, name)));
+            placeService.getAllOrFilteredPlaces(page, size, name)));
     }
 
     @Operation(summary = "Получение площадки по id")

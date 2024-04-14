@@ -43,8 +43,8 @@ public class RoleSecurityExpression {
     private Stream<Privilege> getUserEventPrivileges(int eventId, int userId) {
         List<EventRole> eventRoles = eventRoleService.findByUserIdAndEventId(userId, eventId);
         return eventRoles.stream()
-                .map(it -> it.getRole().getPrivileges())
-                .flatMap(Collection::stream);
+            .map(it -> it.getRole().getPrivileges())
+            .flatMap(Collection::stream);
     }
 
     private boolean checkEventPrivilege(int eventId, PrivilegeName privilegeName) {
@@ -98,6 +98,6 @@ public class RoleSecurityExpression {
 
     public boolean canGetAllOrganizationalRole(@Positive(message = "Параметр eventId не может быть меньше 1!") int eventId) {
         return canAssignOrganizationalRole(eventId) || canAssignOrganizerRole(eventId) ||
-                canAssignAssistantRole(eventId) || canRevokeAssistantRole(eventId) || canRevokeOrganizationalRole(eventId);
+            canAssignAssistantRole(eventId) || canRevokeAssistantRole(eventId) || canRevokeOrganizationalRole(eventId);
     }
 }

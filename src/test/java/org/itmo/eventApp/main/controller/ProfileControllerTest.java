@@ -44,9 +44,9 @@ class ProfileControllerTest extends AbstractTestContainers {
 
         UserChangeNameRequest request = new UserChangeNameRequest("Кодзима", "Гений");
         mockMvc.perform(put("/api/profile/name")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
 
 
         User updatedUser = userRepository.findById(1).orElse(null);
@@ -62,9 +62,9 @@ class ProfileControllerTest extends AbstractTestContainers {
 
         UserChangePasswordRequest request = new UserChangePasswordRequest("old123passwordNEW!", "123passwordNEW!", "123passwordNEW!");
         mockMvc.perform(put("/api/profile/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test
@@ -74,9 +74,9 @@ class ProfileControllerTest extends AbstractTestContainers {
 
         UserChangePasswordRequest request = new UserChangePasswordRequest("oldPassword", "123passwordNEW123!", "123passwordNEW321!");
         mockMvc.perform(put("/api/profile/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
@@ -86,9 +86,9 @@ class ProfileControllerTest extends AbstractTestContainers {
 
         UserChangeLoginRequest request = new UserChangeLoginRequest("newEmail@itmo.ru", LoginType.EMAIL);
         mockMvc.perform(put("/api/profile/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         User updatedUser = userRepository.findById(1).orElse(null);
         Assertions.assertNotNull(updatedUser);
@@ -104,9 +104,9 @@ class ProfileControllerTest extends AbstractTestContainers {
 
         UserChangeLoginRequest request = new UserChangeLoginRequest("test_mail3@itmo.ru", LoginType.EMAIL);
         mockMvc.perform(put("/api/profile/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isConflict());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(MockMvcResultMatchers.status().isConflict());
     }
 
     @Test
@@ -115,16 +115,16 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
 
         mockMvc.perform(get("/api/profile/me"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.surname").value("user"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userInfo[0].login").value("test_mail@itmo.ru"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userInfo[0].type").value("EMAIL"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastLoginDate").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.enablePushNotifications").value(false))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.enableEmailNotifications").value(false))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.devices").isArray());
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value(1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("test"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.surname").value("user"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.userInfo[0].login").value("test_mail@itmo.ru"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.userInfo[0].type").value("EMAIL"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.lastLoginDate").exists())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.enablePushNotifications").value(false))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.enableEmailNotifications").value(false))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.devices").isArray());
     }
 
     @Test
@@ -134,9 +134,9 @@ class ProfileControllerTest extends AbstractTestContainers {
 
         NotificationSettingsRequest request = new NotificationSettingsRequest(false, true);
         mockMvc.perform(put("/api/profile/notifications")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         User updatedUser = userRepository.findById(1).orElse(null);
         Assertions.assertNotNull(updatedUser);
@@ -154,8 +154,8 @@ class ProfileControllerTest extends AbstractTestContainers {
 //        executeSqlScript("/sql/insert_event_role.sql");
 
         mockMvc.perform(get("/api/profile/event-privileges/1")
-                        .with(user(getUserLoginInfo())))
-                .andExpect(status().isNotFound());
+                .with(user(getUserLoginInfo())))
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -163,23 +163,23 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
         UserLoginInfo userLoginInfo = getUserLoginInfo();
         String eventJson = """
-                {
-                    "userId": 1,
-                    "title": "test event"
-                }""";
+            {
+                "userId": 1,
+                "title": "test event"
+            }""";
         mockMvc.perform(
-                post("/api/events")
-                        .content(eventJson)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(user(userLoginInfo))
+            post("/api/events")
+                .content(eventJson)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(userLoginInfo))
         );
 
         MvcResult result = mockMvc.perform(get("/api/profile/event-privileges/1")
-                        .with(user(userLoginInfo)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andReturn();
+                .with(user(userLoginInfo)))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$").isArray())
+            .andReturn();
         String resultString = result.getResponse().getContentAsString();
         Assertions.assertTrue(resultString.contains("ASSIGN_TASK_EXECUTOR"));
         Assertions.assertTrue(resultString.contains("DELETE_EVENT_ACTIVITIES"));
@@ -193,9 +193,9 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
 
         MvcResult result = mockMvc.perform(get("/api/profile/system-privileges")
-                        .with(user(getUserLoginInfo())))
-                .andExpect(status().isOk())
-                .andReturn();
+                .with(user(getUserLoginInfo())))
+            .andExpect(status().isOk())
+            .andReturn();
         String resultString = result.getResponse().getContentAsString();
         Assertions.assertTrue(resultString.contains("CREATE_EVENT_VENUE"));
         Assertions.assertTrue(resultString.contains("VIEW_EVENT_ACTIVITIES"));
@@ -211,14 +211,17 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_3.sql");
 
         String expectedJson = """
-                [{"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","type":"EMAIL","role":"Администратор"},
-                {"id":2,"name":"test2","surname":"user2","login":"test_mail2@itmo.ru","type":"EMAIL","role":"Администратор"},
-                {"id":3,"name":"test3","surname":"user3","login":"test_mail3@itmo.ru","type":"EMAIL","role":"Администратор"}]
-                """;
+            {"total":3,
+            "items":[
+            {"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","type":"EMAIL","role":"Администратор"},
+            {"id":2,"name":"test2","surname":"user2","login":"test_mail2@itmo.ru","type":"EMAIL","role":"Администратор"},
+            {"id":3,"name":"test3","surname":"user3","login":"test_mail3@itmo.ru","type":"EMAIL","role":"Администратор"}
+            ]}
+            """;
 
         mockMvc.perform(get("/api/profile/all-system-users")
-                        .with(user(getUserLoginInfo())))
-                .andExpect(status().isOk())
-                .andExpect(content().json(expectedJson));
+                .with(user(getUserLoginInfo())))
+            .andExpect(status().isOk())
+            .andExpect(content().json(expectedJson));
     }
 }

@@ -21,6 +21,5 @@ public record ParticipantResponse(
 
     @Schema(example = "34", requiredMode = Schema.RequiredMode.REQUIRED)
     Integer eventId
-)
-{
+) {
 }

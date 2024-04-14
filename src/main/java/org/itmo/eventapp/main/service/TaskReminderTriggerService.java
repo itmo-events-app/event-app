@@ -16,15 +16,15 @@ public class TaskReminderTriggerService {
     private final TaskReminderTriggerRepository taskReminderTriggerRepository;
 
     @Transactional
-    public List<Task> retrieveTasksOnReminder(LocalDateTime reminderTime){
+    public List<Task> retrieveTasksOnReminder(LocalDateTime reminderTime) {
         List<Task> tasks = taskReminderTriggerRepository.findTasksByTriggerTimeBefore(reminderTime);
         taskReminderTriggerRepository.deleteAllByTriggerTimeBefore(reminderTime);
         return tasks;
     }
 
-    public void createNewReminderTrigger(Task task){
+    public void createNewReminderTrigger(Task task) {
         TaskReminderTrigger taskReminderTrigger = TaskReminderTrigger.builder()
-                .task(task).triggerTime(task.getReminder()).build();
+            .task(task).triggerTime(task.getReminder()).build();
         taskReminderTriggerRepository.save(taskReminderTrigger);
     }
 }

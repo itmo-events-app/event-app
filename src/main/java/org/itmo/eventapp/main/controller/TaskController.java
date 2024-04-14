@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
+import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
@@ -72,8 +73,8 @@ public class TaskController {
     @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
     @PutMapping("/{id}/files")
     public ResponseEntity<List<String>> uploadFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
-                                                                @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
-                                                                @RequestPart List<MultipartFile> files) {
+                                                    @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
+                                                    @RequestPart List<MultipartFile> files) {
 
         return ResponseEntity.ok().body(taskService.addFiles(id, files));
     }
@@ -81,10 +82,10 @@ public class TaskController {
     @Operation(summary = "Получение списка имен файлов задачи")
     @PreAuthorize("@taskSecurityExpression.canGetTask(#id)")
     @GetMapping("/{id}/files")
-    public ResponseEntity<List<String>> getFileNames(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
-                                                    @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id) {
+    public ResponseEntity<List<FileDataResponse>> getFileNames(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                                               @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id) {
 
-        return ResponseEntity.ok().body(taskService.getFileNames(id));
+        return ResponseEntity.ok().body(taskService.getFileData(id));
     }
 
     @Operation(summary = "Удаление файлов из задачи")
@@ -114,10 +115,10 @@ public class TaskController {
     @PreAuthorize("@taskSecurityExpression.canEditTaskAssignee(#id)")
     @PutMapping("/{id}/assignee/{userId}")
     public ResponseEntity<TaskResponse> taskSetAssignee(
-            @Min(value = 1, message = "Параметр id не может быть меньше 1!")
-            @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
-            @Min(value = 1, message = "Параметр userId не может быть меньше 1!")
-            @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId
+        @Min(value = 1, message = "Параметр id не может быть меньше 1!")
+        @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
+        @Min(value = 1, message = "Параметр userId не может быть меньше 1!")
+        @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId
     ) {
         Task updatedTask = taskService.setAssignee(id, userId);
         return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
@@ -128,8 +129,8 @@ public class TaskController {
     @PreAuthorize("@taskSecurityExpression.canTakeOnTask(#id)")
     @PutMapping("/{id}/assignee")
     public ResponseEntity<TaskResponse> taskTakeOn(
-            @Min(value = 1, message = "Параметр id не может быть меньше 1!")
-            @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id
+        @Min(value = 1, message = "Параметр id не может быть меньше 1!")
+        @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id
     ) {
         /*TODO: TEST*/
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -146,8 +147,8 @@ public class TaskController {
     @PreAuthorize("@taskSecurityExpression.canDeleteTaskAssignee(#id)")
     @DeleteMapping("/{id}/assignee")
     public ResponseEntity<TaskResponse> taskDeleteAssignee(
-            @Min(value = 1, message = "Параметр id не может быть меньше 1!")
-            @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id
+        @Min(value = 1, message = "Параметр id не может быть меньше 1!")
+        @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id
     ) {
         Task updatedTask = taskService.setAssignee(id, -1);
         return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
@@ -158,10 +159,10 @@ public class TaskController {
     @PreAuthorize("@taskSecurityExpression.canEditTaskStatus(#id)")
     @PutMapping("/{id}/status")
     public ResponseEntity<TaskResponse> taskSetStatus(
-            @Min(value = 1, message = "Параметр id не может быть меньше 1!")
-            @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
-            @NotNull(message = "Параметр newStatus не может быть null!")
-            @RequestBody @Parameter(name = "newStatus", description = "Новый статус задачи", example = "EXPIRED") TaskStatus newStatus
+        @Min(value = 1, message = "Параметр id не может быть меньше 1!")
+        @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
+        @NotNull(message = "Параметр newStatus не может быть null!")
+        @RequestBody @Parameter(name = "newStatus", description = "Новый статус задачи", example = "EXPIRED") TaskStatus newStatus
     ) {
         Task updatedTask = taskService.setStatus(id, newStatus);
         return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
@@ -174,10 +175,10 @@ public class TaskController {
     @PreAuthorize("@taskSecurityExpression.canEditTask(#dstEventId)")
     @PutMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListMove(
-            @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
-            @PathVariable @Parameter(name = "dstEventId", description = "ID мероприятия, куда задача будет перемещена", example = "1") Integer dstEventId,
-            @NotEmpty(message = "Список task id не может быть пустым!")
-            @RequestBody List<Integer> taskIds
+        @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
+        @PathVariable @Parameter(name = "dstEventId", description = "ID мероприятия, куда задача будет перемещена", example = "1") Integer dstEventId,
+        @NotEmpty(message = "Список task id не может быть пустым!")
+        @RequestBody List<Integer> taskIds
     ) {
         List<Task> updTasks = taskService.moveTasks(dstEventId, taskIds);
         return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(updTasks, taskService));
@@ -187,10 +188,10 @@ public class TaskController {
     @PreAuthorize("@taskSecurityExpression.getCanCopyTasks(#dstEventId, #taskIds)")
     @PostMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListCopy(
-            @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
-            @PathVariable @Parameter(name = "dstEventId", description = "ID мероприятия, куда задача будет скопирована", example = "1") Integer dstEventId,
-            @NotEmpty(message = "Список task id не может быть пустым!")
-            @RequestBody List<Integer> taskIds
+        @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
+        @PathVariable @Parameter(name = "dstEventId", description = "ID мероприятия, куда задача будет скопирована", example = "1") Integer dstEventId,
+        @NotEmpty(message = "Список task id не может быть пустым!")
+        @RequestBody List<Integer> taskIds
     ) {
         List<Task> newTasks = taskService.copyTasks(dstEventId, taskIds);
         // src == dst - ?
@@ -201,43 +202,43 @@ public class TaskController {
     @PreAuthorize("@taskSecurityExpression.canGetEventTasks(#eventId)")
     @GetMapping("/event/{eventId}")
     public ResponseEntity<List<TaskResponse>> taskListShowInEvent(
-            @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
-            @PathVariable
-            @Parameter(name = "eventId", description = "ID мероприятия", example = "1")
-            Integer eventId,
-            @Min(value = 1, message = "Параметр assigneeId не может быть меньше 1!")
-            @RequestParam(required = false)
-            @Parameter(name = "assigneeId", description = "ID Исполнителя задачи", example = "123")
-            Integer assigneeId,
-            @Min(value = 1, message = "Параметр assignerId не может быть меньше 1!")
-            @RequestParam(required = false)
-            @Parameter(name = "assignerId", description = "ID Создателя задачи", example = "13")
-            Integer assignerId,
-            @Valid @RequestParam(required = false)
-            @Parameter(name = "taskStatus", description = "Статус задачи")
-            TaskStatus taskStatus,
-            @RequestParam(required = false)
-            @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            @Parameter(name = "deadlineLowerLimit", description = "Нижняя граница для фильтрации задач по дедлайну")
-            LocalDateTime deadlineLowerLimit,
-            @RequestParam(required = false)
-            @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            @Parameter(name = "deadlineUpperLimit", description = "Верхняя граница для фильтрации задач по дедлайну")
-            LocalDateTime deadlineUpperLimit,
-            @RequestParam(required = false, defaultValue = "false")
-            @Parameter(name = "subEventTasksGet", description = "Включить получение задач активностей мероприятия")
-            Boolean subEventTasksGet,
-            @RequestParam(required = false, defaultValue = "false")
-            @Parameter(name = "personalTasksGet", description = "Получить свои задачи в мероприятии. Более приоритетный параметр, чем assigneeId")
-            Boolean personalTasksGet,
-            @Min(value = 0, message = "Параметр page не может быть меньше 0!")
-            @RequestParam(required = false, defaultValue = "0")
-            @Parameter(name = "page", description = "Номер страницы")
-            Integer page,
-            @Min(value = 1, message = "Параметр pageSize не может быть меньше 1!")
-            @RequestParam(required = false, defaultValue = "50")
-            @Parameter(name = "pageSize", description = "Размер страницы")
-            Integer pageSize
+        @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
+        @PathVariable
+        @Parameter(name = "eventId", description = "ID мероприятия", example = "1")
+        Integer eventId,
+        @Min(value = 1, message = "Параметр assigneeId не может быть меньше 1!")
+        @RequestParam(required = false)
+        @Parameter(name = "assigneeId", description = "ID Исполнителя задачи", example = "123")
+        Integer assigneeId,
+        @Min(value = 1, message = "Параметр assignerId не может быть меньше 1!")
+        @RequestParam(required = false)
+        @Parameter(name = "assignerId", description = "ID Создателя задачи", example = "13")
+        Integer assignerId,
+        @Valid @RequestParam(required = false)
+        @Parameter(name = "taskStatus", description = "Статус задачи")
+        TaskStatus taskStatus,
+        @RequestParam(required = false)
+        @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        @Parameter(name = "deadlineLowerLimit", description = "Нижняя граница для фильтрации задач по дедлайну")
+        LocalDateTime deadlineLowerLimit,
+        @RequestParam(required = false)
+        @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        @Parameter(name = "deadlineUpperLimit", description = "Верхняя граница для фильтрации задач по дедлайну")
+        LocalDateTime deadlineUpperLimit,
+        @RequestParam(required = false, defaultValue = "false")
+        @Parameter(name = "subEventTasksGet", description = "Включить получение задач активностей мероприятия")
+        Boolean subEventTasksGet,
+        @RequestParam(required = false, defaultValue = "false")
+        @Parameter(name = "personalTasksGet", description = "Получить свои задачи в мероприятии. Более приоритетный параметр, чем assigneeId")
+        Boolean personalTasksGet,
+        @Min(value = 0, message = "Параметр page не может быть меньше 0!")
+        @RequestParam(required = false, defaultValue = "0")
+        @Parameter(name = "page", description = "Номер страницы")
+        Integer page,
+        @Min(value = 1, message = "Параметр pageSize не может быть меньше 1!")
+        @RequestParam(required = false, defaultValue = "50")
+        @Parameter(name = "pageSize", description = "Размер страницы")
+        Integer pageSize
     ) {
         Integer userId = assigneeId;
         if (personalTasksGet) {
@@ -248,53 +249,53 @@ public class TaskController {
 
         Pageable pageRequest = PageRequest.of(page, pageSize, Sort.by("deadline"));
         Page<Task> eventTasks =
-                taskService.getEventTasksWithFilter(eventId,
-                        userId,
-                        assignerId,
-                        taskStatus,
-                        deadlineLowerLimit,
-                        deadlineUpperLimit,
-                        subEventTasksGet,
-                        pageRequest);
+            taskService.getEventTasksWithFilter(eventId,
+                userId,
+                assignerId,
+                taskStatus,
+                deadlineLowerLimit,
+                deadlineUpperLimit,
+                subEventTasksGet,
+                pageRequest);
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("totalElements", String.valueOf(eventTasks.getTotalElements()));
 
         return ResponseEntity.ok()
-                .headers(responseHeaders)
-                .body(TaskMapper.tasksToTaskResponseList(eventTasks.toList(), taskService));
+            .headers(responseHeaders)
+            .body(TaskMapper.tasksToTaskResponseList(eventTasks.toList(), taskService));
     }
 
     @Operation(summary = "Получение списка задач где пользователь является исполнителем")
     @GetMapping("/where-assignee")
     public ResponseEntity<List<TaskResponse>> taskListShowWhereAssignee(
-            @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
-            @RequestParam(required = false)
-            @Parameter(name = "eventId", description = "ID мероприятия", example = "1")
-            Integer eventId,
-            @Min(value = 1, message = "Параметр assignerId не может быть меньше 1!")
-            @RequestParam(required = false)
-            @Parameter(name = "assignerId", description = "ID Создателя задачи", example = "13")
-            Integer assignerId,
-            @Valid @RequestParam(required = false)
-            @Parameter(name = "taskStatus", description = "Статус задачи")
-            TaskStatus taskStatus,
-            @RequestParam(required = false)
-            @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            @Parameter(name = "deadlineLowerLimit", description = "Нижняя граница для фильтрации задач по дедлайну")
-            LocalDateTime deadlineLowerLimit,
-            @RequestParam(required = false)
-            @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            @Parameter(name = "deadlineUpperLimit", description = "Верхняя граница для фильтрации задач по дедлайну")
-            LocalDateTime deadlineUpperLimit,
-            @Min(value = 0, message = "Параметр page не может быть меньше 0!")
-            @RequestParam(required = false, defaultValue = "0")
-            @Parameter(name = "page", description = "Номер страницы")
-            Integer page,
-            @Min(value = 1, message = "Параметр pageSize не может быть меньше 1!")
-            @RequestParam(required = false, defaultValue = "50")
-            @Parameter(name = "pageSize", description = "Размер страницы")
-            Integer pageSize
+        @Min(value = 1, message = "Параметр eventId не может быть меньше 1!")
+        @RequestParam(required = false)
+        @Parameter(name = "eventId", description = "ID мероприятия", example = "1")
+        Integer eventId,
+        @Min(value = 1, message = "Параметр assignerId не может быть меньше 1!")
+        @RequestParam(required = false)
+        @Parameter(name = "assignerId", description = "ID Создателя задачи", example = "13")
+        Integer assignerId,
+        @Valid @RequestParam(required = false)
+        @Parameter(name = "taskStatus", description = "Статус задачи")
+        TaskStatus taskStatus,
+        @RequestParam(required = false)
+        @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        @Parameter(name = "deadlineLowerLimit", description = "Нижняя граница для фильтрации задач по дедлайну")
+        LocalDateTime deadlineLowerLimit,
+        @RequestParam(required = false)
+        @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        @Parameter(name = "deadlineUpperLimit", description = "Верхняя граница для фильтрации задач по дедлайну")
+        LocalDateTime deadlineUpperLimit,
+        @Min(value = 0, message = "Параметр page не может быть меньше 0!")
+        @RequestParam(required = false, defaultValue = "0")
+        @Parameter(name = "page", description = "Номер страницы")
+        Integer page,
+        @Min(value = 1, message = "Параметр pageSize не может быть меньше 1!")
+        @RequestParam(required = false, defaultValue = "50")
+        @Parameter(name = "pageSize", description = "Размер страницы")
+        Integer pageSize
     ) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -304,19 +305,19 @@ public class TaskController {
 
         Pageable pageRequest = PageRequest.of(page, pageSize, Sort.by("deadline"));
         Page<Task> userTasks = taskService.getUserTasksWithFilter(eventId,
-                userId,
-                assignerId,
-                taskStatus,
-                deadlineLowerLimit,
-                deadlineUpperLimit,
-                pageRequest);
+            userId,
+            assignerId,
+            taskStatus,
+            deadlineLowerLimit,
+            deadlineUpperLimit,
+            pageRequest);
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("totalElements", String.valueOf(userTasks.getTotalElements()));
 
         return ResponseEntity.ok()
-                .headers(responseHeaders)
-                .body(TaskMapper.tasksToTaskResponseList(userTasks.toList(), taskService));
+            .headers(responseHeaders)
+            .body(TaskMapper.tasksToTaskResponseList(userTasks.toList(), taskService));
     }
 
 

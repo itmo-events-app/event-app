@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface UserLoginInfoRepository extends JpaRepository<UserLoginInfo, Integer> {
     Optional<UserLoginInfo> getUserLoginInfoByLogin(String login);
+
     boolean existsByLogin(String login);
 }

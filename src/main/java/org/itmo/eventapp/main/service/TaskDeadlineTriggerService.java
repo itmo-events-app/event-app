@@ -18,16 +18,16 @@ public class TaskDeadlineTriggerService {
     private final TaskService taskService;
 
     @Transactional
-    public List<Task> updateAndRetrieveTaskOnDeadline(LocalDateTime deadlineTime){
+    public List<Task> updateAndRetrieveTaskOnDeadline(LocalDateTime deadlineTime) {
         List<Task> tasks = taskDeadlineTriggerRepository.findTasksByTriggerTimeBefore(deadlineTime);
         tasks.forEach(task -> taskService.setStatus(task.getId(), TaskStatus.EXPIRED));
         taskDeadlineTriggerRepository.deleteAllByTriggerTimeBefore(deadlineTime);
         return tasks;
     }
 
-    public void createNewDeadlineTrigger(Task task){
+    public void createNewDeadlineTrigger(Task task) {
         TaskDeadlineTrigger taskDeadlineTrigger = TaskDeadlineTrigger.builder()
-                .task(task).triggerTime(task.getDeadline()).build();
+            .task(task).triggerTime(task.getDeadline()).build();
         taskDeadlineTriggerRepository.save(taskDeadlineTrigger);
     }
 }

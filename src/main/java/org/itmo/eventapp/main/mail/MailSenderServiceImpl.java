@@ -26,7 +26,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class MailSenderServiceImpl implements MailSenderService{
+public class MailSenderServiceImpl implements MailSenderService {
 
     private final JavaMailSender mailSender;
     @Value("${spring.mail.username}")
@@ -37,7 +37,7 @@ public class MailSenderServiceImpl implements MailSenderService{
     public void sendIncomingTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) throws MessagingException, IOException {
         String subject = "Новая задача!";
         String templatePath = "notification/email-templates/incoming-task-template.html";
-        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
+        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName, eventName, taskName, taskLink)));
     }
 
     @Async
@@ -45,7 +45,7 @@ public class MailSenderServiceImpl implements MailSenderService{
     public void sendOverdueTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) throws MessagingException, IOException {
         String subject = "Просроченная задача!";
         String templatePath = "notification/email-templates/overdue-task-template.html";
-        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
+        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName, eventName, taskName, taskLink)));
     }
 
     @Async
@@ -53,7 +53,7 @@ public class MailSenderServiceImpl implements MailSenderService{
     public void sendReminderTaskMessage(String userEmail, String userName, String eventName, String taskName, String taskLink) throws MessagingException, IOException {
         String subject = "Не забудьте выполнить задачу!";
         String templatePath = "notification/email-templates/reminder-task-template.html";
-        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName,eventName,taskName,taskLink)));
+        mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getTaskNotificationTemplateFields(userName, eventName, taskName, taskLink)));
     }
 
     @Async
@@ -88,7 +88,7 @@ public class MailSenderServiceImpl implements MailSenderService{
         message.setRecipients(Message.RecipientType.TO, recipient);
         message.setSubject(subject);
         String messageContent = readTemplate(templatePath);
-        for (Map.Entry<String, String> templateField: templateFields.entrySet()) {
+        for (Map.Entry<String, String> templateField : templateFields.entrySet()) {
             messageContent = messageContent.replace(templateField.getKey(), templateField.getValue());
         }
         message.setContent(messageContent, "text/html; charset=utf-8");

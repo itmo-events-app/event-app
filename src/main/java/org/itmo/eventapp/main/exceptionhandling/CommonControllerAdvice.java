@@ -34,13 +34,14 @@ class CommonControllerAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<Map<String, List<String>>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         List<String> errors = ex.getBindingResult().getAllErrors()
-                .stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .toList();
+            .stream()
+            .map(DefaultMessageSourceResolvable::getDefaultMessage)
+            .toList();
         Map<String, List<String>> errorResponse = new HashMap<>();
         errorResponse.put("errors", errors);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(MinioException.class)
     ResponseEntity<String> handleMethodMinioException(MinioException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
