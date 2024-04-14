@@ -5,8 +5,8 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
+import org.itmo.eventapp.main.model.dto.response.PaginatedResponse;
 import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
@@ -54,6 +54,8 @@ class EventServiceTest {
 
     @Mock
     private CriteriaQuery<Event> query;
+    @Mock
+    private CriteriaQuery<Long> countQuery;
 
     @Mock
     private Root<Event> root;
@@ -66,6 +68,9 @@ class EventServiceTest {
     private EventRoleService eventRoleService;
     @Mock
     private TypedQuery<Event> typedQuery;
+    @Mock
+    private TypedQuery<Long> countTypedQuery;
+
 
     @BeforeEach
     public void setup() {
@@ -102,7 +107,7 @@ class EventServiceTest {
         when(eventRepository.existsById(eventId)).thenReturn(true);
         when(eventRepository.save(any())).thenReturn(new Event());
         when(placeService.findById(anyInt())).thenReturn(new Place());
-        doNothing().when(minioService).deleteImageByEvent(anyString(), any());
+        doNothing().when(minioService).deleteImageByPrefix(anyString(), any());
         Event updatedEvent = eventService.updateEvent(eventId, eventRequest);
 
         assertAll(
@@ -128,7 +133,7 @@ class EventServiceTest {
         when(entityManager.createQuery(query)).thenReturn(typedQuery);
         when(typedQuery.getResultList()).thenReturn(expectedEvents);
 
-        List<Event> result = eventService.getAllOrFilteredEvents(page, size, null, title, startDate, endDate, status, format);
+        PaginatedResponse<Event> result = eventService.getAllOrFilteredEvents(page, size, null, title, startDate, endDate, status, format);
 
         verify(criteriaBuilder).equal(root.get("title"), title);
         verify(criteriaBuilder).greaterThanOrEqualTo(root.get("startDate"), startDate);
@@ -136,7 +141,8 @@ class EventServiceTest {
         verify(criteriaBuilder).equal(root.get("status"), status);
         verify(criteriaBuilder).equal(root.get("format"), format);
 
-        assertEquals(expectedEvents, result);
+        assertEquals(2,result.total());
+        assertEquals(expectedEvents, result.items());
     }
 
     @Test

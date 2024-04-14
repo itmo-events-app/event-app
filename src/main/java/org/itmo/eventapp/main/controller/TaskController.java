@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
+import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
@@ -26,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,7 +55,7 @@ public class TaskController {
                                                 @Parameter(name = "id", description = "ID задачи", example = "1") Integer id) {
         Task task = taskService.findById(id);
 
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(task));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(task, taskService));
     }
 
     @Operation(summary = "Редактирование задачи")
@@ -63,7 +65,39 @@ public class TaskController {
                                                  @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
                                                  @Valid @RequestBody TaskRequest taskRequest) {
         Task edited = taskService.edit(id, taskRequest);
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(edited));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(edited, taskService));
+    }
+
+
+    @Operation(summary = "Добавление файлов к задаче")
+    @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
+    @PutMapping("/{id}/files")
+    public ResponseEntity<List<String>> uploadFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                                                @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
+                                                                @RequestPart List<MultipartFile> files) {
+
+        return ResponseEntity.ok().body(taskService.addFiles(id, files));
+    }
+
+    @Operation(summary = "Получение списка имен файлов задачи")
+    @PreAuthorize("@taskSecurityExpression.canGetTask(#id)")
+    @GetMapping("/{id}/files")
+    public ResponseEntity<List<FileDataResponse>> getFileNames(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                                    @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id) {
+
+        return ResponseEntity.ok().body(taskService.getFileData(id));
+    }
+
+    @Operation(summary = "Удаление файлов из задачи")
+    @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
+    @DeleteMapping("/{id}/files")
+    public ResponseEntity<Void> deleteFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+                                            @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
+                                            @RequestBody List<String> fileNamesInMinio) {
+
+        taskService.deleteFiles(id, fileNamesInMinio);
+
+        return ResponseEntity.status(204).build();
     }
 
     @Operation(summary = "Удаление задачи")
@@ -87,7 +121,7 @@ public class TaskController {
             @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId
     ) {
         Task updatedTask = taskService.setAssignee(id, userId);
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
     }
 
     /*TODO: TEST*/
@@ -105,7 +139,7 @@ public class TaskController {
         Integer userId = userService.findByLogin(currentPrincipalName).getId();
 
         Task updatedTask = taskService.setAssignee(id, userId);
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
     }
 
     // p35 && also delete yourself as privilege 41
@@ -117,7 +151,7 @@ public class TaskController {
             @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id
     ) {
         Task updatedTask = taskService.setAssignee(id, -1);
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
     }
 
     //privilege 32 && privilege 39
@@ -131,7 +165,7 @@ public class TaskController {
             @RequestBody @Parameter(name = "newStatus", description = "Новый статус задачи", example = "EXPIRED") TaskStatus newStatus
     ) {
         Task updatedTask = taskService.setStatus(id, newStatus);
-        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask));
+        return ResponseEntity.ok().body(TaskMapper.taskToTaskResponse(updatedTask, taskService));
     }
 
 
@@ -147,11 +181,11 @@ public class TaskController {
             @RequestBody List<Integer> taskIds
     ) {
         List<Task> updTasks = taskService.moveTasks(dstEventId, taskIds);
-        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(updTasks));
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(updTasks, taskService));
     }
 
     @Operation(summary = "Копирование списка задач")
-    @PreAuthorize("@taskSecurityExpression.canCreateTask(#dstEventId)")
+    @PreAuthorize("@taskSecurityExpression.getCanCopyTasks(#dstEventId, #taskIds)")
     @PostMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListCopy(
             @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")
@@ -161,7 +195,7 @@ public class TaskController {
     ) {
         List<Task> newTasks = taskService.copyTasks(dstEventId, taskIds);
         // src == dst - ?
-        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(newTasks));
+        return ResponseEntity.ok().body(TaskMapper.tasksToTaskResponseList(newTasks, taskService));
     }
 
     @Operation(summary = "Получение списка задач мероприятия")
@@ -229,7 +263,7 @@ public class TaskController {
 
         return ResponseEntity.ok()
                 .headers(responseHeaders)
-                .body(TaskMapper.tasksToTaskResponseList(eventTasks.toList()));
+                .body(TaskMapper.tasksToTaskResponseList(eventTasks.toList(), taskService));
     }
 
     @Operation(summary = "Получение списка задач где пользователь является исполнителем")
@@ -283,7 +317,7 @@ public class TaskController {
 
         return ResponseEntity.ok()
                 .headers(responseHeaders)
-                .body(TaskMapper.tasksToTaskResponseList(userTasks.toList()));
+                .body(TaskMapper.tasksToTaskResponseList(userTasks.toList(), taskService));
     }
 
 

@@ -18,6 +18,7 @@ public class ExceptionConst {
     public static final String USERS_WITH_ROLE_EXIST = "Невозможно удалить роль, так как существуют пользователи, которым она назначена";
     public static final String REVOKE_SELF_ROLE_FORBIDDEN_MESSAGE = "Невозможно лишить роли себя";
     public static final String ASSIGN_SELF_ROLE_FORBIDDEN_MESSAGE = "Невозможно назначить роль себе";
+    public static final String ROLE_TYPE_CHANGING_FORBIDDEN_MESSAGE = "Нельзя изменить тип роли";
 
     public static final String PRIVILEGE_ID_NOT_FOUND_MESSAGE = "Привилегия с id %d не найдена";
     public static final String INVALID_PRIVILEGE_TYPE = "Неверный тип привилегии";
@@ -35,6 +36,10 @@ public class ExceptionConst {
     public static final String NOTIFICATION_ERROR_MESSAGE = "Ошибка получения уведомления, пожалуйста, обновите страницу";
 
     public static final String TASK_NOT_FOUND_MESSAGE = "Задача не найдена";
+
+//    public static final String INVALID_TASK_OBJECT_IDS_MESSAGE = "Не все объекты с приведенными id относятся к задаче!";
+
+    public static final String INVALID_TASK_FILE_NAMES_MESSAGE = "Не все файлы относятся к задаче!";
 
     public static final String REGISTRATION_REQUEST_NOT_FOUND_MESSAGE = "Заявка на регистрацию не найдена";
     public static final String REGISTRATION_REQUEST_EMAIL_EXIST = "Заявка на регистрацию с указанным email уже существует";

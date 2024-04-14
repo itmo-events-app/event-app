@@ -1,12 +1,12 @@
 package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
+import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
-import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.Place;
-import org.itmo.eventapp.main.model.entity.Task;
-import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.repository.TaskRepository;
@@ -21,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -31,6 +32,9 @@ import java.util.Objects;
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @Service
 public class TaskService {
+
+    private static final String BUCKET_NAME = "task-objects";
+
     @Lazy
     private final EventService eventService;
     private final UserService userService;
@@ -39,9 +43,14 @@ public class TaskService {
     private final TaskNotificationUtils taskNotificationUtils;
     private final TaskReminderTriggerService taskReminderTriggerService;
     private final TaskDeadlineTriggerService taskDeadlineTriggerService;
+    private final MinioService minioService;
 
     public Task findById(int id) {
-        return taskRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+        return taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+    }
+
+    public List<Task> findAllById(List<Integer> ids) {
+        return taskRepository.findAllById(ids);
     }
 
     @Transactional
@@ -125,8 +134,63 @@ public class TaskService {
     }
 
     public void delete(Integer id) {
+        minioService.deleteImageByPrefix(BUCKET_NAME, id.toString());
         taskRepository.deleteById(id);
     }
+
+
+    public List<String> addFiles(Integer id, List<MultipartFile> files) {
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+
+        List<String> filenames = new ArrayList<>();
+
+        if (!Objects.isNull(files)) {
+
+            for (MultipartFile file : files) {
+
+                String modifiedFileName = task.getId().toString()
+                    + "_"
+                    + FilenameUtils.getBaseName(file.getOriginalFilename())
+                    + "_"
+                    + System.currentTimeMillis()
+                    + "."
+                    + FilenameUtils.getExtension(file.getOriginalFilename());
+                minioService.uploadWithModifiedFileName(file, BUCKET_NAME, modifiedFileName);
+                filenames.add(modifiedFileName);
+            }
+
+        }
+
+        return filenames;
+
+    }
+
+
+    public void deleteFiles(Integer id, List<String> fileNamesInMinio) {
+
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
+
+        boolean allBelong = fileNamesInMinio.stream().allMatch(filename -> filename.startsWith(task.getId().toString()));
+        if (!allBelong) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TASK_FILE_NAMES_MESSAGE);
+        }
+
+        for (String filename : fileNamesInMinio) {
+            minioService.delete(BUCKET_NAME, filename);
+        }
+
+    }
+
+    public List<String> getFileNames(Integer taskId) {
+        return minioService.getFileNamesByPrefix(BUCKET_NAME, taskId.toString());
+    }
+
+
+    public List<FileDataResponse> getFileData(Integer taskId) {
+        return minioService.getFileDataByPrefix(BUCKET_NAME, taskId.toString());
+    }
+
 
     @Transactional
     public Task setAssignee(Integer taskId, Integer assigneeId) {
@@ -189,6 +253,8 @@ public class TaskService {
         List<Task> tasks = taskRepository.findAllById(taskIds);
 
         List<Task> newTasks = new ArrayList<>();
+        List<String> prefixes = new ArrayList<>();
+
         for (Task task : tasks) {
 
             Task newTask = new Task();
@@ -209,9 +275,16 @@ public class TaskService {
             newTask.setStatus(status);
 
             newTasks.add(newTask);
+            prefixes.add(task.getId().toString());
         }
 
         newTasks = taskRepository.saveAll(newTasks);
+
+        for (int i = 0; i < newTasks.size(); i++) {
+
+            minioService.copyImagesWithPrefix(BUCKET_NAME, BUCKET_NAME, prefixes.get(i), newTasks.get(i).getId().toString());
+
+        }
 
         return newTasks;
     }
@@ -234,22 +307,22 @@ public class TaskService {
             idsWithParent.addAll(ids);
 
             Specification<Task> taskSpecification =
-                    TaskSpecification.filterByEventIdsListAndExtraParams(idsWithParent,
-                            assigneeId,
-                            assignerId,
-                            taskStatus,
-                            deadlineLowerLimit,
-                            deadlineUpperLimit);
+                TaskSpecification.filterByEventIdsListAndExtraParams(idsWithParent,
+                    assigneeId,
+                    assignerId,
+                    taskStatus,
+                    deadlineLowerLimit,
+                    deadlineUpperLimit);
             return taskRepository.findAll(taskSpecification, pageRequest);
 
         } else {
             Specification<Task> taskSpecification =
-                    TaskSpecification.filterByEventIdAndExtraParams(eventId,
-                            assigneeId,
-                            assignerId,
-                            taskStatus,
-                            deadlineLowerLimit,
-                            deadlineUpperLimit);
+                TaskSpecification.filterByEventIdAndExtraParams(eventId,
+                    assigneeId,
+                    assignerId,
+                    taskStatus,
+                    deadlineLowerLimit,
+                    deadlineUpperLimit);
             return taskRepository.findAll(taskSpecification, pageRequest);
         }
 
@@ -275,13 +348,14 @@ public class TaskService {
 
 
         Specification<Task> taskSpecification =
-                TaskSpecification.filterByEventIdAndExtraParams(eventId,
-                        userId,
-                        assignerId,
-                        taskStatus,
-                        deadlineLowerLimit,
-                        deadlineUpperLimit);
+            TaskSpecification.filterByEventIdAndExtraParams(eventId,
+                userId,
+                assignerId,
+                taskStatus,
+                deadlineLowerLimit,
+                deadlineUpperLimit);
         return taskRepository.findAll(taskSpecification, pageRequest);
     }
+
 
 }

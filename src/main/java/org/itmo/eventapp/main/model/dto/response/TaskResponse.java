@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record TaskResponse(
         @Schema(example = "1")
@@ -18,6 +19,7 @@ public record TaskResponse(
         PlaceShortDataResponse place,
         LocalDateTime creationTime,
         LocalDateTime deadline,
-        LocalDateTime reminder
+        LocalDateTime reminder,
+        List<FileDataResponse> fileData
 ) {
 }

@@ -1,18 +1,25 @@
 package org.itmo.eventapp.main.model.mapper;
+import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
+import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
 import org.itmo.eventapp.main.model.dto.response.TaskResponse;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.Place;
 import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.service.TaskService;
 
 import java.util.List;
 
 public final class TaskMapper {
+
     private TaskMapper() {
     }
 
-    public static TaskResponse taskToTaskResponse(Task task) {
+    public static TaskResponse taskToTaskResponse(Task task, TaskService taskService) {
+
+        List<FileDataResponse> fileData = taskService.getFileData(task.getId());
+
         return new TaskResponse(
                 task.getId(),
                 EventMapper.eventToEventShortDataResponse(task.getEvent()),
@@ -23,7 +30,8 @@ public final class TaskMapper {
                 PlaceMapper.placeToPlaceShortResponse(task.getPlace()),
                 task.getCreationTime(),
                 task.getDeadline(),
-                task.getReminder()
+                task.getReminder(),
+                fileData
         );
     }
 
@@ -48,9 +56,9 @@ public final class TaskMapper {
     }
 
 
-    public static List<TaskResponse> tasksToTaskResponseList(List<Task> tasks) {
+    public static List<TaskResponse> tasksToTaskResponseList(List<Task> tasks, TaskService taskService) {
         return tasks.stream()
-                .map(TaskMapper::taskToTaskResponse)
+                .map((task) -> TaskMapper.taskToTaskResponse(task, taskService))
                 .toList();
     }
 }
