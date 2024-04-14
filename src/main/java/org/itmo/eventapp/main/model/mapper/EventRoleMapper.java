@@ -11,19 +11,18 @@ public class EventRoleMapper {
 
     public static UserRoleResponse eventRoleToUserRoleResponse(EventRole eventRole) {
         return new UserRoleResponse(
-                eventRole.getUser().getId(),
-                eventRole.getUser().getName(),
-                eventRole.getUser().getSurname(),
-                eventRole.getUser().getUserLoginInfo().getLogin(),
-                eventRole.getRole().getName());
+            eventRole.getUser().getId(),
+            eventRole.getUser().getName(),
+            eventRole.getUser().getSurname(),
+            eventRole.getUser().getUserLoginInfo().getLogin(),
+            eventRole.getRole().getName());
     }
 
     public static List<UserRoleResponse> eventRolesToUserRoleResponses(List<EventRole> eventRoles) {
         return eventRoles.stream()
-                .map(EventRoleMapper::eventRoleToUserRoleResponse)
-                .toList();
+            .map(EventRoleMapper::eventRoleToUserRoleResponse)
+            .toList();
     }
-
 
 
 }

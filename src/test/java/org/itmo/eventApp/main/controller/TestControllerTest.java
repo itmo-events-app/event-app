@@ -24,8 +24,8 @@ class TestControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user.sql");
 
         mockMvc.perform(get("/hello").param("s", "test"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Hello, test!")));
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString("Hello, test!")));
     }
 
     @Test
@@ -37,16 +37,16 @@ class TestControllerTest extends AbstractTestContainers {
 
         // name should be multipartFile as param name
         MockMultipartFile jsonFile = new MockMultipartFile(
-                "multipartFile",
-                originalFilename,
-                "",
-                "{\"upload\": \"test\"}".getBytes()
+            "multipartFile",
+            originalFilename,
+            "",
+            "{\"upload\": \"test\"}".getBytes()
         );
 
         mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/upload/" + MINIO_BUCKET)
-                        .file(jsonFile)
-                        .contentType("multipart/form-data"))
-                .andExpect(status().isOk());
+                .file(jsonFile)
+                .contentType("multipart/form-data"))
+            .andExpect(status().isOk());
 
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(MINIO_BUCKET).build());
         boolean isObjectExists = isObjectExist(originalFilename);
@@ -65,16 +65,16 @@ class TestControllerTest extends AbstractTestContainers {
 
         // name should be multipartFile as param name
         MockMultipartFile jsonFile = new MockMultipartFile(
-                "multipartFile",
-                originalFilename,
-                "",
-                "{\"upload\": \"test\"}".getBytes()
+            "multipartFile",
+            originalFilename,
+            "",
+            "{\"upload\": \"test\"}".getBytes()
         );
 
         mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/upload/" + MINIO_BUCKET)
-                        .file(jsonFile)
-                        .contentType("multipart/form-data"))
-                .andExpect(status().isOk());
+                .file(jsonFile)
+                .contentType("multipart/form-data"))
+            .andExpect(status().isOk());
 
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(MINIO_BUCKET).build());
         boolean isObjectExists = isObjectExist(originalFilename);
@@ -83,7 +83,7 @@ class TestControllerTest extends AbstractTestContainers {
         assertThat(isObjectExists).isTrue();
 
         mockMvc.perform(delete("/delete/" + MINIO_BUCKET + "/" + originalFilename))
-                .andExpect(status().is(204));
+            .andExpect(status().is(204));
 
         isObjectExists = isObjectExist(originalFilename);
 
@@ -93,8 +93,8 @@ class TestControllerTest extends AbstractTestContainers {
     private boolean isObjectExist(String object) {
         try {
             minioClient.statObject(StatObjectArgs.builder()
-                    .bucket(AbstractTestContainers.MINIO_BUCKET)
-                    .object(object).build());
+                .bucket(AbstractTestContainers.MINIO_BUCKET)
+                .object(object).build());
             return true;
         } catch (ErrorResponseException e) {
             return false;

@@ -7,9 +7,7 @@ import org.itmo.eventapp.main.model.entity.Notification;
 import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.repository.NotificationRepository;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,27 +31,28 @@ public class NotificationService {
         }
 
         notificationRepository.save(Notification.builder()
-                .user(user)
-                .title(title)
-                .description(description)
-                .seen(false)
-                .sentTime(LocalDateTime.now())
-                .link(link)
-                .build());
+            .user(user)
+            .title(title)
+            .description(description)
+            .seen(false)
+            .sentTime(LocalDateTime.now())
+            .link(link)
+            .build());
     }
 
     public Notification updateToSeen(Integer notificationId, Integer userId) {
 
         Notification notification = notificationRepository
-                .findById(notificationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.NOTIFICATION_ERROR_MESSAGE));
+            .findById(notificationId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.NOTIFICATION_ERROR_MESSAGE));
 
         if (!notification.getUser().getId().equals(userId)) {
             // abort operation if user id mismatch
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.NOTIFICATION_ERROR_MESSAGE);
         }
         notification.setSeen(true);
-        notification.setSentTime(LocalDateTime.now());
+        // зачем менять дату уведомления при прочтении?
+        // notification.setSentTime(LocalDateTime.now());
         notificationRepository.save(notification);
         return notification;
     }
@@ -65,9 +64,19 @@ public class NotificationService {
         return notificationRepository.getAllByUserId(userId, pageRequest);
     }
 
+    // почитай про пейджинг
     public List<Notification> getAllByUserId(@NotNull Integer userId, Integer page, Integer size) {
         Pageable pageRequest = PageRequest.of(page, size, Sort.by("sentTime").descending());
         return notificationRepository.getAllByUserId(userId, pageRequest);
+    }
+
+    public Page<Notification> getPageByUserId(@NotNull Integer userId, Integer page, Integer size) {
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("sentTime").descending());
+        List<Notification> notifications = notificationRepository.getAllByUserId(userId, pageRequest);
+
+        long total = notificationRepository.countByUserId(userId);
+
+        return new PageImpl<>(notifications, pageRequest, total);
     }
 
     @Transactional

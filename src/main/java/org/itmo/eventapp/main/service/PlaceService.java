@@ -51,7 +51,7 @@ public class PlaceService {
 
     public Place findById(int id) {
         return placeRepository.findById(id)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.PLACE_NOT_FOUND_MESSAGE));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.PLACE_NOT_FOUND_MESSAGE));
     }
 
     public Place edit(Integer id, PlaceRequest placeRequest) {

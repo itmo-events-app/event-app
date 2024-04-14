@@ -2,18 +2,14 @@ package org.itmo.eventapp.main.security.securityexpression;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.dto.request.UserShortDataRequest;
-import org.itmo.eventapp.main.model.entity.*;
+import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.Privilege;
+import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
-import org.itmo.eventapp.main.service.EventRoleService;
-import org.itmo.eventapp.main.service.EventService;
 import org.itmo.eventapp.main.service.TaskService;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -62,12 +58,12 @@ public class TaskSecurityExpression {
         Stream<Privilege> eventPrivileges = miscSecurityExpression.getUserEventPrivileges(event.getId(), userId);
 
         return eventPrivileges.map(Privilege::getName).anyMatch(it -> {
-                    boolean canEdit = it.equals(PrivilegeName.CHANGE_TASK_STATUS);
-                    boolean canEditAsAssignee = it.equals(PrivilegeName.CHANGE_ASSIGNED_TASK_STATUS)
-                            && task.getAssignee() != null
-                            && userId == task.getAssignee().getId();
-                    return canEdit || canEditAsAssignee;
-                }
+                boolean canEdit = it.equals(PrivilegeName.CHANGE_TASK_STATUS);
+                boolean canEditAsAssignee = it.equals(PrivilegeName.CHANGE_ASSIGNED_TASK_STATUS)
+                    && task.getAssignee() != null
+                    && userId == task.getAssignee().getId();
+                return canEdit || canEditAsAssignee;
+            }
         );
     }
 
@@ -76,7 +72,7 @@ public class TaskSecurityExpression {
         int eventId = getTaskParentEventId(taskId);
         Stream<Privilege> eventPrivileges = miscSecurityExpression.getUserEventPrivileges(eventId, miscSecurityExpression.getCurrentUserId());
         return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(PrivilegeName.ASSIGN_TASK_EXECUTOR)
-                || it.equals(PrivilegeName.REPLACE_TASK_EXECUTOR));
+            || it.equals(PrivilegeName.REPLACE_TASK_EXECUTOR));
     }
 
     public boolean canDeleteTaskAssignee(@Min(value = 1, message = "Параметр taskId не может быть меньше 1!") int taskId) {
@@ -90,8 +86,8 @@ public class TaskSecurityExpression {
         return eventPrivileges.map(Privilege::getName).anyMatch(it -> {
             boolean canDelete = it.equals(PrivilegeName.DELETE_TASK_EXECUTOR);
             boolean canDeleteSelfFromAssignee = it.equals(PrivilegeName.DECLINE_TASK_EXECUTION)
-                    && task.getAssignee() != null
-                    && userId == task.getAssignee().getId();
+                && task.getAssignee() != null
+                && userId == task.getAssignee().getId();
             return canDelete || canDeleteSelfFromAssignee;
         });
     }
@@ -123,7 +119,7 @@ public class TaskSecurityExpression {
         return eventPrivileges.map(Privilege::getName).anyMatch(it -> {
             boolean canEdit = it.equals(PrivilegeName.EDIT_TASK);
             boolean isAssignee = task.getAssignee() != null
-                    && userId == task.getAssignee().getId();
+                && userId == task.getAssignee().getId();
             return canEdit || isAssignee;
         });
 
@@ -134,7 +130,7 @@ public class TaskSecurityExpression {
         int eventId = miscSecurityExpression.getParentEventOrSelfId(dstEventId);
 
         Set<Integer> eventIds = taskService.findAllById(taskIds).stream().map(
-                task-> miscSecurityExpression.getParentEventOrSelfId(task.getEvent().getId())
+            task -> miscSecurityExpression.getParentEventOrSelfId(task.getEvent().getId())
         ).collect(Collectors.toSet());
 
         if (eventIds.size() == 1 && eventIds.stream().toList().get(0).equals(eventId)) {
