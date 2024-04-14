@@ -32,10 +32,7 @@ public class ParticipantsService {
     private static final String PHONE = "Телефон";
 
     public List<Participant> getParticipants(Integer id) {
-        Optional<List<Participant>> foundParticipants = participantsRepository.findAllByEventId(id);
-        List<Participant> participants= new ArrayList<>();
-        if(!foundParticipants.isEmpty()) return  participants = foundParticipants.get();
-        return participants;
+        return participantsRepository.findAllByEventId(id);
     }
 
     public Participant changePresence(Integer eventId, ParticipantPresenceRequest participantPresenceRequest){
