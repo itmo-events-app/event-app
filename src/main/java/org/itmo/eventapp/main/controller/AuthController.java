@@ -4,9 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
@@ -14,6 +11,9 @@ import org.itmo.eventapp.main.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -54,8 +54,8 @@ public class AuthController {
     ResponseEntity<List<RegistrationRequestForAdmin>> listRegisterRequests() {
         // TODO: check for administrator
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(authenticationService.listRegisterRequestsCallback());
+            .status(HttpStatus.OK)
+            .body(authenticationService.listRegisterRequestsCallback());
     }
 
     @PostMapping("/sendVerificationEmail")

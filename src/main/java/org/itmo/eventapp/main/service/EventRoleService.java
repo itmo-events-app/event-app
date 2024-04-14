@@ -6,7 +6,6 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Privilege;
-import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
@@ -44,17 +43,17 @@ public class EventRoleService {
             }
             if (!role.getType().equals(RoleType.EVENT))
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
+                    ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
         }
         var user = userService.findById(userId);
         var event = eventFindById(eventId);
         if (eventRoleRepository.existsByUserIdAndRoleIdAndEventId(userId, roleId, eventId))
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    ExceptionConst.USER_ROLE_ALREADY_EXISTS_IN_EVENT_MESSAGE.formatted(userId, role.getName(), eventId));
+                ExceptionConst.USER_ROLE_ALREADY_EXISTS_IN_EVENT_MESSAGE.formatted(userId, role.getName(), eventId));
         var newEventRole = EventRole.builder()
-                .user(user)
-                .role(role)
-                .event(event).build();
+            .user(user)
+            .role(role)
+            .event(event).build();
         eventRoleRepository.save(newEventRole);
     }
 
@@ -70,7 +69,7 @@ public class EventRoleService {
             }
             if (!role.getType().equals(RoleType.EVENT))
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
+                    ExceptionConst.INVALID_ROLE_TYPE.formatted("организационная"));
         }
         userService.findById(userId);
         eventFindById(eventId);
@@ -81,10 +80,10 @@ public class EventRoleService {
         }
         var userRoleInEvent = eventRoleRepository.findByUserIdAndRoleIdAndEventId(userId, roleId, eventId);
         userRoleInEvent.ifPresentOrElse(eventRoleRepository::delete,
-                () -> {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            ExceptionConst.USER_ROLE_NOT_FOUND_IN_EVENT_MESSAGE.formatted(userId, role.getName(), eventId));
-                });
+            () -> {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    ExceptionConst.USER_ROLE_NOT_FOUND_IN_EVENT_MESSAGE.formatted(userId, role.getName(), eventId));
+            });
     }
 
     public Set<Privilege> getUserEventPrivileges(Integer userId, Integer eventId) {
@@ -94,8 +93,8 @@ public class EventRoleService {
         }
         Set<Privilege> privileges = new HashSet<>();
         eventRoles.stream()
-                .map(it -> it.getRole().getPrivileges())
-                .forEach(privileges::addAll);
+            .map(it -> it.getRole().getPrivileges())
+            .forEach(privileges::addAll);
         return privileges;
     }
 
@@ -106,8 +105,8 @@ public class EventRoleService {
     //TODO временный фикс, надо переделать
     private Event eventFindById(int id) {
         return eventRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
     }
 
     List<EventRole> findAllByEventId(Integer eventId) {

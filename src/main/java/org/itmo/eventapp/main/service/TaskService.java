@@ -5,13 +5,17 @@ import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.TaskRequest;
-import org.itmo.eventapp.main.model.entity.*;
+import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
+import org.itmo.eventapp.main.model.entity.Event;
+import org.itmo.eventapp.main.model.entity.Place;
+import org.itmo.eventapp.main.model.entity.Task;
+import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.itmo.eventapp.main.model.mapper.TaskMapper;
 import org.itmo.eventapp.main.repository.TaskRepository;
+import org.itmo.eventapp.main.service.specification.TaskSpecification;
 import org.itmo.eventapp.main.util.TaskNotificationUtils;
 import org.springframework.context.annotation.Lazy;
-import org.itmo.eventapp.main.service.specification.TaskSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,9 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
@@ -132,9 +136,7 @@ public class TaskService {
         return newTaskData;
     }
 
-    @Transactional
     public void delete(Integer id) {
-
         minioService.deleteImageByPrefix(BUCKET_NAME, id.toString());
         taskRepository.deleteById(id);
     }
@@ -151,12 +153,12 @@ public class TaskService {
             for (MultipartFile file : files) {
 
                 String modifiedFileName = task.getId().toString()
-                        + "_"
-                        + FilenameUtils.getBaseName(file.getOriginalFilename())
-                        + "_"
-                        + System.currentTimeMillis()
-                        + "."
-                        + FilenameUtils.getExtension(file.getOriginalFilename());
+                    + "_"
+                    + FilenameUtils.getBaseName(file.getOriginalFilename())
+                    + "_"
+                    + System.currentTimeMillis()
+                    + "."
+                    + FilenameUtils.getExtension(file.getOriginalFilename());
                 minioService.uploadWithModifiedFileName(file, BUCKET_NAME, modifiedFileName);
                 filenames.add(modifiedFileName);
             }
@@ -185,6 +187,11 @@ public class TaskService {
 
     public List<String> getFileNames(Integer taskId) {
         return minioService.getFileNamesByPrefix(BUCKET_NAME, taskId.toString());
+    }
+
+
+    public List<FileDataResponse> getFileData(Integer taskId) {
+        return minioService.getFileDataByPrefix(BUCKET_NAME, taskId.toString());
     }
 
 
@@ -303,22 +310,22 @@ public class TaskService {
             idsWithParent.addAll(ids);
 
             Specification<Task> taskSpecification =
-                    TaskSpecification.filterByEventIdsListAndExtraParams(idsWithParent,
-                            assigneeId,
-                            assignerId,
-                            taskStatus,
-                            deadlineLowerLimit,
-                            deadlineUpperLimit);
+                TaskSpecification.filterByEventIdsListAndExtraParams(idsWithParent,
+                    assigneeId,
+                    assignerId,
+                    taskStatus,
+                    deadlineLowerLimit,
+                    deadlineUpperLimit);
             return taskRepository.findAll(taskSpecification, pageRequest);
 
         } else {
             Specification<Task> taskSpecification =
-                    TaskSpecification.filterByEventIdAndExtraParams(eventId,
-                            assigneeId,
-                            assignerId,
-                            taskStatus,
-                            deadlineLowerLimit,
-                            deadlineUpperLimit);
+                TaskSpecification.filterByEventIdAndExtraParams(eventId,
+                    assigneeId,
+                    assignerId,
+                    taskStatus,
+                    deadlineLowerLimit,
+                    deadlineUpperLimit);
             return taskRepository.findAll(taskSpecification, pageRequest);
         }
 
@@ -344,12 +351,12 @@ public class TaskService {
 
 
         Specification<Task> taskSpecification =
-                TaskSpecification.filterByEventIdAndExtraParams(eventId,
-                        userId,
-                        assignerId,
-                        taskStatus,
-                        deadlineLowerLimit,
-                        deadlineUpperLimit);
+            TaskSpecification.filterByEventIdAndExtraParams(eventId,
+                userId,
+                assignerId,
+                taskStatus,
+                deadlineLowerLimit,
+                deadlineUpperLimit);
         return taskRepository.findAll(taskSpecification, pageRequest);
     }
 

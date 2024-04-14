@@ -2,21 +2,13 @@ package org.itmo.eventapp.main.security.securityexpression;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.EventRole;
-import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
 import org.itmo.eventapp.main.service.EventRoleService;
 import org.itmo.eventapp.main.service.EventService;
-import org.itmo.eventapp.main.service.TaskService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Validated
@@ -55,9 +47,9 @@ public class EventSecurityExpression {
 
     public boolean canGetEvents() {
         return miscSecurityExpression.checkSystemPrivileges(
-                Arrays.asList(
-                        PrivilegeName.SEARCH_EVENTS_AND_ACTIVITIES,
-                        PrivilegeName.VIEW_ALL_EVENTS));
+            Arrays.asList(
+                PrivilegeName.SEARCH_EVENTS_AND_ACTIVITIES,
+                PrivilegeName.VIEW_ALL_EVENTS));
     }
 
     public boolean canGetUsersHavingRoles(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!") int eventId) {

@@ -1,13 +1,14 @@
 package org.itmo.eventapp.main.minio;
 
 import io.minio.*;
-import io.minio.errors.*;
+import io.minio.errors.MinioException;
+import io.minio.http.Method;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,10 +30,10 @@ public class MinioService {
         }
 
         minioClient.putObject(PutObjectArgs.builder()
-                .stream(multipartFile.getInputStream(), multipartFile.getInputStream().available(), -1)
-                .bucket(bucketName)
-                .object(multipartFile.getOriginalFilename())
-                .build());
+            .stream(multipartFile.getInputStream(), multipartFile.getInputStream().available(), -1)
+            .bucket(bucketName)
+            .object(multipartFile.getOriginalFilename())
+            .build());
     }
 
     @SneakyThrows
@@ -47,19 +48,19 @@ public class MinioService {
         }
 
         minioClient.putObject(PutObjectArgs.builder()
-                .stream(multipartFile.getInputStream(), multipartFile.getInputStream().available(), -1)
-                .bucket(bucketName)
-                .object(fileName)
-                .build());
+            .stream(multipartFile.getInputStream(), multipartFile.getInputStream().available(), -1)
+            .bucket(bucketName)
+            .object(fileName)
+            .build());
     }
 
     @SneakyThrows
     public void delete(String bucket, String object) {
         minioClient.removeObject(
-                RemoveObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(object)
-                        .build()
+            RemoveObjectArgs.builder()
+                .bucket(bucket)
+                .object(object)
+                .build()
         );
     }
 
@@ -95,6 +96,33 @@ public class MinioService {
         return filenames;
     }
 
+
+    @SneakyThrows
+    public List<FileDataResponse> getFileDataByPrefix(String bucket, String prefix) {
+        List<FileDataResponse> filenames = new ArrayList<>();
+        boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+        if (!found) {
+            return filenames;
+        }
+        try {
+            Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(bucket).prefix(prefix).build());
+            for (Result<Item> result : results) {
+                String filename = result.get().objectName();
+                String presignedUrl = minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                        .method(Method.GET)
+                        .bucket(bucket)
+                        .object(filename)
+                        .expiry(60 * 60 * 24)
+                        .build());
+                filenames.add(new FileDataResponse(filename, presignedUrl));
+            }
+        } catch (Exception e) {
+            throw new MinioException("Error getting filenames: " + e.getMessage());
+        }
+        return filenames;
+    }
+
     @SneakyThrows
     public void copyImagesWithPrefix(String sourceBucket, String destinationBucket, String sourcePrefix, String destinationPrefix) {
         try {
@@ -111,18 +139,18 @@ public class MinioService {
 
         try {
             Iterable<Result<Item>> results = minioClient.listObjects(
-                    ListObjectsArgs.builder().bucket(sourceBucket).prefix(sourcePrefix).build()
+                ListObjectsArgs.builder().bucket(sourceBucket).prefix(sourcePrefix).build()
             );
             for (Result<Item> result : results) {
                 Item item = result.get();
                 String sourceObjectName = item.objectName();
                 String destinationObjectName = destinationPrefix + sourceObjectName.substring(sourcePrefix.length());
                 minioClient.copyObject(
-                        CopyObjectArgs.builder()
-                                .source(CopySource.builder().bucket(sourceBucket).object(sourceObjectName).build())
-                                .bucket(destinationBucket)
-                                .object(destinationObjectName)
-                                .build()
+                    CopyObjectArgs.builder()
+                        .source(CopySource.builder().bucket(sourceBucket).object(sourceObjectName).build())
+                        .bucket(destinationBucket)
+                        .object(destinationObjectName)
+                        .build()
                 );
             }
         } catch (Exception ex) {

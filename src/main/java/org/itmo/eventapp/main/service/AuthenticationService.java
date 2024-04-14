@@ -1,13 +1,17 @@
 package org.itmo.eventapp.main.service;
 
 
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
-import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
+import org.itmo.eventapp.main.model.entity.RegistrationRequest;
+import org.itmo.eventapp.main.model.entity.User;
+import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.model.entity.UserNotificationInfo;
 import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
@@ -22,8 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import jakarta.mail.MessagingException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -50,15 +52,14 @@ public class AuthenticationService {
     public String login(LoginRequest loginRequest) {
         try {
             var authentication =
-                    new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password());
+                new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password());
             authenticationManager.authenticate(authentication);
 
             var userLoginInfo = userLoginInfoService.findByLogin(loginRequest.login());
             userLoginInfoService.setLastLoginDate(userLoginInfo, LocalDateTime.now());
 
             return jwtTokenUtil.generateToken(loginRequest.login());
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка аутентификации.");
         }
     }
@@ -68,16 +69,15 @@ public class AuthenticationService {
 
         if (registrationRequestService.existsByEmail(login)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.REGISTRATION_REQUEST_EMAIL_EXIST);
-        }
-        else {
+        } else {
             RegistrationRequest registrationRequest = RegistrationRequest.builder()
-                    .email(registrationUserRequest.login())
-                    .passwordHash(passwordEncoder.encode(registrationUserRequest.password()))
-                    .name(registrationUserRequest.name())
-                    .surname(registrationUserRequest.surname())
-                    .status(RegistrationRequestStatus.NEW)
-                    .sentTime(LocalDateTime.now())
-                    .build();
+                .email(registrationUserRequest.login())
+                .passwordHash(passwordEncoder.encode(registrationUserRequest.password()))
+                .name(registrationUserRequest.name())
+                .surname(registrationUserRequest.surname())
+                .status(RegistrationRequestStatus.NEW)
+                .sentTime(LocalDateTime.now())
+                .build();
             registrationRequestService.save(registrationRequest);
         }
     }
@@ -95,31 +95,31 @@ public class AuthenticationService {
         var reader = roleService.getReaderRole();
 
         UserNotificationInfo notificationInfo = UserNotificationInfo.builder()
-                .devices(new String[] {})
-                .enableEmailNotifications(false)
-                .enablePushNotifications(false)
-                .build();
+            .devices(new String[]{})
+            .enableEmailNotifications(false)
+            .enablePushNotifications(false)
+            .build();
 
         userNotificationInfoService.save(notificationInfo);
 
         User user = User.builder()
-                .name(request.getName())
-                .surname(request.getSurname())
-                .role(reader)
-                .userNotificationInfo(notificationInfo)
-                .build();
+            .name(request.getName())
+            .surname(request.getSurname())
+            .role(reader)
+            .userNotificationInfo(notificationInfo)
+            .build();
 
         userService.save(user);
 
         UserLoginInfo loginInfo = UserLoginInfo.builder()
-                .registration(request)
-                .login(request.getEmail())
-                .loginType(LoginType.EMAIL)
-                .passwordHash(request.getPasswordHash())
-                .lastLoginDate(LocalDateTime.now())
-                .user(user)
-                .loginStatus(LoginStatus.UNAPPROVED)
-                .build();
+            .registration(request)
+            .login(request.getEmail())
+            .loginType(LoginType.EMAIL)
+            .passwordHash(request.getPasswordHash())
+            .lastLoginDate(LocalDateTime.now())
+            .user(user)
+            .loginStatus(LoginStatus.APPROVED)
+            .build();
 
         userLoginInfoService.save(loginInfo);
 
@@ -128,7 +128,8 @@ public class AuthenticationService {
 
         try {
             mailSenderService.sendApproveRegistrationRequestMessage(request.getEmail(), request.getName());
-        } catch (MessagingException | IOException e) {}
+        } catch (MessagingException | IOException e) {
+        }
     }
 
     @Transactional
@@ -144,19 +145,21 @@ public class AuthenticationService {
 
         try {
             mailSenderService.sendDeclineRegistrationRequestMessage(request.getEmail(), request.getName());
-        } catch (MessagingException | IOException e) {}
+        } catch (MessagingException | IOException e) {
+        }
     }
 
     public List<RegistrationRequestForAdmin> listRegisterRequestsCallback() {
         return registrationRequestService.getByStatus(RegistrationRequestStatus.NEW)
-                .stream()
-                .map((request) -> new RegistrationRequestForAdmin(
-                        request.getEmail(),
-                        request.getName(),
-                        request.getSurname(),
-                        request.getStatus(),
-                        request.getSentTime()))
-                .toList();
+            .stream()
+            .map((request) -> new RegistrationRequestForAdmin(
+                request.getId(),
+                request.getEmail(),
+                request.getName(),
+                request.getSurname(),
+                request.getStatus(),
+                request.getSentTime()))
+            .toList();
     }
 
     public void sendVerificationEmail(String returnUrl) {

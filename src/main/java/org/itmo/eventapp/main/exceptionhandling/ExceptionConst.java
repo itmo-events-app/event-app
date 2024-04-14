@@ -49,6 +49,14 @@ public class ExceptionConst {
 
     public static final String INVALID_LOGIN_TYPE = "Неерный тип логина";
 
+    public static final String PARTICIPANTS_LIST_PARSING_ERROR = "Ошибка парсинга списка участников";
+    public static final String EXCEL_COLUMNS_ERROR = "Ошибка парсинга списка участников. В файле не присутствуют столбцы: ФИО или Email или Телефон";
+
+    public static final String EVENT_START_TO_END_VALIDATION = "Время начала мероприятия не может быть после времени конца мероприятия";
+    public static final String EVENT_REGISTRATION_START_TO_END_VALIDATION = "Время начала регистрации на мероприятие не может быть после времени конца регистрации на мероприятие";
+    public static final String EVENT_PREPARATION_START_TO_END_VALIDATION = "Время начала подготовки мероприятия не может быть после времени конца подготовки мероприятия";
+    public static final String TASK_NOTIFICATION_TO_DEADLINE_VALIDATION = "Время уведолмения об исполнении задачи не может быть после времени срока выполнения задачи";
+
     private ExceptionConst() {
     }
 }

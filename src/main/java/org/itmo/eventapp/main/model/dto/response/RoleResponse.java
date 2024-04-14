@@ -6,14 +6,14 @@ import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import java.util.List;
 
 public record RoleResponse(
-        @Schema(example = "1")
-        Integer id,
-        @Schema(example = "Администратор")
-        String name,
-        @Schema(example = "Администратор системы")
-        String description,
-        @Schema(example = "SYSTEM")
-        RoleType type,
-        List<PrivilegeResponse> privileges,
-        Boolean isEditable) {
+    @Schema(example = "1")
+    Integer id,
+    @Schema(example = "Администратор")
+    String name,
+    @Schema(example = "Администратор системы")
+    String description,
+    @Schema(example = "SYSTEM")
+    RoleType type,
+    List<PrivilegeResponse> privileges,
+    Boolean isEditable) {
 }

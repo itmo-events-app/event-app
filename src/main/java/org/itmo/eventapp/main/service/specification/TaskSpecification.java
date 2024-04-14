@@ -1,7 +1,6 @@
 package org.itmo.eventapp.main.service.specification;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
-import org.itmo.eventapp.main.model.dto.request.TaskFilterRequest;
 import org.itmo.eventapp.main.model.entity.Task;
 import org.itmo.eventapp.main.model.entity.enums.TaskStatus;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,12 +21,12 @@ public class TaskSpecification {
                                                                     LocalDateTime deadlineLowerLimit,
                                                                     LocalDateTime deadlineUpperLimit) {
         return Specification
-                .where(hasEventId(eventId))
-                .and(matchesFilter(assigneeId,
-                        assignerId,
-                        taskStatus,
-                        deadlineLowerLimit,
-                        deadlineUpperLimit));
+            .where(hasEventId(eventId))
+            .and(matchesFilter(assigneeId,
+                assignerId,
+                taskStatus,
+                deadlineLowerLimit,
+                deadlineUpperLimit));
     }
 
     public static Specification<Task> filterByEventIdsListAndExtraParams(List<Integer> eventIds,
@@ -37,12 +36,12 @@ public class TaskSpecification {
                                                                          LocalDateTime deadlineLowerLimit,
                                                                          LocalDateTime deadlineUpperLimit) {
         return Specification
-                .where(hasEventIdInList(eventIds))
-                .and(matchesFilter(assigneeId,
-                        assignerId,
-                        taskStatus,
-                        deadlineLowerLimit,
-                        deadlineUpperLimit));
+            .where(hasEventIdInList(eventIds))
+            .and(matchesFilter(assigneeId,
+                assignerId,
+                taskStatus,
+                deadlineLowerLimit,
+                deadlineUpperLimit));
     }
 
     static Specification<Task> matchesFilter(Integer assigneeId,
@@ -51,11 +50,11 @@ public class TaskSpecification {
                                              LocalDateTime deadlineLowerLimit,
                                              LocalDateTime deadlineUpperLimit) {
         return Specification
-                .where(hasAssigneeId(assigneeId))
-                .and(hasAssignerId(assignerId))
-                .and(hasTaskStatus(taskStatus))
-                .and(hasDeadlineUpperLimit(deadlineUpperLimit))
-                .and(hasDeadlineLowerLimit(deadlineLowerLimit));
+            .where(hasAssigneeId(assigneeId))
+            .and(hasAssignerId(assignerId))
+            .and(hasTaskStatus(taskStatus))
+            .and(hasDeadlineUpperLimit(deadlineUpperLimit))
+            .and(hasDeadlineLowerLimit(deadlineLowerLimit));
     }
 
     static Specification<Task> hasAssigneeId(Integer assigneeId) {

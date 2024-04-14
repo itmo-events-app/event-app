@@ -11,11 +11,14 @@ import org.itmo.eventapp.main.model.entity.User;
 import org.itmo.eventapp.main.model.entity.UserNotificationInfo;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -28,7 +31,7 @@ public class UserService {
 
     public User findById(Integer id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
     public boolean existsByRoleId(Integer roleId) {
@@ -41,7 +44,7 @@ public class UserService {
 
     public User findByLogin(String login) {
         return userRepository.findByUserLoginInfo_Login(login)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
     public void updateNotifications(String login, NotificationSettingsRequest request) {
@@ -91,7 +94,21 @@ public class UserService {
         return user.getRole().getPrivileges();
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getAllFilteredUsers(String searchQuery, Integer page, Integer size) {
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("id").ascending());
+        if (searchQuery.isEmpty()) {
+            return userRepository.findAll(pageRequest);
+        } else {
+            String rightPart;
+            String leftPart;
+            String[] parts = searchQuery.split(" ", 2);
+            rightPart = parts[0];
+            if (parts.length == 2) {
+                leftPart = parts[1];
+            } else {
+                leftPart = parts[0];
+            }
+            return userRepository.findByFullName(rightPart, leftPart, pageRequest);
+        }
     }
 }

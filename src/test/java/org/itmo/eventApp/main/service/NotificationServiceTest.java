@@ -21,14 +21,14 @@ class NotificationServiceTest extends AbstractTestContainers {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    private void databaseFilling(){
+    private void databaseFilling() {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
         executeSqlScript("/sql/insert_notifications.sql");
     }
 
     @Test
-    void updateSeenWithCorrectDataTest(){
+    void updateSeenWithCorrectDataTest() {
         databaseFilling();
 
         User dummyUser = new User();
@@ -43,7 +43,7 @@ class NotificationServiceTest extends AbstractTestContainers {
     }
 
     @Test
-    void getAllByUserIdWithCorrectDataTest(){
+    void getAllByUserIdWithCorrectDataTest() {
         databaseFilling();
 
         Integer userId = 1;
@@ -62,7 +62,7 @@ class NotificationServiceTest extends AbstractTestContainers {
     }
 
     @Test
-    void seenAllByUserIdWithCorrectDataTest(){
+    void seenAllByUserIdWithCorrectDataTest() {
         databaseFilling();
 
         Integer userId = 1;
@@ -80,7 +80,7 @@ class NotificationServiceTest extends AbstractTestContainers {
     }
 
     @Test
-    void createNotificationWithCorrectDataTest(){
+    void createNotificationWithCorrectDataTest() {
         databaseFilling();
 
         Integer userId = 1;
@@ -103,7 +103,7 @@ class NotificationServiceTest extends AbstractTestContainers {
     }
 
     @Test
-    void deleteNotificationWithCorrectDataTest(){
+    void deleteNotificationWithCorrectDataTest() {
         databaseFilling();
 
         Integer notificationId = 1;
