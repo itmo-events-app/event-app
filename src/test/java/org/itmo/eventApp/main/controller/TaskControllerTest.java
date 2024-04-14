@@ -149,7 +149,9 @@ class TaskControllerTest extends AbstractTestContainers {
         );
     }
 
-
+/*
+    запрещено создавать таски, у которых начало в прошлом
+    
     @Test
     void taskAddExpiredTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
@@ -169,15 +171,15 @@ class TaskControllerTest extends AbstractTestContainers {
 
         Task task = taskRepository.findById(1).orElseThrow();
 
-        LocalDateTime newDeadline = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
-        LocalDateTime newreminder = LocalDateTime.of(2023, 4, 20, 21, 0, 0);
+        LocalDateTime newDeadline = LocalDateTime.of(2030, 4, 20, 21, 0, 0);
+        LocalDateTime newreminder = LocalDateTime.of(2030, 4, 20, 21, 0, 0);
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(newDeadline, task.getDeadline()),
                 () -> Assertions.assertEquals(newreminder, task.getReminder()),
                 () -> Assertions.assertEquals(TaskStatus.EXPIRED, task.getStatus())
         );
-    }
+    }*/
 
 
     @Test

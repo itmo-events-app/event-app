@@ -94,21 +94,21 @@ class EventControllerTest extends AbstractTestContainers {
         setUpEventData();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "1");
-        params.add("startDate", "2024-03-28T09:00:00");
-        params.add("endDate", "2024-03-28T18:00:00");
+        params.add("startDate", "2030-03-28T09:00:00");
+        params.add("endDate", "2030-03-28T18:00:00");
         params.add("title", "itmo-event");
         params.add("shortDescription", "This is a short description.");
         params.add("fullDescription", "This is a full description of the event.");
         params.add("format", "OFFLINE");
         params.add("status", "PUBLISHED");
-        params.add("registrationStart", "2024-03-01T00:00:00");
-        params.add("registrationEnd", "2024-03-25T23:59:59");
+        params.add("registrationStart", "2030-03-01T00:00:00");
+        params.add("registrationEnd", "2030-03-25T23:59:59");
         params.add("parent", "1");
         params.add("participantLimit", "50");
         params.add("participantAgeLowest", "18");
         params.add("participantAgeHighest", "50");
-        params.add("preparingStart", "2024-03-20T00:00:00");
-        params.add("preparingEnd", "2024-03-27T23:59:59");
+        params.add("preparingStart", "2030-03-20T00:00:00");
+        params.add("preparingEnd", "2030-03-27T23:59:59");
         ClassPathResource imageResource = new ClassPathResource("/images/itmo.jpeg");
         byte[] content = imageResource.getInputStream().readAllBytes();
         MockMultipartFile image = new MockMultipartFile("image", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
@@ -131,21 +131,21 @@ class EventControllerTest extends AbstractTestContainers {
         setUpEventData();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "10000000");
-        params.add("startDate", "2024-03-28T09:00:00");
-        params.add("endDate", "2024-03-28T18:00:00");
+        params.add("startDate", "2030-03-28T09:00:00");
+        params.add("endDate", "2030-03-28T18:00:00");
         params.add("title", "itmo-event");
         params.add("shortDescription", "This is a short description.");
         params.add("fullDescription", "This is a full description of the event.");
         params.add("format", "OFFLINE");
         params.add("status", "PUBLISHED");
-        params.add("registrationStart", "2024-03-01T00:00:00");
-        params.add("registrationEnd", "2024-03-25T23:59:59");
+        params.add("registrationStart", "2030-03-01T00:00:00");
+        params.add("registrationEnd", "2030-03-25T23:59:59");
         params.add("parent", "1");
         params.add("participantLimit", "50");
         params.add("participantAgeLowest", "18");
         params.add("participantAgeHighest", "50");
-        params.add("preparingStart", "2024-03-20T00:00:00");
-        params.add("preparingEnd", "2024-03-27T23:59:59");
+        params.add("preparingStart", "2030-03-20T00:00:00");
+        params.add("preparingEnd", "2030-03-27T23:59:59");
         ClassPathResource imageResource = new ClassPathResource("/images/itmo.jpeg");
         byte[] content = imageResource.getInputStream().readAllBytes();
         MockMultipartFile image = new MockMultipartFile("image", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
@@ -164,21 +164,21 @@ class EventControllerTest extends AbstractTestContainers {
         setUpEventData();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "1");
-        params.add("startDate", "2024-03-28T09:00:00");
-        params.add("endDate", "2024-03-28T18:00:00");
+        params.add("startDate", "2030-03-28T09:00:00");
+        params.add("endDate", "2030-03-28T18:00:00");
         params.add("title", "");
         params.add("shortDescription", "This is a short description.");
         params.add("fullDescription", "This is a full description of the event.");
         params.add("format", "OFFLINE");
         params.add("status", "PUBLISHED");
-        params.add("registrationStart", "2024-03-01T00:00:00");
-        params.add("registrationEnd", "2024-03-25T23:59:59");
+        params.add("registrationStart", "2030-03-01T00:00:00");
+        params.add("registrationEnd", "2030-03-25T23:59:59");
         params.add("parent", "1");
         params.add("participantLimit", "50");
         params.add("participantAgeLowest", "18");
         params.add("participantAgeHighest", "50");
-        params.add("preparingStart", "2024-03-20T00:00:00");
-        params.add("preparingEnd", "2024-03-27T23:59:59");
+        params.add("preparingStart", "2030-03-20T00:00:00");
+        params.add("preparingEnd", "2030-03-27T23:59:59");
         ClassPathResource imageResource = new ClassPathResource("/images/itmo.jpeg");
         byte[] content = imageResource.getInputStream().readAllBytes();
         MockMultipartFile image = new MockMultipartFile("image", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
@@ -333,20 +333,20 @@ class EventControllerTest extends AbstractTestContainers {
                 {
                   "id": 1,
                   "placeId": 1,
-                  "startDate": "2024-03-30T21:32:23.536819",
-                  "endDate": "2024-03-30T21:32:23.536819",
+                  "startDate": "2030-03-30T21:32:23.536819",
+                  "endDate": "2030-03-30T21:32:23.536819",
                   "title": "party",
                   "shortDescription": "cool party",
                   "fullDescription": "very cool party",
                   "format": "OFFLINE",
                   "status": "PUBLISHED",
-                  "registrationStart": "2024-03-30T21:32:23.536819",
-                  "registrationEnd": "2024-03-30T21:32:23.536819",
+                  "registrationStart": "2030-03-30T21:32:23.536819",
+                  "registrationEnd": "2030-03-30T21:32:23.536819",
                   "participantLimit": 10,
                   "participantAgeLowest": 5,
                   "participantAgeHighest": 7,
-                  "preparingStart": "2024-03-30T21:32:23.536819",
-                  "preparingEnd": "2024-03-30T21:32:23.536819"
+                  "preparingStart": "2030-03-30T21:32:23.536819",
+                  "preparingEnd": "2030-03-30T21:32:23.536819"
                 }""";
 
         mockMvc.perform(get("/api/events/1")
@@ -362,21 +362,21 @@ class EventControllerTest extends AbstractTestContainers {
         // add one event for updating later
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "1");
-        params.add("startDate", "2024-03-28T09:00:00");
-        params.add("endDate", "2024-03-28T18:00:00");
+        params.add("startDate", "2030-03-28T09:00:00");
+        params.add("endDate", "2030-03-28T18:00:00");
         params.add("title", "itmo-event");
         params.add("shortDescription", "This is a short description.");
         params.add("fullDescription", "This is a full description of the event.");
         params.add("format", "OFFLINE");
         params.add("status", "PUBLISHED");
-        params.add("registrationStart", "2024-03-01T00:00:00");
-        params.add("registrationEnd", "2024-03-25T23:59:59");
+        params.add("registrationStart", "2030-03-01T00:00:00");
+        params.add("registrationEnd", "2030-03-25T23:59:59");
         params.add("parent", "1");
         params.add("participantLimit", "50");
         params.add("participantAgeLowest", "18");
         params.add("participantAgeHighest", "50");
-        params.add("preparingStart", "2024-03-20T00:00:00");
-        params.add("preparingEnd", "2024-03-27T23:59:59");
+        params.add("preparingStart", "2030-03-20T00:00:00");
+        params.add("preparingEnd", "2030-03-27T23:59:59");
         ClassPathResource imageResource = new ClassPathResource("/images/itmo.jpeg");
         byte[] content = imageResource.getInputStream().readAllBytes();
         MockMultipartFile image = new MockMultipartFile("image", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
@@ -396,39 +396,39 @@ class EventControllerTest extends AbstractTestContainers {
                 {
                   "id": 3,
                   "placeId": 2,
-                  "startDate": "2024-04-02T14:00:00",
-                  "endDate": "2024-04-02T16:00:00",
+                  "startDate": "2030-04-02T14:00:00",
+                  "endDate": "2030-04-02T16:00:00",
                   "title": "New updated test title",
                   "shortDescription": "Short Description",
                   "fullDescription": "Full Description",
                   "format": "ONLINE",
                   "status": "DRAFT",
-                  "registrationStart": "2024-03-16T00:00:00",
-                  "registrationEnd": "2024-03-31T23:59:59",
+                  "registrationStart": "2030-03-16T00:00:00",
+                  "registrationEnd": "2030-03-31T23:59:59",
                   "participantLimit": 30,
                   "parent": 2,
                   "participantAgeLowest": 10,
                   "participantAgeHighest": 90,
-                  "preparingStart": "2024-03-26T14:00:00",
-                  "preparingEnd": "2024-03-31T14:00:00"
+                  "preparingStart": "2030-03-26T14:00:00",
+                  "preparingEnd": "2030-03-31T14:00:00"
                 }""";
         MultiValueMap<String, String> updatedParams = new LinkedMultiValueMap<>();
         updatedParams.add("placeId", "2");
-        updatedParams.add("startDate", "2024-04-02T14:00:00");
-        updatedParams.add("endDate", "2024-04-02T16:00:00");
+        updatedParams.add("startDate", "2030-04-02T14:00:00");
+        updatedParams.add("endDate", "2030-04-02T16:00:00");
         updatedParams.add("title", "New updated test title");
         updatedParams.add("shortDescription", "Short Description");
         updatedParams.add("fullDescription", "Full Description");
         updatedParams.add("format", "ONLINE");
         updatedParams.add("status", "DRAFT");
-        updatedParams.add("registrationStart", "2024-03-16T00:00:00");
-        updatedParams.add("registrationEnd", "2024-03-31T23:59:59");
+        updatedParams.add("registrationStart", "2030-03-16T00:00:00");
+        updatedParams.add("registrationEnd", "2030-03-31T23:59:59");
         updatedParams.add("parent", "2");
         updatedParams.add("participantLimit", "30");
         updatedParams.add("participantAgeLowest", "10");
         updatedParams.add("participantAgeHighest", "90");
-        updatedParams.add("preparingStart", "2024-03-26T14:00:00");
-        updatedParams.add("preparingEnd", "2024-03-31T14:00:00");
+        updatedParams.add("preparingStart", "2030-03-26T14:00:00");
+        updatedParams.add("preparingEnd", "2030-03-31T14:00:00");
         ClassPathResource updatedImageResource = new ClassPathResource("/images/itmo.png");
         byte[] updatedContent = updatedImageResource.getInputStream().readAllBytes();
         MockMultipartFile updatedImage = new MockMultipartFile("image", "itmo.png", MediaType.IMAGE_PNG_VALUE, updatedContent);
@@ -500,21 +500,21 @@ class EventControllerTest extends AbstractTestContainers {
         // add one event for updating later
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("placeId", "1");
-        params.add("startDate", "2024-03-28T09:00:00");
-        params.add("endDate", "2024-03-28T18:00:00");
+        params.add("startDate", "2030-03-28T09:00:00");
+        params.add("endDate", "2030-03-28T18:00:00");
         params.add("title", "itmo-event");
         params.add("shortDescription", "This is a short description.");
         params.add("fullDescription", "This is a full description of the event.");
         params.add("format", "OFFLINE");
         params.add("status", "PUBLISHED");
-        params.add("registrationStart", "2024-03-01T00:00:00");
-        params.add("registrationEnd", "2024-03-25T23:59:59");
+        params.add("registrationStart", "2030-03-01T00:00:00");
+        params.add("registrationEnd", "2030-03-25T23:59:59");
         params.add("parent", "1");
         params.add("participantLimit", "50");
         params.add("participantAgeLowest", "18");
         params.add("participantAgeHighest", "50");
-        params.add("preparingStart", "2024-03-20T00:00:00");
-        params.add("preparingEnd", "2024-03-27T23:59:59");
+        params.add("preparingStart", "2030-03-20T00:00:00");
+        params.add("preparingEnd", "2030-03-27T23:59:59");
         ClassPathResource imageResource = new ClassPathResource("/images/itmo.jpeg");
         byte[] content = imageResource.getInputStream().readAllBytes();
         MockMultipartFile image = new MockMultipartFile("image", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
