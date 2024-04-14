@@ -61,7 +61,7 @@ public class AuthController {
     @PostMapping("/sendVerificationEmail")
     ResponseEntity<Void> sendVerificationEmail(@RequestParam String returnUrl) {
         authenticationService.sendVerificationEmail(returnUrl);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/validateEmailVerificationToken")
