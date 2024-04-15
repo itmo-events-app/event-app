@@ -3,11 +3,8 @@ package org.itmo.eventapp.main.service;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.dto.request.*;
-import org.itmo.eventapp.main.model.dto.response.ProfileResponse;
-import org.itmo.eventapp.main.model.dto.response.UserInfoResponse;
 import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
-import org.itmo.eventapp.main.repository.UserPasswordRecoveryInfoRepository;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,8 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +31,8 @@ public class UserService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
-    public boolean existsByRoleId(Integer roleId) {
-        return userRepository.existsByRoleId(roleId);
+    public boolean existsByRolesId(Integer roleId) {
+        return userRepository.existsByRolesId(roleId);
     }
 
     public void save(User user) {
@@ -101,7 +98,10 @@ public class UserService {
 
     public Set<Privilege> getUserSystemPrivileges(Integer userId) {
         User user = findById(userId);
-        return user.getRole().getPrivileges();
+        return user.getRoles().stream()
+                .map(Role::getPrivileges)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
     }
 
     public Page<User> getAllFilteredUsers(String searchQuery, Integer page, Integer size) {

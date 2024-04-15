@@ -26,7 +26,7 @@ public class StrongPasswordValidator implements ConstraintValidator<StrongPasswo
         Pattern pattern = Pattern.compile("[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~]+");
         Matcher matcher = pattern.matcher(s);
 
-        if (s.length() <= 8) {
+        if (s.length() < 8) {
             constraintValidatorContext.disableDefaultConstraintViolation(); // Отключаем стандартное сообщение
             constraintValidatorContext.buildConstraintViolationWithTemplate("Минимальная длина пароля - 8 символов").addConstraintViolation();
 

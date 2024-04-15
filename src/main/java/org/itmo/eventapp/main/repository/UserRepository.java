@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByUserLoginInfo_Login(String login);
 
-    boolean existsByRoleId(Integer roleId);
+    boolean existsByRolesId(Integer roleId);
 
     @Query("SELECT u FROM User u " +
         "WHERE LOWER(u.name) LIKE LOWER(concat('%', :rightPart,'%')) " +

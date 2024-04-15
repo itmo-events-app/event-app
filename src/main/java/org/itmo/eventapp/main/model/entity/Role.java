@@ -43,11 +43,4 @@ public class Role {
         inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
     private Set<Privilege> privileges = new HashSet<>();
 
-    public void removePrivilege(Privilege privilege) {
-        this.privileges.remove(privilege);
-    }
-
-    public void addPrivilege(Privilege privilege) {
-        this.privileges.add(privilege);
-    }
 }

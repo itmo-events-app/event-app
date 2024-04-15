@@ -142,11 +142,9 @@ public class TaskService {
     }
 
 
-    public List<String> addFiles(Integer id, List<MultipartFile> files) {
+    public List<FileDataResponse> addFiles(Integer id, List<MultipartFile> files) {
 
         Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
-
-        List<String> filenames = new ArrayList<>();
 
         if (!Objects.isNull(files)) {
 
@@ -155,17 +153,16 @@ public class TaskService {
                 String modifiedFileName = task.getId().toString()
                     + "_"
                     + FilenameUtils.getBaseName(file.getOriginalFilename())
-                    + "_"
-                    + System.currentTimeMillis()
+                    + "__"
+                    + LocalDateTime.now()
                     + "."
                     + FilenameUtils.getExtension(file.getOriginalFilename());
                 minioService.uploadWithModifiedFileName(file, BUCKET_NAME, modifiedFileName);
-                filenames.add(modifiedFileName);
             }
 
         }
 
-        return filenames;
+        return getFileData(id);
 
     }
 

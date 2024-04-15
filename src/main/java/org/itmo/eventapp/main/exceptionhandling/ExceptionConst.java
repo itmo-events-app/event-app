@@ -19,6 +19,7 @@ public class ExceptionConst {
     public static final String REVOKE_SELF_ROLE_FORBIDDEN_MESSAGE = "Невозможно лишить роли себя";
     public static final String ASSIGN_SELF_ROLE_FORBIDDEN_MESSAGE = "Невозможно назначить роль себе";
     public static final String ROLE_TYPE_CHANGING_FORBIDDEN_MESSAGE = "Нельзя изменить тип роли";
+    public static final String AT_LEAST_ONE_SYSTEM_ROLE_MESSAGE = "У пользователя должно быть не менее одной системной роли";
 
     public static final String PRIVILEGE_ID_NOT_FOUND_MESSAGE = "Привилегия с id %d не найдена";
     public static final String INVALID_PRIVILEGE_TYPE = "Неверный тип привилегии";

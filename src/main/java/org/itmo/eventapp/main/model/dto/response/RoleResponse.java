@@ -15,5 +15,7 @@ public record RoleResponse(
     @Schema(example = "SYSTEM")
     RoleType type,
     List<PrivilegeResponse> privileges,
-    Boolean isEditable) {
+    @Schema(example = "false")
+    Boolean isEditable
+) {
 }

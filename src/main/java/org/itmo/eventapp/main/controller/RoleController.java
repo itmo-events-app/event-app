@@ -186,7 +186,7 @@ public class RoleController {
 
     @Operation(summary = "Назначение пользователю системной роли")
     @PreAuthorize("@roleSecurityExpression.canAssignSystemRole()")
-    @PutMapping("/system/{userId}/{roleId}")
+    @PostMapping("/system/{userId}/{roleId}")
     public ResponseEntity<Void> assignSystemRole(
         @AuthenticationPrincipal UserLoginInfo userDetails,
         @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
@@ -197,11 +197,12 @@ public class RoleController {
 
     @Operation(summary = "Лишение пользователя системной роли")
     @PreAuthorize("@roleSecurityExpression.canRevokeSystemRole()")
-    @PutMapping("/system-revoke/{userId}")
+    @DeleteMapping("/system-revoke/{userId}/{roleId}")
     public ResponseEntity<Void> revokeSystemRole(
         @AuthenticationPrincipal UserLoginInfo userDetails,
-        @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId) {
-        roleService.revokeSystemRole(userDetails.getUser().getId(), userId);
+        @Positive(message = "Параметр userId не может быть меньше 1!") @PathVariable @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
+        @Positive(message = "Параметр roleId не может быть меньше 1!") @PathVariable @Parameter(name = "roleId", description = "ID роли", example = "1") Integer roleId) {
+        roleService.revokeSystemRole(userDetails.getUser().getId(), userId, roleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

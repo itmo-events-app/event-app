@@ -64,7 +64,7 @@ public class RoleService {
         if (basicRoles.contains(role.getName()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.ROLE_DELETING_FORBIDDEN_MESSAGE);
         if (role.getType().equals(RoleType.SYSTEM)) {
-            if (userService.existsByRoleId(id))
+            if (userService.existsByRolesId(id))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.USERS_WITH_ROLE_EXIST);
         } else {
             // TODO: временно, надо будет переделать
@@ -108,16 +108,27 @@ public class RoleService {
         var role = findRoleById(roleId);
         if (role.getType().equals(RoleType.EVENT))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_ROLE_TYPE.formatted("системная"));
-        user.setRole(role);
-        userService.save(user);
+        if (!user.getRoles().contains(role)) {
+            user.addRole(role);
+            userService.save(user);
+        }
     }
 
-    public void revokeSystemRole(Integer currentPrincipalId, Integer userId) {
+    public void revokeSystemRole(Integer currentPrincipalId, Integer userId, Integer roleId) {
         if (currentPrincipalId.equals(userId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.REVOKE_SELF_ROLE_FORBIDDEN_MESSAGE);
         var user = userService.findById(userId);
-        user.setRole(getReaderRole());
-        userService.save(user);
+        var role = findRoleById(roleId);
+        if (role.getType().equals(RoleType.EVENT))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_ROLE_TYPE.formatted("системная"));
+        var roles = user.getRoles();
+        if (roles.size() == 1) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.AT_LEAST_ONE_SYSTEM_ROLE_MESSAGE);
+        }
+        if (roles.contains(role)) {
+            user.removeRole(role);
+            userService.save(user);
+        }
     }
 
     public Role findByName(String name) {
