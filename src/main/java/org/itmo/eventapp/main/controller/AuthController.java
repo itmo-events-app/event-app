@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RequiredArgsConstructor
 @RestController
 public class AuthController {
@@ -55,5 +56,23 @@ public class AuthController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(authenticationService.listRegisterRequestsCallback());
+    }
+
+    @PostMapping("/sendVerificationEmail")
+    ResponseEntity<Void> sendVerificationEmail(@RequestParam String returnUrl) {
+        authenticationService.sendVerificationEmail(returnUrl);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/validateEmailVerificationToken")
+    ResponseEntity<Void> validateEmailVerificationToken(@RequestParam String token) {
+        authenticationService.validateEmailVerificationToken(token);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/verifyEmail")
+    ResponseEntity<Void> verifyEmail() {
+        authenticationService.verifyEmail();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
