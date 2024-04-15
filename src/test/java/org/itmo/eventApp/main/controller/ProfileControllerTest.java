@@ -215,9 +215,9 @@ class ProfileControllerTest extends AbstractTestContainers {
         String expectedJson = """
             {"total":3,
             "items":[
-            {"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","type":"EMAIL","role":"Администратор"},
-            {"id":2,"name":"test2","surname":"user2","login":"test_mail2@itmo.ru","type":"EMAIL","role":"Администратор"},
-            {"id":3,"name":"test3","surname":"user3","login":"test_mail3@itmo.ru","type":"EMAIL","role":"Администратор"}
+            {"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","type":"EMAIL","roles":["Администратор"]},
+            {"id":2,"name":"test2","surname":"user2","login":"test_mail2@itmo.ru","type":"EMAIL","roles":["Администратор"]},
+            {"id":3,"name":"test3","surname":"user3","login":"test_mail3@itmo.ru","type":"EMAIL","roles":["Администратор"]}
             ]}
             """;
 
