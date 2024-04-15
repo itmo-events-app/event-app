@@ -2,14 +2,12 @@ package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
-import org.itmo.eventapp.main.model.dto.request.NotificationSettingsRequest;
-import org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest;
-import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
-import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
-import org.itmo.eventapp.main.model.entity.Privilege;
-import org.itmo.eventapp.main.model.entity.User;
-import org.itmo.eventapp.main.model.entity.UserNotificationInfo;
+import org.itmo.eventapp.main.model.dto.request.*;
+import org.itmo.eventapp.main.model.dto.response.ProfileResponse;
+import org.itmo.eventapp.main.model.dto.response.UserInfoResponse;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
+import org.itmo.eventapp.main.repository.UserPasswordRecoveryInfoRepository;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +27,7 @@ public class UserService {
 
     private final UserLoginInfoService userLoginInfoService;
     private final UserNotificationInfoService userNotificationInfoService;
+    private final UserPasswordRecoveryInfoService userPasswordRecoveryInfoService;
 
     public User findById(Integer id) {
         return userRepository.findById(id)
@@ -87,6 +87,16 @@ public class UserService {
         }
 
         userLoginInfoService.setPassword(user.getUserLoginInfo(), request.newPassword());
+    }
+
+    public void changePassword(NewPasswordRequest request) {
+        UserPasswordRecoveryInfo info = userPasswordRecoveryInfoService.findByToken(request.token());
+
+        if (!request.newPassword().equals(request.confirmNewPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.USER_PASSWORD_MISMATCH_MESSAGE);
+        }
+
+        userLoginInfoService.setPassword(info.getUser().getUserLoginInfo(), request.newPassword());
     }
 
     public Set<Privilege> getUserSystemPrivileges(Integer userId) {

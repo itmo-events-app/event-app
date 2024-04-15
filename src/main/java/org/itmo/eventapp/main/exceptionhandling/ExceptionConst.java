@@ -41,6 +41,7 @@ public class ExceptionConst {
 
     public static final String INVALID_TASK_FILE_NAMES_MESSAGE = "Не все файлы относятся к задаче!";
 
+    public static final String EMAIL_NOT_APPROVED = "Невозможно восстановить пароль без подтвержденной почты";
 
     public static final String EMAIL_ALREADY_APPROVED = "Email уже подтвержден";
 

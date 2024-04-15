@@ -4,6 +4,8 @@ package org.itmo.eventapp.main.service;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
+import org.itmo.eventapp.main.model.dto.request.NewPasswordRequest;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
@@ -12,6 +14,7 @@ import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
+import org.itmo.eventapp.main.repository.UserPasswordRecoveryInfoRepository;
 import org.itmo.eventapp.main.security.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +29,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -37,6 +42,8 @@ public class AuthenticationService {
     private final UserNotificationInfoService userNotificationInfoService;
     private final RoleService roleService;
     private final RegistrationRequestService registrationRequestService;
+
+    private final UserPasswordRecoveryInfoService userPasswordRecoveryInfoService;
     private final UserEmailVerificationInfoService userEmailVerificationInfoService;
 
     private final PasswordEncoder passwordEncoder;
@@ -58,7 +65,7 @@ public class AuthenticationService {
             return jwtTokenUtil.generateToken(loginRequest.login());
         }
         catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE);
         }
     }
 
@@ -116,7 +123,7 @@ public class AuthenticationService {
             .passwordHash(request.getPasswordHash())
             .lastLoginDate(LocalDateTime.now())
             .user(user)
-            .loginStatus(LoginStatus.APPROVED)
+            .loginStatus(LoginStatus.UNAPPROVED)
             .build();
 
         userLoginInfoService.save(loginInfo);
@@ -160,6 +167,25 @@ public class AuthenticationService {
             .toList();
     }
 
+
+    public void recoverPassword(String email, String returnUrl) {
+
+        UserLoginInfo info = userLoginInfoService.findByLogin(email);
+
+        if (info.getLoginStatus() != LoginStatus.APPROVED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.EMAIL_NOT_APPROVED);
+        }
+
+        String token = userPasswordRecoveryInfoService.updateUserToken(info.getUser());
+
+        String url = returnUrl + "?token=" + token;
+
+        try {
+            mailSenderService.sendRecoveryPasswordMessage(email, info.getUser().getName(), url);
+        }
+        catch (MessagingException | IOException e) {}
+    }
+
     public void sendVerificationEmail(String returnUrl) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -182,6 +208,22 @@ public class AuthenticationService {
         catch (MessagingException | IOException e) {}
     }
 
+
+    public void validateRecoveryToken(String token) {
+
+        UserPasswordRecoveryInfo info = userPasswordRecoveryInfoService.findByToken(token);
+
+        if (info.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Время запроса истекло. Отправьте запро на восстановление ещё раз.");
+        }
+    }
+
+    public void newPassword(NewPasswordRequest request) {
+        userService.changePassword(request);
+    }
+
+  
     public void validateEmailVerificationToken(String token) {
         UserEmailVerificationInfo info = userEmailVerificationInfoService.findByToken(token);
 

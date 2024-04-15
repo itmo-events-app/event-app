@@ -83,6 +83,6 @@ public class UserLoginInfo implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return loginStatus == LoginStatus.APPROVED;
+        return true;
     }
 }
