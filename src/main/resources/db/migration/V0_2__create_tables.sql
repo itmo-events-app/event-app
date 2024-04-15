@@ -37,10 +37,15 @@ create table if not exists user_notification_info(
 create table if not exists user_t
 (
     id int generated always as identity primary key not null,
-    role_id int not null references role(id),
     notification_info_id int not null references user_notification_info(id),
     name varchar(256) not null,
     surname varchar(256)
+);
+create table if not exists user_role
+(
+    id int generated always as identity primary key not null,
+    user_id int not null references user_t(id),
+    role_id int not null references role(id)
 );
 create table if not exists user_login_info(
     id int generated always as identity primary key not null,
