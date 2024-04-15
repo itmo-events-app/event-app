@@ -7,10 +7,8 @@ import org.itmo.eventapp.main.service.EventRoleService;
 import org.itmo.eventapp.main.service.EventService;
 import org.itmo.eventapp.main.service.UserLoginInfoService;
 import org.itmo.eventapp.main.service.UserService;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -58,21 +56,23 @@ public class MiscSecurityExpression {
         return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(privilegeName));
     }
 
-    public Set<Privilege> getUserSystemPrivileges(int userId) {
+    public Stream<Privilege> getUserSystemPrivileges(int userId) {
         // TODO: Should we check for null here?
-        return userService.findById(userId).getRole().getPrivileges();
+        return userService.findById(userId)
+                .getRoles()
+                .stream()
+                .map(Role::getPrivileges)
+                .flatMap(Set::stream);
     }
 
     public boolean checkSystemPrivilege(PrivilegeName privilegeName) {
         return getUserSystemPrivileges(getCurrentUserId())
-            .stream()
             .map(Privilege::getName)
             .anyMatch(it -> it.equals(privilegeName));
     }
 
     public boolean checkSystemPrivileges(List<PrivilegeName> privilegeNames) {
         Set<PrivilegeName> names = getUserSystemPrivileges(getCurrentUserId())
-            .stream()
             .map(Privilege::getName)
             .collect(Collectors.toSet());
         for (PrivilegeName privilegeName : privilegeNames) {
