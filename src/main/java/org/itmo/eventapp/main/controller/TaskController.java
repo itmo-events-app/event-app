@@ -72,11 +72,12 @@ public class TaskController {
     @Operation(summary = "Добавление файлов к задаче")
     @PreAuthorize("@taskSecurityExpression.canEditTaskFiles(#id)")
     @PutMapping("/{id}/files")
-    public ResponseEntity<List<String>> uploadFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
+    public ResponseEntity<List<FileDataResponse>> uploadFiles(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                     @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
                                                     @RequestPart List<MultipartFile> files) {
 
-        return ResponseEntity.ok().body(taskService.addFiles(id, files));
+        List<FileDataResponse> allTaskFilesList = taskService.addFiles(id, files);
+        return ResponseEntity.ok().body(allTaskFilesList);
     }
 
     @Operation(summary = "Получение списка имен файлов задачи")

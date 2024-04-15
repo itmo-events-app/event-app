@@ -19,6 +19,22 @@ import java.util.List;
 public class MinioService {
     private final MinioClient minioClient;
 
+    private final String bucketPolicy = """
+            {
+                Id: 'public-policy',
+                Statement: [
+                    {
+                        Action: ['s3:GetObject'],
+                        Effect: 'Allow',
+                        Principal: {
+                            AWS: ['*'],
+                        },
+                        Resource: ['arn:aws:s3:::%s/*'],
+                    },
+                ],
+            }
+            """;
+
     @SneakyThrows
     public void upload(MultipartFile multipartFile, String bucketName) {
         try {
@@ -42,6 +58,7 @@ public class MinioService {
         try {
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+//                minioClient.setBucketPolicy(SetBucketPolicyArgs.builder().bucket(bucketName).config(String.format(bucketPolicy, bucketName)).build());
             }
         } catch (Exception ex) {
             throw new MinioException(ex.getMessage());
