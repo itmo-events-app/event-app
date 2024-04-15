@@ -135,7 +135,13 @@ create table if not exists task_reminder_trigger
     task_id int references task(id) on delete cascade,
     trigger_time timestamp not null
 );
-
+create table if not exists user_password_recovery_info
+(
+    id int generated always as identity primary key not null,
+    token varchar(128),
+    user_id integer not null references user_t(id),
+    expiry_date timestamp not null
+);
 create table if not exists user_email_verification_info(
     id int generated always as identity primary key not null,
     token varchar(128) not null,
