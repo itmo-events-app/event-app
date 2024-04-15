@@ -67,12 +67,12 @@ public class AuthController {
     @PostMapping("/validateEmailVerificationToken")
     ResponseEntity<Void> validateEmailVerificationToken(@RequestParam String token) {
         authenticationService.validateEmailVerificationToken(token);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/verifyEmail")
     ResponseEntity<Void> verifyEmail() {
         authenticationService.verifyEmail();
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
