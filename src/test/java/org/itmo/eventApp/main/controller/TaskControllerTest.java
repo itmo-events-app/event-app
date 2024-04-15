@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 
@@ -100,6 +101,7 @@ class TaskControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void taskAddTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -152,6 +154,7 @@ class TaskControllerTest extends AbstractTestContainers {
     запрещено создавать таски, у которых начало в прошлом
     
     @Test
+    @WithMockUser(username = "test_mail@test_mail.com")
     void taskAddExpiredTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_place.sql");
@@ -223,6 +226,7 @@ class TaskControllerTest extends AbstractTestContainers {
     }*/
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void taskEditTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");

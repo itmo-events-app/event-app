@@ -56,8 +56,9 @@ public class AuthenticationService {
             userLoginInfoService.setLastLoginDate(userLoginInfo, LocalDateTime.now());
 
             return jwtTokenUtil.generateToken(loginRequest.login());
-        } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка аутентификации.");
+        }
+        catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден.");
         }
     }
 

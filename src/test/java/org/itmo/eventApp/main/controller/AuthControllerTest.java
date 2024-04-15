@@ -1,6 +1,5 @@
 package org.itmo.eventApp.main.controller;
 
-import org.itmo.eventapp.main.security.util.JwtTokenUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -9,9 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class AuthControllerTest extends AbstractTestContainers {
-
-    @Autowired
-    JwtTokenUtil jwtTokenUtil;
 
 
     //todo assert incorrect, need to fix
