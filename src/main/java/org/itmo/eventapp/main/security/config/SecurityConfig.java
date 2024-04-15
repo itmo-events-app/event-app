@@ -63,6 +63,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/register").permitAll()
+                .requestMatchers("/recoveryPassword").permitAll()
+                .requestMatchers("/validateRecoveryToken").permitAll()
+                .requestMatchers("/newPassword").permitAll()
                 .anyRequest().authenticated())
                 //.anyRequest().permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
