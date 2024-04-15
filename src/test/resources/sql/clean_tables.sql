@@ -1,5 +1,5 @@
-delete from role_privilege where id > 62;   -- Number of roles-privilege relations = 62
-                                            -- Admin (22) ; Reader (6) ; Organizer (25) ; Assistant (9) ;
+delete from role_privilege where id > 61;   -- Number of roles-privilege relations = 61
+truncate table user_role cascade;           -- Admin (21) ; Reader (6) ; Organizer (25) ; Assistant (9) ;
 delete from role where id > 4;              -- Number of basic roles = 4
 delete from privilege where id > 44;        -- Number of basic privilege = 44
 truncate table task cascade;
@@ -26,7 +26,8 @@ alter sequence user_login_info_id_seq restart with 1;
 alter sequence user_t_id_seq restart with 1;
 alter sequence user_notification_info_id_seq restart with 1;
 alter sequence registration_request_id_seq restart with 1;
-alter sequence role_privilege_id_seq restart with 63;   -- Number of roles-privilege relations = 62
-                                                        -- Admin (22) ; Reader (6) ; Organizer (25) ; Assistant (9) ;
+alter sequence user_role_id_seq restart with 1;
+alter sequence role_privilege_id_seq restart with 63;   -- Number of roles-privilege relations = 61
+                                                        -- Admin (21) ; Reader (6) ; Organizer (25) ; Assistant (9) ;
 alter sequence role_id_seq restart with 5;              -- Number of basic roles = 4
 alter sequence privilege_id_seq restart with 45;        -- Number of basic privilege = 44
