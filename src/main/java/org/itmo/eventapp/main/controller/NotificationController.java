@@ -71,8 +71,8 @@ public class NotificationController {
     @GetMapping
     public ResponseEntity<Page<NotificationResponse>> getNotifications(
         @AuthenticationPrincipal UserLoginInfo userDetails,
-        @RequestParam(name = "page") @Min(0) @Parameter(name = "page", description = "Номер страницы, с которой начать показ уведомлений", example = "0") Integer page,
-        @RequestParam(name = "size") @Min(1) @Max(25) @Parameter(name = "size", description = "Число уведомлений на странице", example = "15") Integer size
+        @RequestParam(name = "page", defaultValue = "0") @Min(0) @Parameter(name = "page", description = "Номер страницы, с которой начать показ уведомлений", example = "0") Integer page,
+        @RequestParam(name = "size", defaultValue = "25") @Min(1) @Max(25) @Parameter(name = "size", description = "Число уведомлений на странице", example = "15") Integer size
     ) {
         Page<Notification> notificationPage = notificationService.getPageByUserId(userDetails.getUser().getId(), page, size);
         Page<NotificationResponse> responseBody = NotificationMapper.notificationPageToNotificationPageResponse(notificationPage);
@@ -83,8 +83,8 @@ public class NotificationController {
     @PutMapping
     public ResponseEntity<List<NotificationResponse>> setAllAsSeenNotifications(
         @AuthenticationPrincipal UserLoginInfo userDetails,
-        @RequestParam(name = "page") @Min(0) @Parameter(name = "page", description = "Номер страницы, с которой начать показ уведомлений", example = "0") Integer page,
-        @RequestParam(name = "size") @Min(1) @Max(25) @Parameter(name = "size", description = "Число уведомлений на странице", example = "15") Integer size
+        @RequestParam(name = "page", defaultValue = "0") @Min(0) @Parameter(name = "page", description = "Номер страницы, с которой начать показ уведомлений", example = "0") Integer page,
+        @RequestParam(name = "size", defaultValue = "25") @Min(1) @Max(25) @Parameter(name = "size", description = "Число уведомлений на странице", example = "15") Integer size
     ) {
 
         List<Notification> notifications = notificationService.updateSeenToAllByUserId(userDetails.getUser().getId(), page, size);
@@ -109,4 +109,19 @@ public class NotificationController {
         return ResponseEntity.ok(responseBody);
     }
 
+    @Operation(summary = "Получение количества уведомлений у пользователя")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = {
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = Long.class))
+                            })
+            })
+    @GetMapping(path = "/notSeenCount")
+    public ResponseEntity<Long> getNotSeenCountNotification(@AuthenticationPrincipal UserLoginInfo userDetails) {
+        return ResponseEntity.ok(notificationService.getCountNotSeenNotificationByUserId(userDetails.getId()));
+    }
 }
