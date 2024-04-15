@@ -1,7 +1,9 @@
 package org.itmo.eventapp.main.exceptionhandling;
 
+import io.jsonwebtoken.security.SignatureException;
 import io.minio.errors.MinioException;
 import jakarta.validation.ValidationException;
+import org.aspectj.weaver.patterns.HasThisTypePatternTriedToSneakInSomeGenericOrParameterizedTypePatternMatchingStuffAnywhereVisitor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,5 +47,10 @@ class CommonControllerAdvice {
     @ExceptionHandler(MinioException.class)
     ResponseEntity<String> handleMethodMinioException(MinioException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(SignatureException.class)
+    ResponseEntity<String> handleSignatureException(SignatureException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

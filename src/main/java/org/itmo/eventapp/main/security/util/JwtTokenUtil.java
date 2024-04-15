@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenUtil {
 
     private static final String SECRET = "HellMegaSecretKeyForItmoEventAppNoOneShouldKnowItKeepYourMouthShut";
@@ -23,12 +25,9 @@ public class JwtTokenUtil {
     private static final int MINUTES = 60 * 24 * 365;
 
     private Claims extractAllClaims(String token) {
-        try {
-            return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build()
+        return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build()
                 .parseClaimsJws(token).getBody();
-        } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка валидации токена");
-        }
+
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
