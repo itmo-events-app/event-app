@@ -83,4 +83,8 @@ public class NotificationService {
     public void deleteNotificationsBeforeSentTime(LocalDateTime beforeTime) {
         notificationRepository.deleteNotificationsBySentTimeBefore(beforeTime);
     }
+
+    public Long getCountNotSeenNotificationByUserId(@NotNull Integer userId) {
+        return notificationRepository.getCountNotSeenNotificationByUserId(userId);
+    }
 }
