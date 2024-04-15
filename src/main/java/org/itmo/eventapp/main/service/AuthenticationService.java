@@ -155,7 +155,7 @@ public class AuthenticationService {
     }
 
     public List<RegistrationRequestForAdmin> listRegisterRequestsCallback() {
-        return registrationRequestService.getByStatus(RegistrationRequestStatus.NEW)
+        return registrationRequestService.getAll()
             .stream()
             .map((request) -> new RegistrationRequestForAdmin(
                 request.getId(),
