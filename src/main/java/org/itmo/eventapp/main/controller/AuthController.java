@@ -78,13 +78,13 @@ public class AuthController {
                                                @Parameter(name = "token", description = "Токен восстановления пароля", example = "c5b7bcc0-cffe-4f57-853c-7fa18e56b36d")
                                                String token) {
         authenticationService.validateRecoveryToken(token);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "Запрос на смену пароля")
     @PostMapping("/newPassword")
     ResponseEntity<Void> newPassword(@Valid @RequestBody NewPasswordRequest request) {
         authenticationService.newPassword(request);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
