@@ -76,7 +76,7 @@ public record EventRequest(
     @NotNull(message = "Поле preparingEnd не может быть null!")
     @Schema(example = "2024-08-31Е12:00:00", requiredMode = Schema.RequiredMode.REQUIRED)
     LocalDateTime preparingEnd,
-    @Schema(example = "image.png", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(example = "image.png", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     MultipartFile image
 ) {
 }

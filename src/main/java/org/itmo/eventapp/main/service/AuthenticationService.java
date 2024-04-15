@@ -10,10 +10,7 @@ import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
-import org.itmo.eventapp.main.model.entity.RegistrationRequest;
-import org.itmo.eventapp.main.model.entity.User;
-import org.itmo.eventapp.main.model.entity.UserLoginInfo;
-import org.itmo.eventapp.main.model.entity.UserNotificationInfo;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
@@ -23,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +42,9 @@ public class AuthenticationService {
     private final UserNotificationInfoService userNotificationInfoService;
     private final RoleService roleService;
     private final RegistrationRequestService registrationRequestService;
+
     private final UserPasswordRecoveryInfoService userPasswordRecoveryInfoService;
+    private final UserEmailVerificationInfoService userEmailVerificationInfoService;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
@@ -166,6 +167,7 @@ public class AuthenticationService {
             .toList();
     }
 
+
     public void recoverPassword(String email, String returnUrl) {
 
         UserLoginInfo info = userLoginInfoService.findByLogin(email);
@@ -175,14 +177,35 @@ public class AuthenticationService {
         }
 
         String token = userPasswordRecoveryInfoService.updateUserToken(info.getUser());
-
-        String url = returnUrl + "?token=" + token;
-
+      
         try {
             mailSenderService.sendRecoveryPasswordMessage(email, info.getUser().getName(), url);
         }
         catch (MessagingException | IOException e) {}
     }
+
+    public void sendVerificationEmail(String returnUrl) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var email = authentication.getName();
+
+        UserLoginInfo info = userLoginInfoService.findByLogin(email);
+
+        if (info.getLoginStatus() == LoginStatus.APPROVED){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.EMAIL_ALREADY_APPROVED);
+        }
+
+        User user = userService.findByLogin(email);
+        String token = userEmailVerificationInfoService.updateUserToken(user);
+
+        String url = returnUrl + "?token=" + token;
+
+        try {
+            mailSenderService.sendEmailVerificationMessage(email, user.getName(), url);
+        }
+        catch (MessagingException | IOException e) {}
+    }
+
 
     public void validateRecoveryToken(String token) {
 
@@ -196,5 +219,23 @@ public class AuthenticationService {
 
     public void newPassword(NewPasswordRequest request) {
         userService.changePassword(request);
+    }
+  
+    public void validateEmailVerificationToken(String token) {
+        UserEmailVerificationInfo info = userEmailVerificationInfoService.findByToken(token);
+
+        if (info.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Время запроса истекло. Отправьте запрос ещё раз");
+        }
+    }
+
+    public void verifyEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var email = authentication.getName();
+
+        UserLoginInfo userLoginInfo = userLoginInfoService.findByLogin(email);
+        userLoginInfo.setLoginStatus(LoginStatus.APPROVED);
+
+        userLoginInfoService.save(userLoginInfo);
     }
 }

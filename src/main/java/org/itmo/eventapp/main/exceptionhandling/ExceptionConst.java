@@ -43,6 +43,8 @@ public class ExceptionConst {
 
     public static final String EMAIL_NOT_APPROVED = "Невозможно восстановить пароль без подтвержденной почты";
 
+    public static final String EMAIL_ALREADY_APPROVED = "Email уже подтвержден";
+
     public static final String REGISTRATION_REQUEST_NOT_FOUND_MESSAGE = "Заявка на регистрацию не найдена";
     public static final String REGISTRATION_REQUEST_EMAIL_EXIST = "Заявка на регистрацию с указанным email уже существует";
 

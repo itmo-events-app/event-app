@@ -85,6 +85,22 @@ public class AuthController {
     @PostMapping("/newPassword")
     ResponseEntity<Void> newPassword(@Valid @RequestBody NewPasswordRequest request) {
         authenticationService.newPassword(request);
+      
+    @PostMapping("/sendVerificationEmail")
+    ResponseEntity<Void> sendVerificationEmail(@RequestParam String returnUrl) {
+        authenticationService.sendVerificationEmail(returnUrl);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/validateEmailVerificationToken")
+    ResponseEntity<Void> validateEmailVerificationToken(@RequestParam String token) {
+        authenticationService.validateEmailVerificationToken(token);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/verifyEmail")
+    ResponseEntity<Void> verifyEmail() {
+        authenticationService.verifyEmail();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
