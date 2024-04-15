@@ -123,7 +123,7 @@ public class AuthenticationService {
             .passwordHash(request.getPasswordHash())
             .lastLoginDate(LocalDateTime.now())
             .user(user)
-            .loginStatus(LoginStatus.APPROVED)
+            .loginStatus(LoginStatus.UNAPPROVED)
             .build();
 
         userLoginInfoService.save(loginInfo);
@@ -177,7 +177,9 @@ public class AuthenticationService {
         }
 
         String token = userPasswordRecoveryInfoService.updateUserToken(info.getUser());
-      
+
+        String url = returnUrl + "?token=" + token;
+
         try {
             mailSenderService.sendRecoveryPasswordMessage(email, info.getUser().getName(), url);
         }
@@ -220,6 +222,7 @@ public class AuthenticationService {
     public void newPassword(NewPasswordRequest request) {
         userService.changePassword(request);
     }
+
   
     public void validateEmailVerificationToken(String token) {
         UserEmailVerificationInfo info = userEmailVerificationInfoService.findByToken(token);

@@ -78,13 +78,13 @@ public class MailSenderServiceImpl implements MailSenderService {
         String subject = "Восстановление пароля";
         String templatePath = "notification/email-templates/recovery-password.html";
         mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getRecoveryPasswordTemplateFields(userName, url)));
-
+    }
 
     @Async
     @Override
     public void sendEmailVerificationMessage(String userEmail, String userName, String url) throws MessagingException, IOException {
         String subject = "Подтверждение почты";
-        String templatePath = "notification/email-templates/decline-registration-request.html";
+        String templatePath = "notification/email-templates/verify-email.html";
         mailSender.send(createMessageFromTemplate(userEmail, subject, templatePath, getRecoveryPasswordTemplateFields(userName, url)));
     }
 
