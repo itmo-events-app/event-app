@@ -14,6 +14,7 @@ import org.itmo.eventapp.main.model.dto.response.RoleResponse;
 import org.itmo.eventapp.main.model.entity.Privilege;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
@@ -238,6 +239,17 @@ public class RoleController {
         @Parameter(name = "id", description = "ID роли", example = "1") @PathVariable Integer id) {
         return ResponseEntity.ok().body(
             EventMapper.eventsToEventResponseList(eventRoleService.getEventsByRole(userDetails.getUser().getId(), id))
+        );
+    }
+
+    @Operation(summary = "Получение списка мероприятий пользователя по привилегии")
+    @GetMapping("{privilegeId}/{userId}/events")
+    public ResponseEntity<List<EventResponse>> getEventsByPrivilige(
+            @Parameter(name = "privilegeId", description = "ID привилегии", example = "1") @PathVariable Integer privilegeId,
+            @Positive(message = "Параметр userId не может быть меньше 1!")
+            @Parameter(name = "userId", description = "ID пользователя", example = "1") @PathVariable Integer userId) {
+        return ResponseEntity.ok().body(
+                EventMapper.eventsToEventResponseList(eventRoleService.getEventsByPrivilege(userId, privilegeId))
         );
     }
 }
