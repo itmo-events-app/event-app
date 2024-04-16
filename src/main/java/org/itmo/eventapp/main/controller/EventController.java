@@ -71,7 +71,7 @@ public class EventController {
                 })
         })
     @PreAuthorize("@eventSecurityExpression.canUpdateEvent(#id)")
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponse> updateEvent(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id,
                                                      @Valid EventRequest eventRequest) {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
@@ -148,8 +148,8 @@ public class EventController {
     }
 
     @Operation(summary = "Удаление мероприятия")
-    @PreAuthorize("@eventSecurityExpression.canDeleteEventOrActivity(#id)")
     @DeleteMapping("/{id}")
+    @PreAuthorize("@eventSecurityExpression.canDeleteEventOrActivity(#id)")
     @Transactional
     public ResponseEntity<Void> deleteEventById(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id) {
         eventService.deleteEventById(id);
