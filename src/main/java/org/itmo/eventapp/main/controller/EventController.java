@@ -77,7 +77,7 @@ public class EventController {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
     }
 
-    @Operation(summary = "Фильрация мероприятий")
+    @Operation(summary = "Фильтрация мероприятий")
     @ApiResponses(
         value = {
             @ApiResponse(
