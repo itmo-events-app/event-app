@@ -43,12 +43,10 @@ public class MinioService {
         try {
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-                System.out.println(bucketPolicy);
                 minioClient.setBucketPolicy(SetBucketPolicyArgs.builder().bucket(bucketName).config(bucketPolicy).build());
 
             }
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
             throw new MinioException(ex.getMessage());
 
         }
