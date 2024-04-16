@@ -14,10 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -111,6 +108,16 @@ public class EventRoleService {
 
     List<EventRole> findAllByEventId(Integer eventId) {
         return eventRoleRepository.findAllByEventId(eventId);
+    }
+
+    public Map<String, List<String>> findAllUserEventRolesGroupedByEvent(Integer userId) {
+        List<EventRole> userRoles = eventRoleRepository.findAllByUserId(userId);
+        Map<String, List<String>> rolesByEvent = new HashMap<>();
+        for (EventRole eventRole : userRoles) {
+            rolesByEvent.computeIfAbsent(eventRole.getEvent().getTitle(), k -> new ArrayList<>())
+                    .add(eventRole.getRole().getName());
+        }
+        return rolesByEvent;
     }
 
     @Transactional

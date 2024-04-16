@@ -11,9 +11,7 @@ import org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
 import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
 import org.itmo.eventapp.main.model.dto.response.*;
-import org.itmo.eventapp.main.model.entity.Privilege;
-import org.itmo.eventapp.main.model.entity.User;
-import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.mapper.PrivilegeMapper;
 import org.itmo.eventapp.main.model.mapper.UserMapper;
 import org.itmo.eventapp.main.service.EventRoleService;
@@ -27,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -111,7 +110,7 @@ public class ProfileController {
 
     @Operation(summary = "Получение списка пользователей в системе")
     @GetMapping("/all-system-users")
-    public ResponseEntity<PaginatedResponse<UserSystemRoleResponse>> getAllUsers(
+    public ResponseEntity<PaginatedResponse<UserResponse>> getAllUsers(
         @RequestParam(name = "searchQuery", defaultValue = "")
         @Parameter(name = "searchQuery",
             description = "Строка для поиска по имени и фамилии",
@@ -132,9 +131,13 @@ public class ProfileController {
         Integer size
     ) {
         Page<User> pages = userService.getAllFilteredUsers(searchQuery, page, size);
-        PaginatedResponse<UserSystemRoleResponse> response =
+
+        PaginatedResponse<UserResponse> response =
             new PaginatedResponse<>(pages.getTotalElements(), pages.getContent()
-                .stream().map(UserMapper::userToUserSystemRoleResponse).toList());
+                .stream().map(user -> UserMapper
+                            .userToUserResponse(
+                                    user,
+                                    eventRoleService.findAllUserEventRolesGroupedByEvent(user.getId()))).toList());
         return ResponseEntity.ok().body(response);
     }
 }

@@ -4,18 +4,21 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 
 import java.util.List;
+import java.util.Map;
 
-public record UserSystemRoleResponse(
+public record UserResponse(
         Integer id,
         @Schema(example = "Иван")
-    String name,
+        String name,
         @Schema(example = "Иванов")
-    String surname,
+        String surname,
         @Schema(example = "ivan@itmo.ru")
-    String login,
+        String login,
         @Schema(example = "EMAIL")
-    LoginType type,
-//    @Schema(example = "Читатель")
-    List<String> roles
+        LoginType type,
+//        @Schema(example = "Читатель")
+        List<String> systemRoles,
+
+        Map<String, List<String>> eventRoles
 ) {
 }
