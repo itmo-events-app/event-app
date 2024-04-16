@@ -69,9 +69,9 @@ public class EventController {
                 })
         })
     @PreAuthorize("@eventSecurityExpression.canUpdateEvent(#id)")
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponse> updateEvent(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id,
-                                                     @Valid @RequestBody EventRequest eventRequest) {
+                                                     @Valid EventRequest eventRequest) {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
     }
 
