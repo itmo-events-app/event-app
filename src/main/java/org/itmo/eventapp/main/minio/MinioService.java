@@ -39,7 +39,6 @@ public class MinioService {
                 "    ],\n" +
                 "    \"Version\": \"2012-10-17\"\n" +
                 "}\n";
-        ;
         try {
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
