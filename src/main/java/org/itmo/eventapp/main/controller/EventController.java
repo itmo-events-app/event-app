@@ -44,12 +44,14 @@ public class EventController {
     private final EventService eventService;
 
     @Operation(summary = "Создание активности мероприятия")
+    @PreAuthorize("@eventSecurityExpression.canCreateActivity(#eventRequest.parent)")
     @PostMapping(value = "/activity", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Integer> addActivity(@Valid EventRequest eventRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.addEvent(eventRequest).getId());
     }
 
     @Operation(summary = "Создание мероприятия")
+    @PreAuthorize("@eventSecurityExpression.canCreateEvent()")
     @PostMapping
     public ResponseEntity<Integer> addEventByOrganizer(@RequestBody @Valid CreateEventRequest eventRequest) {
         return ResponseEntity
@@ -147,6 +149,7 @@ public class EventController {
 
     @Operation(summary = "Удаление мероприятия")
     @DeleteMapping("/{id}")
+    @PreAuthorize("@eventSecurityExpression.canDeleteEventOrActivity(#id)")
     @Transactional
     public ResponseEntity<Void> deleteEventById(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id) {
         eventService.deleteEventById(id);
