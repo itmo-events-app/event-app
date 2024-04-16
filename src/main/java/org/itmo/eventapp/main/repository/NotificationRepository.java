@@ -24,4 +24,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     void deleteNotificationsBySentTimeBefore(LocalDateTime time);
 
     Long countByUserId(Integer userId);
+
+    @Query(value = "SELECT count(n) FROM notification n WHERE n.user_id = :id AND n.seen = false", nativeQuery = true)
+    Long getCountNotSeenNotificationByUserId(Integer id);
 }

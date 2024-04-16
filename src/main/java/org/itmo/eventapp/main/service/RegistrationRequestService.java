@@ -33,6 +33,10 @@ public class RegistrationRequestService {
         return registrationRequestRepository.getRegistrationRequestsByStatus(status);
     }
 
+    public List<RegistrationRequest> getAll() {
+        return registrationRequestRepository.findAll();
+    }
+
     public boolean existsByEmail(String email) {
         return registrationRequestRepository.existsByEmail(email);
     }

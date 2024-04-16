@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -34,8 +35,10 @@ class PlaceControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void placeGetTest() throws Exception {
         executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_user.sql");
 
         String expectedJson = """
             {
@@ -57,9 +60,12 @@ class PlaceControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void placeGetAllOrFilteredTest() throws Exception {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_place_2.sql");
+
+        executeSqlScript("/sql/insert_user.sql");
 
         String expectedJson = """
             [
@@ -83,14 +89,20 @@ class PlaceControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void placeGetInvalidIdTest() throws Exception {
+
+        executeSqlScript("/sql/insert_user.sql");
+
         mockMvc.perform(get("/api/places/-1"))
             .andExpect(status().isBadRequest())
             .andExpect(content().string(containsString("placeGet.id: Параметр id не может быть меньше 1!")));
     }
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void placeAddTest() throws Exception {
+
         executeSqlScript("/sql/insert_user.sql");
 
         String name = "name";
@@ -134,7 +146,9 @@ class PlaceControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void placeAddInvalidTest() throws Exception {
+
         executeSqlScript("/sql/insert_user.sql");
 
         String taskJson = """
@@ -193,6 +207,7 @@ class PlaceControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void placeEditInvalidTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
@@ -223,6 +238,7 @@ class PlaceControllerTest extends AbstractTestContainers {
     }
 
     @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
     void placeDeleteTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 

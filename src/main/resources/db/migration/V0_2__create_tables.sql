@@ -37,10 +37,15 @@ create table if not exists user_notification_info(
 create table if not exists user_t
 (
     id int generated always as identity primary key not null,
-    role_id int not null references role(id),
     notification_info_id int not null references user_notification_info(id),
     name varchar(256) not null,
     surname varchar(256)
+);
+create table if not exists user_role
+(
+    id int generated always as identity primary key not null,
+    user_id int not null references user_t(id),
+    role_id int not null references role(id)
 );
 create table if not exists user_login_info(
     id int generated always as identity primary key not null,
@@ -123,6 +128,13 @@ create table if not exists task
     reminder timestamp not null
 );
 
+create table if not exists user_email_verification_info(
+    id int generated always as identity primary key not null,
+    token varchar(128) not null,
+    user_id integer not null references user_t(id),
+    expiry_date timestamp not null  
+);
+
 create table if not exists task_deadline_trigger
 (
     id int generated always as identity primary key not null,
@@ -134,4 +146,11 @@ create table if not exists task_reminder_trigger
     id int generated always as identity primary key not null,
     task_id int references task(id) on delete cascade,
     trigger_time timestamp not null
+);
+create table if not exists user_password_recovery_info
+(
+    id int generated always as identity primary key not null,
+    token varchar(128),
+    user_id integer not null references user_t(id),
+    expiry_date timestamp not null
 );

@@ -1,13 +1,11 @@
 package org.itmo.eventapp.main.security.securityexpression;
 
 import lombok.RequiredArgsConstructor;
-import org.itmo.eventapp.main.model.entity.Event;
-import org.itmo.eventapp.main.model.entity.EventRole;
-import org.itmo.eventapp.main.model.entity.Privilege;
-import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
 import org.itmo.eventapp.main.service.EventRoleService;
 import org.itmo.eventapp.main.service.EventService;
+import org.itmo.eventapp.main.service.UserLoginInfoService;
 import org.itmo.eventapp.main.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,9 +28,12 @@ public class MiscSecurityExpression {
 
     private final UserService userService;
 
+    private final UserLoginInfoService userLoginInfoService;
+
     public int getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserLoginInfo userLoginInfo = (UserLoginInfo) authentication.getPrincipal();
+
+        UserLoginInfo userLoginInfo = userLoginInfoService.findByLogin(authentication.getName());
         return userLoginInfo.getUser().getId();
     }
 
@@ -55,21 +56,23 @@ public class MiscSecurityExpression {
         return eventPrivileges.map(Privilege::getName).anyMatch(it -> it.equals(privilegeName));
     }
 
-    public Set<Privilege> getUserSystemPrivileges(int userId) {
+    public Stream<Privilege> getUserSystemPrivileges(int userId) {
         // TODO: Should we check for null here?
-        return userService.findById(userId).getRole().getPrivileges();
+        return userService.findById(userId)
+                .getRoles()
+                .stream()
+                .map(Role::getPrivileges)
+                .flatMap(Set::stream);
     }
 
     public boolean checkSystemPrivilege(PrivilegeName privilegeName) {
         return getUserSystemPrivileges(getCurrentUserId())
-            .stream()
             .map(Privilege::getName)
             .anyMatch(it -> it.equals(privilegeName));
     }
 
     public boolean checkSystemPrivileges(List<PrivilegeName> privilegeNames) {
         Set<PrivilegeName> names = getUserSystemPrivileges(getCurrentUserId())
-            .stream()
             .map(Privilege::getName)
             .collect(Collectors.toSet());
         for (PrivilegeName privilegeName : privilegeNames) {

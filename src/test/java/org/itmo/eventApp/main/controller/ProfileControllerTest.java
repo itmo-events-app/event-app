@@ -161,7 +161,9 @@ class ProfileControllerTest extends AbstractTestContainers {
     @Test
     void testGetUserEventPrivileges() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
-        UserLoginInfo userLoginInfo = getUserLoginInfo();
+
+        String token = getToken("test_mail@itmo.ru", "password");
+
         String eventJson = """
             {
                 "userId": 1,
@@ -171,11 +173,11 @@ class ProfileControllerTest extends AbstractTestContainers {
             post("/api/events")
                 .content(eventJson)
                 .contentType(MediaType.APPLICATION_JSON)
-                .with(user(userLoginInfo))
+                .header("Authorization", "Bearer " + token)
         );
 
         MvcResult result = mockMvc.perform(get("/api/profile/event-privileges/1")
-                .with(user(userLoginInfo)))
+                        .header("Authorization", "Bearer " + token))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$").isArray())
@@ -213,9 +215,9 @@ class ProfileControllerTest extends AbstractTestContainers {
         String expectedJson = """
             {"total":3,
             "items":[
-            {"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","type":"EMAIL","role":"Администратор"},
-            {"id":2,"name":"test2","surname":"user2","login":"test_mail2@itmo.ru","type":"EMAIL","role":"Администратор"},
-            {"id":3,"name":"test3","surname":"user3","login":"test_mail3@itmo.ru","type":"EMAIL","role":"Администратор"}
+            {"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","type":"EMAIL","roles":["Администратор"]},
+            {"id":2,"name":"test2","surname":"user2","login":"test_mail2@itmo.ru","type":"EMAIL","roles":["Администратор"]},
+            {"id":3,"name":"test3","surname":"user3","login":"test_mail3@itmo.ru","type":"EMAIL","roles":["Администратор"]}
             ]}
             """;
 

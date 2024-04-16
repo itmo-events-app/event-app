@@ -2,6 +2,7 @@ package org.itmo.eventapp.main.model.mapper;
 
 import org.itmo.eventapp.main.model.dto.response.UserShortDataResponse;
 import org.itmo.eventapp.main.model.dto.response.UserSystemRoleResponse;
+import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.User;
 
 import java.util.List;
@@ -31,7 +32,9 @@ public class UserMapper {
             user.getSurname(),
             user.getUserLoginInfo().getLogin(),
             user.getUserLoginInfo().getLoginType(),
-            user.getRole().getName()
+            user.getRoles().stream()
+                    .map(Role::getName)
+                    .toList()
         );
     }
 

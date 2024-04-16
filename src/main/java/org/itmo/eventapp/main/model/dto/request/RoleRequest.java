@@ -16,8 +16,10 @@ public record RoleRequest(
     @Schema(example = "Администратор системы")
     String description,
     @NotNull(message = "Поле isEvent не может быть null")
+    @Schema(example = "false")
     Boolean isEvent,
     @NotNull(message = "Поле privileges не может быть null")
+    @Schema(example = "[\"1\", \"2\"]")
     List<Integer> privileges
 ) {
 }

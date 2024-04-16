@@ -2,13 +2,8 @@ package org.itmo.eventapp.main.service;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
-import org.itmo.eventapp.main.model.dto.request.NotificationSettingsRequest;
-import org.itmo.eventapp.main.model.dto.request.UserChangeLoginRequest;
-import org.itmo.eventapp.main.model.dto.request.UserChangeNameRequest;
-import org.itmo.eventapp.main.model.dto.request.UserChangePasswordRequest;
-import org.itmo.eventapp.main.model.entity.Privilege;
-import org.itmo.eventapp.main.model.entity.User;
-import org.itmo.eventapp.main.model.entity.UserNotificationInfo;
+import org.itmo.eventapp.main.model.dto.request.*;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -19,7 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,14 +24,15 @@ public class UserService {
 
     private final UserLoginInfoService userLoginInfoService;
     private final UserNotificationInfoService userNotificationInfoService;
+    private final UserPasswordRecoveryInfoService userPasswordRecoveryInfoService;
 
     public User findById(Integer id) {
         return userRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE));
     }
 
-    public boolean existsByRoleId(Integer roleId) {
-        return userRepository.existsByRoleId(roleId);
+    public boolean existsByRolesId(Integer roleId) {
+        return userRepository.existsByRolesId(roleId);
     }
 
     public void save(User user) {
@@ -89,9 +86,22 @@ public class UserService {
         userLoginInfoService.setPassword(user.getUserLoginInfo(), request.newPassword());
     }
 
+    public void changePassword(NewPasswordRequest request) {
+        UserPasswordRecoveryInfo info = userPasswordRecoveryInfoService.findByToken(request.token());
+
+        if (!request.newPassword().equals(request.confirmNewPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.USER_PASSWORD_MISMATCH_MESSAGE);
+        }
+
+        userLoginInfoService.setPassword(info.getUser().getUserLoginInfo(), request.newPassword());
+    }
+
     public Set<Privilege> getUserSystemPrivileges(Integer userId) {
         User user = findById(userId);
-        return user.getRole().getPrivileges();
+        return user.getRoles().stream()
+                .map(Role::getPrivileges)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
     }
 
     public Page<User> getAllFilteredUsers(String searchQuery, Integer page, Integer size) {

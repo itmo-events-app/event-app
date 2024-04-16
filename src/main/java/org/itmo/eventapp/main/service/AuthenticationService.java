@@ -4,14 +4,12 @@ package org.itmo.eventapp.main.service;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
+import org.itmo.eventapp.main.model.dto.request.NewPasswordRequest;
+import org.itmo.eventapp.main.model.entity.*;
 import org.itmo.eventapp.main.mail.MailSenderService;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
-import org.itmo.eventapp.main.model.entity.RegistrationRequest;
-import org.itmo.eventapp.main.model.entity.User;
-import org.itmo.eventapp.main.model.entity.UserLoginInfo;
-import org.itmo.eventapp.main.model.entity.UserNotificationInfo;
 import org.itmo.eventapp.main.model.entity.enums.LoginStatus;
 import org.itmo.eventapp.main.model.entity.enums.LoginType;
 import org.itmo.eventapp.main.model.entity.enums.RegistrationRequestStatus;
@@ -20,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +37,9 @@ public class AuthenticationService {
     private final UserNotificationInfoService userNotificationInfoService;
     private final RoleService roleService;
     private final RegistrationRequestService registrationRequestService;
+
+    private final UserPasswordRecoveryInfoService userPasswordRecoveryInfoService;
+    private final UserEmailVerificationInfoService userEmailVerificationInfoService;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
@@ -55,8 +58,9 @@ public class AuthenticationService {
             userLoginInfoService.setLastLoginDate(userLoginInfo, LocalDateTime.now());
 
             return jwtTokenUtil.generateToken(loginRequest.login());
-        } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка аутентификации.");
+        }
+        catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE);
         }
     }
 
@@ -101,7 +105,7 @@ public class AuthenticationService {
         User user = User.builder()
             .name(request.getName())
             .surname(request.getSurname())
-            .role(reader)
+            .roles(Set.of(reader))
             .userNotificationInfo(notificationInfo)
             .build();
 
@@ -114,7 +118,7 @@ public class AuthenticationService {
             .passwordHash(request.getPasswordHash())
             .lastLoginDate(LocalDateTime.now())
             .user(user)
-            .loginStatus(LoginStatus.APPROVED)
+            .loginStatus(LoginStatus.UNAPPROVED)
             .build();
 
         userLoginInfoService.save(loginInfo);
@@ -146,7 +150,7 @@ public class AuthenticationService {
     }
 
     public List<RegistrationRequestForAdmin> listRegisterRequestsCallback() {
-        return registrationRequestService.getByStatus(RegistrationRequestStatus.NEW)
+        return registrationRequestService.getAll()
             .stream()
             .map((request) -> new RegistrationRequestForAdmin(
                 request.getId(),
@@ -156,5 +160,80 @@ public class AuthenticationService {
                 request.getStatus(),
                 request.getSentTime()))
             .toList();
+    }
+
+
+    public void recoverPassword(String email, String returnUrl) {
+
+        UserLoginInfo info = userLoginInfoService.findByLogin(email);
+
+        if (info.getLoginStatus() != LoginStatus.APPROVED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.EMAIL_NOT_APPROVED);
+        }
+
+        String token = userPasswordRecoveryInfoService.updateUserToken(info.getUser());
+
+        String url = returnUrl + "?token=" + token;
+
+        try {
+            mailSenderService.sendRecoveryPasswordMessage(email, info.getUser().getName(), url);
+        }
+        catch (MessagingException | IOException e) {}
+    }
+
+    public void sendVerificationEmail(String returnUrl) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var email = authentication.getName();
+
+        UserLoginInfo info = userLoginInfoService.findByLogin(email);
+
+        if (info.getLoginStatus() == LoginStatus.APPROVED){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ExceptionConst.EMAIL_ALREADY_APPROVED);
+        }
+
+        User user = userService.findByLogin(email);
+        String token = userEmailVerificationInfoService.updateUserToken(user);
+
+        String url = returnUrl + "?token=" + token;
+
+        try {
+            mailSenderService.sendEmailVerificationMessage(email, user.getName(), url);
+        }
+        catch (MessagingException | IOException e) {}
+    }
+
+
+    public void validateRecoveryToken(String token) {
+
+        UserPasswordRecoveryInfo info = userPasswordRecoveryInfoService.findByToken(token);
+
+        if (info.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Время запроса истекло. Отправьте запро на восстановление ещё раз.");
+        }
+    }
+
+    public void newPassword(NewPasswordRequest request) {
+        userService.changePassword(request);
+    }
+
+  
+    public void validateEmailVerificationToken(String token) {
+        UserEmailVerificationInfo info = userEmailVerificationInfoService.findByToken(token);
+
+        if (info.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Время запроса истекло. Отправьте запрос ещё раз");
+        }
+    }
+
+    public void verifyEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var email = authentication.getName();
+
+        UserLoginInfo userLoginInfo = userLoginInfoService.findByLogin(email);
+        userLoginInfo.setLoginStatus(LoginStatus.APPROVED);
+
+        userLoginInfoService.save(userLoginInfo);
     }
 }
