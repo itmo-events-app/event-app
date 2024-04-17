@@ -80,6 +80,7 @@ public class RoleController {
 
     @Operation(summary = "Получение списка организационных ролей в мероприятии, назначенных пользователю")
     @GetMapping("/system/{userId}")
+    // TODO: добавить нужный @PreAuthorize
     public ResponseEntity<List<RoleResponse>> getUserSystemRoles(
             @Min(value = 1, message = "Поле userId не может быть меньше 1!") @PathVariable("userId") @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId)
     {
@@ -88,12 +89,9 @@ public class RoleController {
     }
 
     @Operation(summary = "Получение списка организационных ролей")
-    // TODO: временно, возможно, нужно переделать
-    @PreAuthorize("@roleSecurityExpression.canGetAllOrganizationalRole(#eventId)")
+    // TODO: добавить нужный @PreAuthorize
     @GetMapping("/organizational")
-    public ResponseEntity<List<RoleResponse>> getOrganizationalRoles(
-        @Positive(message = "Параметр eventId не может быть меньше 1!")
-        @RequestParam @Parameter(name = "eventId", description = "ID меропрятия", example = "1") Integer eventId) {
+    public ResponseEntity<List<RoleResponse>> getOrganizationalRoles() {
         return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.getRoles(RoleType.EVENT)));
     }
 
