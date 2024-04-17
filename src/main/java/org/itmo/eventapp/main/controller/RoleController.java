@@ -3,13 +3,18 @@ package org.itmo.eventapp.main.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.RoleRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.dto.response.PrivilegeResponse;
+import org.itmo.eventapp.main.model.dto.response.PrivilegeWithHasOrganizerRolesResponse;
 import org.itmo.eventapp.main.model.dto.response.RoleResponse;
+import org.itmo.eventapp.main.model.entity.Privilege;
+import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.UserLoginInfo;
+import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
 import org.itmo.eventapp.main.model.entity.enums.PrivilegeType;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
@@ -26,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -72,14 +78,31 @@ public class RoleController {
         return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.getRoles(RoleType.SYSTEM)));
     }
 
+    @Operation(summary = "Получение списка организационных ролей в мероприятии, назначенных пользователю")
+    @GetMapping("/system/{userId}")
+    // TODO: добавить нужный @PreAuthorize
+    public ResponseEntity<List<RoleResponse>> getUserSystemRoles(
+            @Min(value = 1, message = "Поле userId не может быть меньше 1!") @PathVariable("userId") @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId)
+    {
+        return ResponseEntity.ok(
+                RoleMapper.rolesToRoleResponseList(roleService.findSystemRolesByUser(userId)));
+    }
+
     @Operation(summary = "Получение списка организационных ролей")
-    // TODO: временно, возможно, нужно переделать
-    @PreAuthorize("@roleSecurityExpression.canGetAllOrganizationalRole(#eventId)")
+    // TODO: добавить нужный @PreAuthorize
     @GetMapping("/organizational")
-    public ResponseEntity<List<RoleResponse>> getOrganizationalRoles(
-        @Positive(message = "Параметр eventId не может быть меньше 1!")
-        @RequestParam @Parameter(name = "eventId", description = "ID меропрятия", example = "1") Integer eventId) {
+    public ResponseEntity<List<RoleResponse>> getOrganizationalRoles() {
         return ResponseEntity.ok(RoleMapper.rolesToRoleResponseList(roleService.getRoles(RoleType.EVENT)));
+    }
+
+    @Operation(summary = "Получение списка организационных ролей в мероприятии, назначенных пользователю")
+    @GetMapping("/organizational/{userId}/{eventId}")
+    public ResponseEntity<List<RoleResponse>> getUserEventRoles(
+            @Min(value = 1, message = "Поле userId не может быть меньше 1!") @PathVariable("userId") @Parameter(name = "userId", description = "ID пользователя", example = "1") Integer userId,
+            @Min(value = 1, message = "Поле eventId не может быть меньше 1!") @PathVariable("eventId") @Parameter(name = "eventId", description = "ID мероприятия", example = "1") Integer eventId)
+    {
+        return ResponseEntity.ok(
+                RoleMapper.rolesToRoleResponseList(roleService.findEventRolesByUserAndEvent(userId, eventId)));
     }
 
     @Operation(summary = "Поиск ролей по совпадению в названии")
@@ -214,6 +237,17 @@ public class RoleController {
         @Parameter(name = "id", description = "ID роли", example = "1") @PathVariable Integer id) {
         return ResponseEntity.ok().body(
             EventMapper.eventsToEventResponseList(eventRoleService.getEventsByRole(userDetails.getUser().getId(), id))
+        );
+    }
+
+    @Operation(summary = "Получение списка мероприятий пользователя по привилегии")
+    @GetMapping("{privilegeId}/{userId}/events")
+    public ResponseEntity<List<EventResponse>> getEventsByPrivilige(
+            @Parameter(name = "privilegeId", description = "ID привилегии", example = "1") @PathVariable Integer privilegeId,
+            @Positive(message = "Параметр userId не может быть меньше 1!")
+            @Parameter(name = "userId", description = "ID пользователя", example = "1") @PathVariable Integer userId) {
+        return ResponseEntity.ok().body(
+                EventMapper.eventsToEventResponseList(eventRoleService.getEventsByPrivilege(userId, privilegeId))
         );
     }
 }
