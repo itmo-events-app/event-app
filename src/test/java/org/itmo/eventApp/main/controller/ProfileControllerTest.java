@@ -213,17 +213,15 @@ class ProfileControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_user_3.sql");
 
         String expectedJson = """
-            {"total":3,
-            "items":[
-            {"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","type":"EMAIL","roles":["Администратор"]},
-            {"id":2,"name":"test2","surname":"user2","login":"test_mail2@itmo.ru","type":"EMAIL","roles":["Администратор"]},
-            {"id":3,"name":"test3","surname":"user3","login":"test_mail3@itmo.ru","type":"EMAIL","roles":["Администратор"]}
-            ]}
+            {"total":3,"items":[{"id":1,"name":"test","surname":"user","login":"test_mail@itmo.ru","type":"EMAIL","systemRoles":["Администратор"],"eventRoles":{}},
+            {"id":2,"name":"test2","surname":"user2","login":"test_mail2@itmo.ru","type":"EMAIL","systemRoles":["Администратор"],"eventRoles":{}},
+            {"id":3,"name":"test3","surname":"user3","login":"test_mail3@itmo.ru","type":"EMAIL","systemRoles":["Администратор"],"eventRoles":{}}]}
             """;
 
         mockMvc.perform(get("/api/profile/all-system-users")
                 .with(user(getUserLoginInfo())))
             .andExpect(status().isOk())
             .andExpect(content().json(expectedJson));
+
     }
 }

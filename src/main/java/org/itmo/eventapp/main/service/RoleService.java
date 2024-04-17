@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -87,6 +88,17 @@ public class RoleService {
         return roleRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 ExceptionConst.ROLE_ID_NOT_FOUND_MESSAGE.formatted(id)));
+    }
+
+    @Transactional
+    public List<Role> findEventRolesByUserAndEvent(Integer userId, Integer eventId) {
+        ArrayList<Integer> ids = new ArrayList<Integer>(eventRoleRepository.findByUserIdAndEventId(userId, eventId)
+                .stream().map(eventRole -> eventRole.getRole().getId()).toList());
+        return roleRepository.findAllById(ids);
+    }
+
+    public List<Role> findSystemRolesByUser(Integer userId){
+        return userService.findById(userId).getRoles().stream().toList();
     }
 
     public Role findOrganizationalRoleById(Integer id) {

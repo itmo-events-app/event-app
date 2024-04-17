@@ -1,11 +1,12 @@
 package org.itmo.eventapp.main.model.mapper;
 
 import org.itmo.eventapp.main.model.dto.response.UserShortDataResponse;
-import org.itmo.eventapp.main.model.dto.response.UserSystemRoleResponse;
+import org.itmo.eventapp.main.model.dto.response.UserResponse;
 import org.itmo.eventapp.main.model.entity.Role;
 import org.itmo.eventapp.main.model.entity.User;
 
 import java.util.List;
+import java.util.Map;
 
 public class UserMapper {
 
@@ -24,9 +25,8 @@ public class UserMapper {
         );
     }
 
-    public static UserSystemRoleResponse userToUserSystemRoleResponse(User user) {
-        return new UserSystemRoleResponse(
-            // getUserLoginInfo is always not null
+    public static UserResponse userToUserResponse(User user, Map<String, List<String>> rolesByEvent) {
+        return new UserResponse(
             user.getId(),
             user.getName(),
             user.getSurname(),
@@ -34,13 +34,8 @@ public class UserMapper {
             user.getUserLoginInfo().getLoginType(),
             user.getRoles().stream()
                     .map(Role::getName)
-                    .toList()
+                    .toList(),
+            rolesByEvent
         );
-    }
-
-    public static List<UserSystemRoleResponse> usersToUserSystemRoleResponses(List<User> users) {
-        return users.stream()
-            .map(UserMapper::userToUserSystemRoleResponse)
-            .toList();
     }
 }

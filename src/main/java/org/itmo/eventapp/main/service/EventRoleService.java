@@ -6,6 +6,7 @@ import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Privilege;
+import org.itmo.eventapp.main.model.entity.enums.PrivilegeName;
 import org.itmo.eventapp.main.model.entity.enums.RoleType;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
@@ -14,10 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -113,6 +111,16 @@ public class EventRoleService {
         return eventRoleRepository.findAllByEventId(eventId);
     }
 
+    public Map<String, List<String>> findAllUserEventRolesGroupedByEvent(Integer userId) {
+        List<EventRole> userRoles = eventRoleRepository.findAllByUserId(userId);
+        Map<String, List<String>> rolesByEvent = new HashMap<>();
+        for (EventRole eventRole : userRoles) {
+            rolesByEvent.computeIfAbsent(eventRole.getEvent().getTitle(), k -> new ArrayList<>())
+                    .add(eventRole.getRole().getName());
+        }
+        return rolesByEvent;
+    }
+
     @Transactional
     public void saveAll(List<EventRole> eventRoles) {
         eventRoleRepository.saveAll(eventRoles);
@@ -124,6 +132,13 @@ public class EventRoleService {
 
     public List<Event> getEventsByRole(Integer userId, Integer roleId) {
         return EventMapper.eventRolesToEvents(eventRoleRepository.findAllByUserIdAndRoleId(userId, roleId));
+    }
+
+    public List<Event> getEventsByPrivilege(Integer userId, Integer privilegeId) {
+        Privilege privilege = new Privilege();
+        privilege.setId(privilegeId);
+        return EventMapper.eventRolesToEvents(eventRoleRepository
+                .findAllByUserIdAndRolePrivilegesIsContaining(userId, privilege));
     }
 
     public boolean userHasOrganizerRoles(Integer userId) {
