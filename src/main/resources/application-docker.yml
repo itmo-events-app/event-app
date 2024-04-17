@@ -40,9 +40,9 @@ springdoc:
 
 notifications:
   cron:
-    create-notification-job: '0 0/1 * * * *' # каждая 15-я минута каждого часа -- для подробностей смотри https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html
+    create-notification-job: '0 1 * * * *' # каждая 15-я минута каждого часа -- для подробностей смотри https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html
     sending-period-in-minutes: 1 # это число должно совпадать с частотой срабатывания выражения выше, иначе будем отслылать дубликаты
-    delete-notification-job: '0 0/1 * * * *' # каждый понедельник 00:00
+    delete-notification-job: '0 1 * * * *' # каждый понедельник 00:00
     delete-period-in-days: 7
   taskUrl: ${TASK_URL:'http://localhost:8080/task/'}
 
