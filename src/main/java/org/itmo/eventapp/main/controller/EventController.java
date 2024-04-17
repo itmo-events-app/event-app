@@ -24,6 +24,7 @@ import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.model.mapper.EventRoleMapper;
 import org.itmo.eventapp.main.service.EventService;
+import org.itmo.eventapp.main.service.TaskService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,6 +43,7 @@ import java.util.List;
 @Validated
 public class EventController {
     private final EventService eventService;
+    private final TaskService taskService;
 
     @Operation(summary = "Создание активности мероприятия")
     @PreAuthorize("@eventSecurityExpression.canCreateActivity(#eventRequest.parent)")
@@ -152,6 +154,7 @@ public class EventController {
     @PreAuthorize("@eventSecurityExpression.canDeleteEventOrActivity(#id)")
     @Transactional
     public ResponseEntity<Void> deleteEventById(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id) {
+        taskService.deleteAllByEventId(id);
         eventService.deleteEventById(id);
         return ResponseEntity.noContent().build();
     }
