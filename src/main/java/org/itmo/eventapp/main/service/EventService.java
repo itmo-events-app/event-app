@@ -185,6 +185,7 @@ public class EventService {
 
     public void deleteEventById(Integer id) {
         eventRepository.deleteById(id);
+        minioService.deleteImageByPrefix(BUCKET_NAME, id.toString());
     }
 
     public List<Integer> getAllSubEventIds(Integer parentId) {

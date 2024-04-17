@@ -446,12 +446,48 @@ class EventControllerTest extends AbstractTestContainers {
     @Test
     void deleteEventByIdTest() throws Exception {
         setUpEventData();
-        mockMvc.perform(delete("/api/events/1")
+        UserLoginInfo userLoginInfo = getUserLoginInfo();
+        // add one event with image for updating later
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("placeId", "1");
+        params.add("startDate", "2030-03-28T09:00:00");
+        params.add("endDate", "2030-03-28T18:00:00");
+        params.add("title", "itmo-event");
+        params.add("shortDescription", "This is a short description.");
+        params.add("fullDescription", "This is a full description of the event.");
+        params.add("format", "OFFLINE");
+        params.add("status", "PUBLISHED");
+        params.add("registrationStart", "2030-03-01T00:00:00");
+        params.add("registrationEnd", "2030-03-25T23:59:59");
+        params.add("parent", "1");
+        params.add("participantLimit", "50");
+        params.add("participantAgeLowest", "18");
+        params.add("participantAgeHighest", "50");
+        params.add("preparingStart", "2030-03-20T00:00:00");
+        params.add("preparingEnd", "2030-03-27T23:59:59");
+        ClassPathResource imageResource = new ClassPathResource("/images/itmo.jpeg");
+        byte[] content = imageResource.getInputStream().readAllBytes();
+        MockMultipartFile image = new MockMultipartFile("image", "itmo.jpeg", MediaType.IMAGE_JPEG_VALUE, content);
+        mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/events/activity")
+                        .file(image)
+                        .params(params)
+                        .contentType("multipart/form-data")
+                        .with(user(userLoginInfo)))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("3"));
+        boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
+        boolean isObjectExists = isImageExist("3.jpeg");
+        assertThat(isBucketExists).isTrue();
+        assertThat(isObjectExists).isTrue();
+        mockMvc.perform(delete("/api/events/3")
                 .with(user(getUserLoginInfo())))
             .andExpect(status().isNoContent());
-
-        Optional<Event> deletedEvent = eventRepository.findById(1);
+        Optional<Event> deletedEvent = eventRepository.findById(3);
         Assertions.assertFalse(deletedEvent.isPresent());
+        isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
+        isObjectExists = isImageExist("3.jpeg");
+        assertThat(isBucketExists).isTrue();
+        assertThat(isObjectExists).isFalse();
     }
 
     @Test
