@@ -3,7 +3,6 @@ package org.itmo.eventapp.main.exceptionhandling;
 import io.jsonwebtoken.security.SignatureException;
 import io.minio.errors.MinioException;
 import jakarta.validation.ValidationException;
-import org.aspectj.weaver.patterns.HasThisTypePatternTriedToSneakInSomeGenericOrParameterizedTypePatternMatchingStuffAnywhereVisitor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,7 @@ class CommonControllerAdvice {
 
     @ExceptionHandler(ResponseStatusException.class)
     ResponseEntity<String> handleResponseStatusException(ResponseStatusException ex) {
-        return ResponseEntity.status(ex.getStatusCode()).body(ex.getMessage());
+        return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
