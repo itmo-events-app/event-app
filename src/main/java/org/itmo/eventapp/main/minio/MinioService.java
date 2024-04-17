@@ -22,9 +22,9 @@ import java.util.List;
 public class MinioService {
     private final MinioClient minioClient;
 
-    @Value("${server.ip}")
+    @Value("${server.ip:localhost}")
     private String ip;
-    @Value("${minio.port}")
+    @Value("${minio.port:9000}")
     private String minioPort;
 
     @SneakyThrows
