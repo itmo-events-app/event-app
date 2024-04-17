@@ -6,23 +6,25 @@ import io.minio.http.Method;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.itmo.eventapp.main.model.dto.response.FileDataResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class MinioService {
     private final MinioClient minioClient;
 
-    @Value("${server.ip:localhost}")
+    @Value("${server.ip}")
     private String ip;
-    @Value("${minio.port:9000}")
+    @Value("${minio.port}")
     private String minioPort;
 
     @SneakyThrows
@@ -52,7 +54,9 @@ public class MinioService {
     }
 
     private String getUnsignedUrl(String bucketName, String objectName) {
-        return "http://" + ip + ":" + minioPort + "/" + bucketName + "/" + objectName;
+        String url = "http://" + ip + ":" + minioPort + "/" + bucketName + "/" + objectName;
+        log.debug("unsigned url: {}", url);
+        return url;
     }
 
     @SneakyThrows

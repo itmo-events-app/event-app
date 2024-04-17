@@ -1,4 +1,5 @@
 spring.application.name: event-app
+
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -14,10 +15,8 @@ spring:
   mail:
     host: smtp.mail.ru
     port: 465
-    username: username # нерабочая конфигурация, нужны реальные имя и пароль в env
-    password: password # обращаться за данными к @alex_darklol
-    #    username: ${EMAIL_USERNAME}
-    #    password: ${EMAIL_PASSWORD}
+    username: ${EMAIL_USERNAME:username}
+    password: ${EMAIL_PASSWORD:password}
     properties:
       mail:
         smtp:
@@ -28,9 +27,10 @@ spring:
           writetimeout: 5000
 
 minio:
-  url: http://minio:9000
-  accessKey: minio-admin
-  secretKey: minio-admin
+  url: ${MINIO_URL:'http://minio:9000'}
+  port: ${MINIO_PORT:9000}
+  accessKey: ${MINIO_ACCESS_KEY:minio-admin}
+  secretKey: ${MINIO_SECRET_KEY:minio-admin}
 
 springdoc:
   api-docs:
@@ -40,12 +40,10 @@ springdoc:
 
 notifications:
   cron:
-    create-notification-job: '0 0/15 * * * *' # каждая 15-я минута часа -- для подробностей смотри https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html
-    sending-period-in-minutes: 15 # это число должно совпадать с частотой срабатывания выражения выше, иначе будем отслылать дубликаты
-    delete-notification-job: '0 0 0 * * MON' # каждый понедельник 00:00
+    create-notification-job: '0 0/1 * * * *' # каждая 15-я минута каждого часа -- для подробностей смотри https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html
+    sending-period-in-minutes: 1 # это число должно совпадать с частотой срабатывания выражения выше, иначе будем отслылать дубликаты
+    delete-notification-job: '0 0/1 * * * *' # каждый понедельник 00:00
     delete-period-in-days: 7
-  taskUrl: 'http://localhost:8080/task/'
+  taskUrl: ${TASK_URL:'http://localhost:8080/task/'}
 
-rsa:
-  private-key: classpath:certs/private.pem
-  public-key: classpath:certs/public.pem
+server.ip: ${IP:localhost}
