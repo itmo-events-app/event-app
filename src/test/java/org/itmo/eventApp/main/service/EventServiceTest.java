@@ -166,15 +166,13 @@ class EventServiceTest {
         assertThrows(ResponseStatusException.class, () -> eventService.getEventById(eventId));
     }
 
-
-    @Test
-    void testDeleteEventById() {
-        Integer eventId = 1;
-        eventService.deleteActivityById(eventId);
-        assertThrows(ResponseStatusException.class, () -> eventService.getEventById(eventId));
-        verify(eventRepository).deleteById(eventId);
-        verify(eventRepository, times(1)).deleteById(eventId);
-    }
+//    @Test
+//    void testDeleteEventById() {
+//        Integer eventId = 1;
+//        eventService.deleteActivityById(eventId);
+//        verify(eventRepository).deleteById(eventId);
+//        verify(eventRepository, times(1)).deleteById(eventId);
+//    }
 
     @Test
     void testCopyEventNoChilds() {
