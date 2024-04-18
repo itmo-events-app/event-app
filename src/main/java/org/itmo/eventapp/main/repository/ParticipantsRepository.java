@@ -13,4 +13,6 @@ public interface ParticipantsRepository extends JpaRepository<Participant, Integ
 
     Optional<Participant> findByIdAndEventId(Integer id, Integer eventId);
 
+    void deleteAllByEventId(Integer eventId);
+
 }
