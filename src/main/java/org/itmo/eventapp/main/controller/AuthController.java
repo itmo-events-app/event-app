@@ -2,20 +2,20 @@ package org.itmo.eventapp.main.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.LoginRequest;
 import org.itmo.eventapp.main.model.dto.request.NewPasswordRequest;
 import org.itmo.eventapp.main.model.dto.request.RecoveryPasswordRequest;
 import org.itmo.eventapp.main.model.dto.request.RegistrationUserRequest;
 import org.itmo.eventapp.main.model.dto.response.RegistrationRequestForAdmin;
-import org.itmo.eventapp.main.model.validation.annotation.ValidLogin;
 import org.itmo.eventapp.main.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +23,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@Validated
 public class AuthController {
 
     private final AuthenticationService authenticationService;
@@ -41,24 +42,28 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(summary = "Одобрение заявки на регистрацию")
+    @Operation(summary = "Утверждение заявки на регистрацию в системе")
+    @PreAuthorize("@authSecurityExpression.canApproveRegistrationRequest()")
     @PostMapping(value = "/approveRegister/{requestId}")
-    ResponseEntity<Void> approveRegister(@PathVariable("requestId") @Parameter(name = "requestId", description = "ID заявки на регистрацию", example = "1") Integer requestId) {
-        // TODO: check for administrator
+    ResponseEntity<Void> approveRegister(
+        @Positive(message = "Параметр requestId не может быть меньше 1!") @PathVariable("requestId") @Parameter(name = "requestId", description = "ID заявки на регистрацию", example = "1") Integer requestId) {
         authenticationService.approveRegistrationRequestCallback(requestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "Отклонение заявки на регистрацию в системе")
     @PostMapping(value = "/declineRegister/{requestId}")
-    ResponseEntity<Void> declineRegister(@PathVariable("requestId") Integer requestId) {
-        // TODO: check for administrator
+    @PreAuthorize("@authSecurityExpression.canRejectRegistrationRequest()")
+    ResponseEntity<Void> declineRegister(
+        @Positive(message = "Параметр requestId не может быть меньше 1!") @PathVariable("requestId") @Parameter(name = "requestId", description = "ID заявки на регистрацию", example = "1") Integer requestId) {
         authenticationService.declineRegistrationRequestCallback(requestId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "Получение списка всех заявок на регистрацию в системе")
     @GetMapping(value = "/listRegisterRequests")
+    @PreAuthorize("@authSecurityExpression.canApproveRegistrationRequest() or @authSecurityExpression.canRejectRegistrationRequest()")
     ResponseEntity<List<RegistrationRequestForAdmin>> listRegisterRequests() {
-        // TODO: check for administrator
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(authenticationService.listRegisterRequestsCallback());
