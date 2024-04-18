@@ -44,6 +44,6 @@ notifications:
     sending-period-in-minutes: 1 # это число должно совпадать с частотой срабатывания выражения выше, иначе будем отслылать дубликаты
     delete-notification-job: '0 1 * * * *' # каждый понедельник 00:00
     delete-period-in-days: 7
-  taskUrl: ${TASK_URL:'http://localhost:8080/task/'}
+  taskUrl: ${TASK_URL:http://localhost:8080/task/}
 
 server.ip: ${IP:localhost}
