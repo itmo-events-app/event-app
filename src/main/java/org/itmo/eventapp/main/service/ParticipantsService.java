@@ -1,5 +1,6 @@
 package org.itmo.eventapp.main.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -45,9 +46,9 @@ public class ParticipantsService {
         return participant;
     }
 
+    @Transactional
     public List<Participant> setParticipants(Integer eventId, MultipartFile participantsListFile) throws IOException {
-
-        savetoMinio(participantsListFile, eventId);
+        participantsRepository.deleteAllByEventId(eventId);
         List<Participant> participants = new ArrayList<>();
 
         try {
@@ -73,6 +74,7 @@ public class ParticipantsService {
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ExceptionConst.PARTICIPANTS_LIST_PARSING_ERROR);
         }
+        savetoMinio(participantsListFile, eventId);
         return participants;
     }
 

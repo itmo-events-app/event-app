@@ -10,7 +10,7 @@ public record ParticipantPresenceRequest(
     @NotNull(message = "Поле participantId не может быть null!")
     @Schema(example = "67", requiredMode = Schema.RequiredMode.REQUIRED)
     Integer participantId,
-    @NotBlank(message = "Поле isVisited не может быть пустым!")
+    @NotNull(message = "Поле isVisited не может быть пустым!")
     @Schema(example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
     boolean isVisited
 ) {
