@@ -170,7 +170,7 @@ class EventServiceTest {
     @Test
     void testDeleteEventById() {
         Integer eventId = 1;
-        eventService.deleteEventById(eventId);
+        eventService.deleteActivityById(eventId);
         assertThrows(ResponseStatusException.class, () -> eventService.getEventById(eventId));
         verify(eventRepository).deleteById(eventId);
         verify(eventRepository, times(1)).deleteById(eventId);

@@ -183,13 +183,12 @@ public class EventService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
     }
 
-    public void deleteEventById(Integer id) {
+    public void deleteActivityById(Integer id) {
 
-        List<Integer> activityIds = getAllSubEventIds(id);
-        for (Integer activityId: activityIds) {
-            minioService.deleteImageByPrefix(BUCKET_NAME, activityId.toString());
+        Event activity = this.getEventById(id);
+        if (activity.getParent() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.EVENT_DELETION_FORBIDDEN_MESSAGE);
         }
-        eventRepository.deleteAllById(activityIds);
         minioService.deleteImageByPrefix(BUCKET_NAME, id.toString());
         eventRepository.deleteById(id);
 

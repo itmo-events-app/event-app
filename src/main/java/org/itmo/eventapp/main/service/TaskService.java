@@ -141,21 +141,18 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-    public void deleteAllByEventId(Integer eventId) {
+    public void deleteAllByActivityId(Integer eventId) {
 
-        List<Integer> activityIds = eventService.getAllSubEventIds(eventId);
-        List<Integer> idsWithParent = new ArrayList<>();
-        idsWithParent.add(eventId);
-        idsWithParent.addAll(activityIds);
-
-        for (Integer activityId : idsWithParent) {
-            List<Task> tasksToDelete = taskRepository.findAllByEventId(activityId);
-            for (Task task : tasksToDelete) {
-                minioService.deleteImageByPrefix(BUCKET_NAME, task.getId().toString());
-            }
-            taskRepository.deleteAll(tasksToDelete);
+        Event activity = eventService.getEventById(eventId);
+        if (activity.getParent() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.EVENT_DELETION_FORBIDDEN_MESSAGE);
         }
 
+        List<Task> tasksToDelete = taskRepository.findAllByEventId(eventId);
+        for (Task task : tasksToDelete) {
+            minioService.deleteImageByPrefix(BUCKET_NAME, task.getId().toString());
+        }
+        taskRepository.deleteAll(tasksToDelete);
     }
 
 
