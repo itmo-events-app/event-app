@@ -87,7 +87,7 @@ public class UserService {
         String cnfPassword = request.confirmNewPassword();
 
         // Проверяем, что новый пароль совпадает с подтверждением
-        if (!request.newPassword().equals(request.confirmNewPassword())) {
+        if (!newPassword.equals(cnfPassword)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.USER_PASSWORD_MISMATCH_MESSAGE);
         }
 
