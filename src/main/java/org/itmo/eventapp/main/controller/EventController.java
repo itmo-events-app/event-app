@@ -149,13 +149,13 @@ public class EventController {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.getEventById(id)));
     }
 
-    @Operation(summary = "Удаление мероприятия")
+    @Operation(summary = "Удаление активности")
     @DeleteMapping("/{id}")
     @PreAuthorize("@eventSecurityExpression.canDeleteEventOrActivity(#id)")
     @Transactional
-    public ResponseEntity<Void> deleteEventById(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id) {
-        taskService.deleteAllByEventId(id);
-        eventService.deleteEventById(id);
+    public ResponseEntity<Void> deleteActivityById(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID активности", example = "1") Integer id) {
+        taskService.deleteAllByActivityId(id);
+        eventService.deleteActivityById(id);
         return ResponseEntity.noContent().build();
     }
 
