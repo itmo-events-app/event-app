@@ -19,11 +19,11 @@ IP - ip сервера, на котором запущено приложени�
 <br>
 
 В случае отсутствия будут применены следующие значения по умолчанию:  
-EMAIL_USERNAME=itmo.event-app@mail.ru  
-EMAIL_PASSWORD=TrXn37gvRKwAMfRmtdRd  
+EMAIL_USERNAME=username  
+EMAIL_PASSWORD=password  
 MINIO_URL=http://minio:9000  
 MINIO_PORT=9000  
 MINIO_ACCESS_KEY=minio-admin  
 MINIO_SECRET_KEY=minio-admin  
 TASK_URL=http://localhost:8080/task/  
-IP=158.160.165.10  
+IP=localhost
