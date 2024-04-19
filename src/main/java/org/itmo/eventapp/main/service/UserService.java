@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,6 +27,8 @@ public class UserService {
     private final UserLoginInfoService userLoginInfoService;
     private final UserNotificationInfoService userNotificationInfoService;
     private final UserPasswordRecoveryInfoService userPasswordRecoveryInfoService;
+
+    private final AuthenticationManager authenticationManager;
 
     public User findById(Integer id) {
         return userRepository.findById(id)
@@ -78,9 +82,26 @@ public class UserService {
     public void changePassword(String login, UserChangePasswordRequest request) {
         User user = userLoginInfoService.findByLogin(login).getUser();
 
+        String oldPassword = request.oldPassword();
+        String newPassword = request.newPassword();
+        String cnfPassword = request.confirmNewPassword();
+
         // Проверяем, что новый пароль совпадает с подтверждением
-        if (!request.newPassword().equals(request.confirmNewPassword())) {
+        if (!newPassword.equals(cnfPassword)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.USER_PASSWORD_MISMATCH_MESSAGE);
+        }
+
+        // Проверяем, что текущий и новый пароль не совпадают
+        if (newPassword.equals(oldPassword)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.USER_PASSWORD_UNCHANGED_MESSAGE);
+        }
+
+        // Проверяем, что верно введен старый пароль
+        try {
+            var authentication = new UsernamePasswordAuthenticationToken(login, oldPassword);
+            authenticationManager.authenticate(authentication);
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.USER_AUTHENTICATION_FAIL_MESSAGE);
         }
 
         userLoginInfoService.setPassword(user.getUserLoginInfo(), request.newPassword());
