@@ -12,3 +12,5 @@ insert into user_login_info (user_id, login, login_status, login_type, password_
 values (1, 'admin_mail@itmo.ru', 'APPROVED', 'EMAIL', '$2a$10$DP4EvNpQKbgSwi68DGyZcOeK.t12oCxd1D0ZC09LVZb69wqYE8u0K', 'reset token', (select now()), 1);
 
 insert into user_role (user_id, role_id) values (1, 1);
+
+insert into login_attempts (login, attempts, lockout_expired) values ('admin_mail@itmo.ru', 0, '2025-12-01')

@@ -76,7 +76,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @Operation(summary = "Запрос на валидацию токена")
+    @Operation(summary = "Запрос на валидацию токена при восстановлении пароля")
     @PostMapping("/validateRecoveryToken")
     ResponseEntity<Void> validateRecoveryToken(@NotBlank(message = "Токен отсутствует")
                                                @RequestParam
@@ -93,18 +93,21 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @Operation(summary = "Отправка запроса на верификацию email")
     @PostMapping("/sendVerificationEmail")
     ResponseEntity<Void> sendVerificationEmail(@RequestParam String returnUrl) {
         authenticationService.sendVerificationEmail(returnUrl);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @Operation(summary = "Запрос на валидацию токена при верификации")
     @PostMapping("/validateEmailVerificationToken")
     ResponseEntity<Void> validateEmailVerificationToken(@RequestParam String token) {
         authenticationService.validateEmailVerificationToken(token);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @Operation(summary = "Запрос на верификацию email")
     @PostMapping("/verifyEmail")
     ResponseEntity<Void> verifyEmail() {
         authenticationService.verifyEmail();

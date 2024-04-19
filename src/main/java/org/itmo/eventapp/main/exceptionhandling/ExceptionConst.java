@@ -34,6 +34,8 @@ public class ExceptionConst {
     @SuppressWarnings("java:S2068")
     public static final String USER_PASSWORD_MISMATCH_MESSAGE = "Пароли не совпадают";
 
+    public static final String REDUNDANT_PASSWORD_RECOVERY = "Старый и новый пароли не должны совпадать";
+
     public static final String NOTIFICATION_ERROR_MESSAGE = "Ошибка получения уведомления, пожалуйста, обновите страницу";
 
     public static final String TASK_NOT_FOUND_MESSAGE = "Задача не найдена";
@@ -58,6 +60,8 @@ public class ExceptionConst {
     public static final String EVENT_REGISTRATION_START_TO_END_VALIDATION = "Время начала регистрации на мероприятие не может быть после времени конца регистрации на мероприятие";
     public static final String EVENT_PREPARATION_START_TO_END_VALIDATION = "Время начала подготовки мероприятия не может быть после времени конца подготовки мероприятия";
     public static final String TASK_NOTIFICATION_TO_DEADLINE_VALIDATION = "Время уведолмения об исполнении задачи не может быть после времени срока выполнения задачи";
+    public static final String LOGIN_ATTEMPTS_NOT_FOUND = "Информация о блокировках пользователя не найдена";
+    public static final String USER_BLOCKED = "Пользователь заблокирован. Повторите попытку позже.";
 
     private ExceptionConst() {
     }
