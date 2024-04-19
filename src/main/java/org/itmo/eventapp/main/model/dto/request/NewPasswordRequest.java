@@ -13,7 +13,7 @@ import org.itmo.eventapp.main.model.validation.annotation.StrongPassword;
 public record NewPasswordRequest(
 
         @NotBlank(message = "Должен присутствовать токен")
-        @Schema(example = "c5b7bcc0-cffe-4f57-853c-7fa18e56b36d", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(example = "c5b7bcc0-cffe-4f57-853c-7fa18e56b36d", requiredMode = Schema.RequiredMode.REQUIRED)
         String token,
 
         @NotBlank(message = "Поле пароля не должно быть пустым")

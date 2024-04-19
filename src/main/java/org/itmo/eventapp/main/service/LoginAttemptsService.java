@@ -31,17 +31,10 @@ public class LoginAttemptsService {
     }
 
     public boolean checkIsUserNonBlocked(String login) {
-        var attemptsOpt = loginAttemptsRepository.findByLogin(login);
+        var attempts = findByLogin(login);
 
-        if (attemptsOpt.isPresent()) {
-            var attempts = attemptsOpt.get();
-
-            if (attempts.getAttempts() == MAX_ATTEMPTS
-                    && attempts.getLockoutExpired().isAfter(LocalDateTime.now())) {
-                return false;
-            }
-        }
-        return true;
+        return attempts.getAttempts() != MAX_ATTEMPTS
+                || !attempts.getLockoutExpired().isAfter(LocalDateTime.now());
     }
 
     public void clearUserAttempts(String login) {
@@ -52,23 +45,17 @@ public class LoginAttemptsService {
 
     public boolean incrementUserAttempts(String login) {
 
-        var attemptsOpt = loginAttemptsRepository.findByLogin(login);
+        var attempts = findByLogin(login);
 
-        if (attemptsOpt.isPresent()) {
-            var attempts = attemptsOpt.get();
-
-            if (attempts.getAttempts() == MAX_ATTEMPTS) {
-
-                if (attempts.getLockoutExpired().isBefore(LocalDateTime.now())) {
-                    blockUser(attempts);
-                    return false;
-                }
-            }
-
-            attempts.setAttempts(attempts.getAttempts() + 1);
-
-            loginAttemptsRepository.save(attempts);
+        if (attempts.getAttempts() == MAX_ATTEMPTS
+                && attempts.getLockoutExpired().isBefore(LocalDateTime.now())) {
+                blockUser(attempts);
+                return false;
         }
+
+        attempts.setAttempts(attempts.getAttempts() + 1);
+        loginAttemptsRepository.save(attempts);
+
         return true;
     }
 

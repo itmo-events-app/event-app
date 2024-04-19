@@ -1,3 +1,4 @@
+truncate table login_attempts cascade;
 delete from role_privilege where id > 61;   -- Number of roles-privilege relations = 61
 truncate table user_role cascade;           -- Admin (21) ; Reader (6) ; Organizer (25) ; Assistant (9) ;
 delete from role where id > 4;              -- Number of basic roles = 4
@@ -12,7 +13,6 @@ truncate table user_login_info cascade;
 truncate table user_t cascade;
 truncate table user_notification_info cascade;
 truncate table registration_request cascade;
-truncate table login_attempts cascade;
 
 -- reset id sequences
 alter sequence task_id_seq restart with 1;
