@@ -12,6 +12,7 @@ truncate table user_login_info cascade;
 truncate table user_t cascade;
 truncate table user_notification_info cascade;
 truncate table registration_request cascade;
+truncate table login_attempts cascade;
 
 -- reset id sequences
 alter sequence task_id_seq restart with 1;
@@ -27,6 +28,7 @@ alter sequence user_t_id_seq restart with 1;
 alter sequence user_notification_info_id_seq restart with 1;
 alter sequence registration_request_id_seq restart with 1;
 alter sequence user_role_id_seq restart with 1;
+after sequence login_attempts restart with 1;
 alter sequence role_privilege_id_seq restart with 63;   -- Number of roles-privilege relations = 61
                                                         -- Admin (21) ; Reader (6) ; Organizer (25) ; Assistant (9) ;
 alter sequence role_id_seq restart with 5;              -- Number of basic roles = 4
