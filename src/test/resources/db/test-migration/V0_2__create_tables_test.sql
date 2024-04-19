@@ -153,3 +153,11 @@ create table if not exists user_email_verification_info(
     user_id integer not null references user_t(id),
     expiry_date timestamp not null
 );
+
+create table if not exists login_attempts
+(
+    id int generated always as identity primary key not null,
+    login varchar(256) not null unique,
+    attempts int not null,
+    lockout_expired timestamp not null
+);
