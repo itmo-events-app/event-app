@@ -34,6 +34,7 @@ public class ExceptionConst {
     @SuppressWarnings("java:S2068")
     public static final String USER_PASSWORD_MISMATCH_MESSAGE = "Пароли не совпадают";
 
+    @SuppressWarnings("java:S2068")
     public static final String REDUNDANT_PASSWORD_RECOVERY = "Старый и новый пароли не должны совпадать";
 
     public static final String NOTIFICATION_ERROR_MESSAGE = "Ошибка получения уведомления, пожалуйста, обновите страницу";
