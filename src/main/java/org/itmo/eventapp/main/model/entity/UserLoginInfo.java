@@ -51,6 +51,9 @@ public class UserLoginInfo implements UserDetails {
 
     private LocalDateTime lastLoginDate;
 
+    @OneToOne(mappedBy = "userLoginInfo", fetch = FetchType.EAGER)
+    private LoginAttempts loginAttempts;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new ArrayList<GrantedAuthority>();
@@ -73,7 +76,8 @@ public class UserLoginInfo implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return loginAttempts.getAttempts() != 5
+                || loginAttempts.getLockoutExpired().isBefore(LocalDateTime.now());
     }
 
     @Override

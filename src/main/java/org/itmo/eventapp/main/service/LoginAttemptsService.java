@@ -20,7 +20,8 @@ public class LoginAttemptsService {
     private final LoginAttemptsRepository loginAttemptsRepository;
 
     public LoginAttempts findByLogin(String login) {
-        return loginAttemptsRepository.findByLogin(login)
+
+        return loginAttemptsRepository.findByUserLoginInfo_Login(login)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.LOGIN_ATTEMPTS_NOT_FOUND));
     }
 
@@ -30,33 +31,21 @@ public class LoginAttemptsService {
         loginAttemptsRepository.save(attempts);
     }
 
-    public boolean checkIsUserNonBlocked(String login) {
-        var attempts = findByLogin(login);
-
-        return attempts.getAttempts() != MAX_ATTEMPTS
-                || !attempts.getLockoutExpired().isAfter(LocalDateTime.now());
-    }
-
     public void clearUserAttempts(String login) {
         LoginAttempts attempts = findByLogin(login);
         attempts.setAttempts(0);
         loginAttemptsRepository.save(attempts);
     }
 
-    public boolean incrementUserAttempts(String login) {
-
+    public void incrementUserAttempts(String login) {
         var attempts = findByLogin(login);
 
-        if (attempts.getAttempts() == MAX_ATTEMPTS
-                && attempts.getLockoutExpired().isBefore(LocalDateTime.now())) {
+        if (attempts.getAttempts() == MAX_ATTEMPTS) {
                 blockUser(attempts);
-                return false;
         }
 
         attempts.setAttempts(attempts.getAttempts() + 1);
         loginAttemptsRepository.save(attempts);
-
-        return true;
     }
 
     public void save(LoginAttempts attempts) {

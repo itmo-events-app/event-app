@@ -157,7 +157,7 @@ create table if not exists user_email_verification_info(
 create table if not exists login_attempts
 (
     id int generated always as identity primary key not null,
-    login varchar(256) not null unique,
+    user_login_info_id integer not null references user_login_info(id),
     attempts int not null,
     lockout_expired timestamp not null
 );

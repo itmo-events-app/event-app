@@ -20,7 +20,9 @@ public class LoginAttempts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 
-    private String login;
+    @OneToOne
+    @JoinColumn(name = "user_login_info_id")
+    private UserLoginInfo userLoginInfo;
 
     private Integer attempts;
 

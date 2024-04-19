@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,11 +52,6 @@ public class AuthenticationService {
     private MailSenderService mailSenderService;
 
     public String login(LoginRequest loginRequest) {
-
-        if (!loginAttemptsService.checkIsUserNonBlocked(loginRequest.login())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.USER_BLOCKED);
-        }
-
         try {
 
             var authentication =
@@ -63,19 +59,19 @@ public class AuthenticationService {
             authenticationManager.authenticate(authentication);
 
             var userLoginInfo = userLoginInfoService.findByLogin(loginRequest.login());
+
             userLoginInfoService.setLastLoginDate(userLoginInfo, LocalDateTime.now());
 
             loginAttemptsService.clearUserAttempts(loginRequest.login());
 
             return jwtTokenUtil.generateToken(loginRequest.login());
         }
-        catch (Exception ex) {
-
-            if (!loginAttemptsService.incrementUserAttempts(loginRequest.login())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.USER_BLOCKED);
-            }
-
+        catch (BadCredentialsException ex) {
+            loginAttemptsService.incrementUserAttempts(loginRequest.login());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.USER_NOT_FOUND_MESSAGE);
+        }
+        catch (LockedException ex) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ExceptionConst.USER_BLOCKED);
         }
     }
 
@@ -142,8 +138,9 @@ public class AuthenticationService {
         registrationRequestService.save(request);
 
         LoginAttempts loginAttempts = LoginAttempts.builder()
-                .login(request.getEmail())
+                .userLoginInfo(loginInfo)
                 .attempts(0)
+                .lockoutExpired(LocalDateTime.now())
                 .build();
 
         loginAttemptsService.save(loginAttempts);

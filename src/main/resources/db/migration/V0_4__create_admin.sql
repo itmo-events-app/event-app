@@ -13,4 +13,4 @@ values (1, 'admin_mail@itmo.ru', 'APPROVED', 'EMAIL', '$2a$10$DP4EvNpQKbgSwi68DG
 
 insert into user_role (user_id, role_id) values (1, 1);
 
-insert into login_attempts (login, attempts, lockout_expired) values ('admin_mail@itmo.ru', 0, '2025-12-01')
+insert into login_attempts (user_login_info_id, attempts, lockout_expired) values (1, 0, '2023-12-01')
