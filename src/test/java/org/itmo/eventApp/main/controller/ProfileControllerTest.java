@@ -60,7 +60,7 @@ class ProfileControllerTest extends AbstractTestContainers {
     void testChangePassword() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
 
-        UserChangePasswordRequest request = new UserChangePasswordRequest("old123passwordNEW!", "123passwordNEW!", "123passwordNEW!");
+        UserChangePasswordRequest request = new UserChangePasswordRequest("password", "123passwordNEW!", "123passwordNEW!");
         mockMvc.perform(put("/api/profile/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
