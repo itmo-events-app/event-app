@@ -134,7 +134,7 @@ public class TaskSecurityExpression {
         ).collect(Collectors.toSet());
 
         if (eventIds.size() == 1 && eventIds.stream().toList().get(0).equals(eventId)) {
-            boolean canEdit = miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.EDIT_TASK);
+            boolean canEdit = miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.CREATE_TASK);
             boolean canSee = miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.VIEW_ALL_EVENT_TASKS);
             return canSee && canEdit;
 
