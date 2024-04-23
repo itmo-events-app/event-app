@@ -38,10 +38,15 @@ public class LoginAttemptsService {
     }
 
     public void incrementUserAttempts(String login) {
-        var attempts = findByLogin(login);
+        var attemptsOpt = loginAttemptsRepository.findByUserLoginInfo_Login(login);
+
+        if (attemptsOpt.isEmpty()) return;
+
+        var attempts = attemptsOpt.get();
 
         if (attempts.getAttempts() == MAX_ATTEMPTS) {
                 blockUser(attempts);
+                return;
         }
 
         attempts.setAttempts(attempts.getAttempts() + 1);
