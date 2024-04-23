@@ -125,22 +125,23 @@ public class TaskSecurityExpression {
 
     }
 
+
     public boolean getCanCopyTasks(int dstEventId, List<Integer> taskIds) {
 
         int eventId = miscSecurityExpression.getParentEventOrSelfId(dstEventId);
+        boolean canCreate = miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.CREATE_TASK);
+        if (!canCreate) return false;
 
         Set<Integer> eventIds = taskService.findAllById(taskIds).stream().map(
-            task -> miscSecurityExpression.getParentEventOrSelfId(task.getEvent().getId())
+                task -> miscSecurityExpression.getParentEventOrSelfId(task.getEvent().getId())
         ).collect(Collectors.toSet());
 
-        if (eventIds.size() == 1 && eventIds.stream().toList().get(0).equals(eventId)) {
-            boolean canEdit = miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.CREATE_TASK);
-            boolean canSee = miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.VIEW_ALL_EVENT_TASKS);
-            return canSee && canEdit;
-
+        for (Integer evId: eventIds) {
+            boolean canSee = miscSecurityExpression.checkEventPrivilege(evId, PrivilegeName.VIEW_ALL_EVENT_TASKS);
+            if (!canSee) return false;
         }
 
-        return false;
+        return true;
 
     }
 }

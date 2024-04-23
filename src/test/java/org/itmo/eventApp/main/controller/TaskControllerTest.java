@@ -697,32 +697,6 @@ class TaskControllerTest extends AbstractTestContainers {
 
 
     @Test
-    void taskInvalidCopyTest() throws Exception {
-        executeSqlScript("/sql/insert_user.sql");
-        executeSqlScript("/sql/insert_user_2.sql");
-        executeSqlScript("/sql/insert_place.sql");
-        executeSqlScript("/sql/insert_event.sql");
-        executeSqlScript("/sql/insert_event_3.sql");
-        executeSqlScript("/sql/insert_event_role_1.sql");
-        executeSqlScript("/sql/insert_event_role_2.sql");
-        executeSqlScript("/sql/insert_task.sql");
-
-        Task task = taskRepository.findById(1).orElseThrow();
-        Assertions.assertEquals(1, task.getEvent().getId());
-
-        mockMvc.perform(post("/api/tasks/event/2")
-                .content("[1]")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(user(getUserLoginInfo())))
-            .andExpect(status().isForbidden());
-
-        Assertions.assertFalse(taskRepository.findById(2).isPresent());
-        task = taskRepository.findById(1).orElseThrow();
-        Assertions.assertEquals(1, task.getEvent().getId());
-
-    }
-
-    @Test
     void taskGetAllInEventTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
         executeSqlScript("/sql/insert_user_2.sql");
