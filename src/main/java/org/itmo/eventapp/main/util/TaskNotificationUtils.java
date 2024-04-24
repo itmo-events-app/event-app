@@ -34,12 +34,14 @@ public class TaskNotificationUtils {
             task.getAssignee().getId(),
             taskFullUrl + task.getId().toString());
 
-        mailSenderService.sendIncomingTaskMessage(
-            task.getAssignee().getUserLoginInfo().getLogin(),
-            task.getAssignee().getName(),
-            task.getEvent().getTitle(),
-            task.getTitle(),
-            taskFullUrl + task.getId().toString());
+        if (task.getAssignee().getUserNotificationInfo().isEnableEmailNotifications()) {
+            mailSenderService.sendIncomingTaskMessage(
+                    task.getAssignee().getUserLoginInfo().getLogin(),
+                    task.getAssignee().getName(),
+                    task.getEvent().getTitle(),
+                    task.getTitle(),
+                    taskFullUrl + task.getId().toString());
+        }
     }
 
     @Async
@@ -58,19 +60,23 @@ public class TaskNotificationUtils {
             task.getAssigner().getId(),
             taskFullUrl + task.getId().toString());
 
-        mailSenderService.sendOverdueTaskMessage(
-            task.getAssignee().getUserLoginInfo().getLogin(),
-            task.getAssignee().getName(),
-            task.getEvent().getTitle(),
-            task.getTitle(),
-            taskFullUrl + task.getId().toString());
+        if (task.getAssignee().getUserNotificationInfo().isEnableEmailNotifications()) {
+            mailSenderService.sendOverdueTaskMessage(
+                    task.getAssignee().getUserLoginInfo().getLogin(),
+                    task.getAssignee().getName(),
+                    task.getEvent().getTitle(),
+                    task.getTitle(),
+                    taskFullUrl + task.getId().toString());
+        }
 
-        mailSenderService.sendOverdueTaskMessage(
-            task.getAssigner().getUserLoginInfo().getLogin(),
-            task.getAssigner().getName(),
-            task.getEvent().getTitle(),
-            task.getTitle(),
-            taskFullUrl + task.getId().toString());
+        if (task.getAssigner().getUserNotificationInfo().isEnableEmailNotifications()) {
+            mailSenderService.sendOverdueTaskMessage(
+                    task.getAssigner().getUserLoginInfo().getLogin(),
+                    task.getAssigner().getName(),
+                    task.getEvent().getTitle(),
+                    task.getTitle(),
+                    taskFullUrl + task.getId().toString());
+        }
     }
 
     @Async
@@ -85,11 +91,13 @@ public class TaskNotificationUtils {
             task.getAssignee().getId(),
             taskFullUrl + task.getId().toString());
 
-        mailSenderService.sendReminderTaskMessage(
-            task.getAssignee().getUserLoginInfo().getLogin(),
-            task.getAssignee().getName(),
-            task.getEvent().getTitle(),
-            task.getTitle(),
-            taskFullUrl + task.getId().toString());
+        if (task.getAssignee().getUserNotificationInfo().isEnableEmailNotifications()) {
+            mailSenderService.sendReminderTaskMessage(
+                    task.getAssignee().getUserLoginInfo().getLogin(),
+                    task.getAssignee().getName(),
+                    task.getEvent().getTitle(),
+                    task.getTitle(),
+                    taskFullUrl + task.getId().toString());
+        }
     }
 }

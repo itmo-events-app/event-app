@@ -32,31 +32,6 @@ import java.util.List;
 public class NotificationController {
     private final NotificationService notificationService;
 
-//    @Operation(summary = "Получение списка всех уведомлений")
-//    @ApiResponses(
-//            value = {
-//                    @ApiResponse(
-//                            responseCode = "200",
-//                            content = {
-//                                    @Content(
-//                                            mediaType = "application/json",
-//                                            array = @ArraySchema(schema = @Schema(implementation = NotificationResponse.class)))
-//                            })
-//            })
-//    @GetMapping
-//    public ResponseEntity<List<NotificationResponse>> getAllNotifications(
-//            @AuthenticationPrincipal UserLoginInfo userDetails,
-//            @RequestParam(name = "page") @Min(0) @Parameter(name = "page", description = "Номер страницы, с которой начать показ уведомлений", example = "0") Integer page,
-//            @RequestParam(name = "size") @Min(1) @Max(25) @Parameter(name = "size", description = "Число уведомлений на странице", example = "15") Integer size
-//    ) {
-//        List<Notification> notifications = notificationService.getAllByUserId(userDetails.getUser().getId(), page, size);
-//        List<NotificationResponse> responseBody = new ArrayList<>();
-//        for (Notification notification: notifications) {
-//            responseBody.add(NotificationMapper.notificationToNotificationResponse(notification));
-//        }
-//        return ResponseEntity.ok(responseBody);
-//    }
-
     @Operation(summary = "Получение списка всех уведомлений")
     @ApiResponses(
         value = {

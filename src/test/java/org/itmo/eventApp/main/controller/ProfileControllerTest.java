@@ -122,8 +122,8 @@ class ProfileControllerTest extends AbstractTestContainers {
             .andExpect(MockMvcResultMatchers.jsonPath("$.userInfo[0].login").value("test_mail@itmo.ru"))
             .andExpect(MockMvcResultMatchers.jsonPath("$.userInfo[0].type").value("EMAIL"))
             .andExpect(MockMvcResultMatchers.jsonPath("$.lastLoginDate").exists())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.enablePushNotifications").value(false))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.enableEmailNotifications").value(false))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.enablePushNotifications").value(true))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.enableEmailNotifications").value(true))
             .andExpect(MockMvcResultMatchers.jsonPath("$.devices").isArray());
     }
 

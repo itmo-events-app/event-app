@@ -39,9 +39,11 @@ class TaskNotificationUtilsTest extends AbstractTestContainers {
             .title("TestTask")
             .event(Event.builder().title("EventTitle").build())
             .assignee(User.builder().id(1).name("HelperName")
-                .userLoginInfo(UserLoginInfo.builder().login("test_mail@itmo.ru").build()).build())
+                .userLoginInfo(UserLoginInfo.builder().login("test_mail@itmo.ru").build())
+                .userNotificationInfo(UserNotificationInfo.builder().enableEmailNotifications(true).build()).build())
             .assigner(User.builder().id(2).name("OrganizerName")
-                .userLoginInfo(UserLoginInfo.builder().login("test_mail1@itmo.ru").build()).build())
+                .userLoginInfo(UserLoginInfo.builder().login("test_mail1@itmo.ru").build())
+                .userNotificationInfo(UserNotificationInfo.builder().enableEmailNotifications(true).build()).build())
             .build();
     }
 
