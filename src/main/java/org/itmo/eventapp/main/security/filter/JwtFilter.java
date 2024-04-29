@@ -1,6 +1,7 @@
 package org.itmo.eventapp.main.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
@@ -73,6 +74,17 @@ public class JwtFilter extends OncePerRequestFilter {
             ExceptionResponse errorResponse = ExceptionResponse.builder()
                     .statusCode(HttpServletResponse.SC_BAD_REQUEST)
                     .description("Ошибка валидации токена.")
+                    .build();
+
+            ObjectMapper mapper = new ObjectMapper();
+            response.getWriter().write(mapper.writeValueAsString(errorResponse));
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json; charset=UTF-8");
+
+            ExceptionResponse errorResponse = ExceptionResponse.builder()
+                    .statusCode(HttpServletResponse.SC_UNAUTHORIZED)
+                    .description("Срок действия токена истек")
                     .build();
 
             ObjectMapper mapper = new ObjectMapper();
