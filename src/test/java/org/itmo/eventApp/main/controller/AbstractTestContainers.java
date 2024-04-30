@@ -126,7 +126,6 @@ public abstract class AbstractTestContainers {
     protected void executeSqlScript(String sqlFileName) {
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
         resourceDatabasePopulator.addScript(new ClassPathResource(sqlFileName));
-//        resourceDatabasePopulator.setSeparator("@@");
         resourceDatabasePopulator.setSqlScriptEncoding("UTF-8");
         resourceDatabasePopulator.execute(dataSource);
     }

@@ -18,11 +18,11 @@ import java.util.function.Function;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenUtil {
-    @Value("${security.secret}")
-    private static String SECRET;
+    @Value("${security.secret:HellMegaSecretKeyForItmoEventAppNoOneShouldKnowItKeepYourMouthShut}")
+    private String SECRET;
 
-    @Value("${security.jwt-token.lifetime:60*24*365}")
-    private static int MINUTES;
+    @Value("${security.jwt-token.lifetime:60}")
+    private int MINUTES;
 
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder().setSigningKey(createSigningKey()).build()

@@ -51,4 +51,4 @@ server.ip: ${IP:localhost}
 security:
   secret: ${SECURITY_SECRET:HellMegaSecretKeyForItmoEventAppNoOneShouldKnowItKeepYourMouthShut}
   jwt-token:
-    lifetime: ${JWT_LIFETIME:60*24*365}
+    lifetime: ${JWT_LIFETIME:60}
