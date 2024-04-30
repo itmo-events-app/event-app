@@ -14,6 +14,8 @@ MINIO_ACCESS_KEY - логин от консоли minio.
 MINIO_SECRET_KEY - пароль от консоли minio.  
 TASK_URL - url, по которому можно обратиться к задаче, без id задачи.  
 IP - ip сервера, на котором запущено приложение.  
+SECURITY_SECRET - строка для шифрования jwt токена
+JWT_LIFETIME - время жизни jwt токена в минутах
 <br>
 <div style="text-align:left"><img src=../images/env-docker-compose.png/></div>
 <br>
@@ -27,3 +29,5 @@ MINIO_ACCESS_KEY=minio-admin
 MINIO_SECRET_KEY=minio-admin  
 TASK_URL=http://localhost:8080/task/  
 IP=localhost
+SECURITY_SECRET=HellMegaSecretKeyForItmoEventAppNoOneShouldKnowItKeepYourMouthShut
+JWT_LIFETIME=60*24*365

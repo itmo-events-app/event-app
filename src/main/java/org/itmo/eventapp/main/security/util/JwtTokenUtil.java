@@ -5,10 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Key;
 import java.time.Instant;
@@ -19,15 +18,15 @@ import java.util.function.Function;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenUtil {
+    @Value("${security.secret:HellMegaSecretKeyForItmoEventAppNoOneShouldKnowItKeepYourMouthShut}")
+    private String SECRET;
 
-    private static final String SECRET = "HellMegaSecretKeyForItmoEventAppNoOneShouldKnowItKeepYourMouthShut";
-    private static final Key SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET));
-    private static final int MINUTES = 60 * 24 * 365;
+    @Value("${security.jwt-token.lifetime:60}")
+    private int MINUTES;
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build()
-                .parseClaimsJws(token).getBody();
-
+        return Jwts.parserBuilder().setSigningKey(createSigningKey()).build()
+            .parseClaimsJws(token).getBody();
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -53,14 +52,17 @@ public class JwtTokenUtil {
     }
 
     public String generateToken(String login) {
-
         var now = Instant.now();
 
         return Jwts.builder()
             .setSubject(login)
             .setIssuedAt(Date.from(now))
             .setExpiration(Date.from(now.plus(MINUTES, ChronoUnit.MINUTES)))
-            .signWith(SECRET_KEY)
+            .signWith(createSigningKey())
             .compact();
+    }
+
+    private Key createSigningKey() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET));
     }
 }
