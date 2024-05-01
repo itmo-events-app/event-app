@@ -59,7 +59,7 @@ public class TaskController {
     }
 
     @Operation(summary = "Редактирование задачи")
-    @PreAuthorize("@taskSecurityExpression.canEditTask(#taskRequest.eventId)")
+    @PreAuthorize("@taskSecurityExpression.canEditTask(#id)")
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponse> taskEdit(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
                                                  @PathVariable @Parameter(name = "id", description = "ID задачи", example = "1") Integer id,
@@ -173,7 +173,7 @@ public class TaskController {
     /*TODO: TEST*/
 
     @Operation(summary = "Перемещение списка задач")
-    @PreAuthorize("@taskSecurityExpression.canEditTask(#dstEventId)")
+    @PreAuthorize("@taskSecurityExpression.canEditTaskInEvent(#dstEventId)")
     @PutMapping("/event/{dstEventId}")
     public ResponseEntity<List<TaskResponse>> taskListMove(
         @Min(value = 1, message = "Параметр dstEventId не может быть меньше 1!")

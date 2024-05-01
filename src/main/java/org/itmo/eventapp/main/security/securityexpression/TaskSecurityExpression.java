@@ -35,7 +35,14 @@ public class TaskSecurityExpression {
         return miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.CREATE_TASK);
     }
 
-    public boolean canEditTask(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!") int eventId) {
+    public boolean canEditTask(@Min(value = 1, message = "Параметр taskId не может быть меньше 1!") int taskId) {
+
+        int eventId = getTaskParentEventId(taskId);
+        return miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.EDIT_TASK);
+
+    }
+
+    public boolean canEditTaskInEvent(@Min(value = 1, message = "Параметр eventId не может быть меньше 1!") int eventId) {
 
         eventId = miscSecurityExpression.getParentEventOrSelfId(eventId);
         return miscSecurityExpression.checkEventPrivilege(eventId, PrivilegeName.EDIT_TASK);
