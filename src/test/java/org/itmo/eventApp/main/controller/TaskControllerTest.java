@@ -356,8 +356,8 @@ class TaskControllerTest extends AbstractTestContainers {
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().isOk());
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("task-objects").build());
-        boolean isImageExists = isImageExist("1.jpeg");
-        boolean isImage2Exists = isImageExist("2.png");
+        boolean isImageExists = isImageExist("1");
+        boolean isImage2Exists = isImageExist("2");
 
 
         Assertions.assertAll(
@@ -386,7 +386,7 @@ class TaskControllerTest extends AbstractTestContainers {
                         .with(user(getUserLoginInfo())))
                 .andExpect(status().is(204));
 
-        Assertions.assertFalse(isImageExist("1.jpeg"));
+        Assertions.assertFalse(isImageExist("1"));
         Assertions.assertFalse(taskObjectRepository.findById(1).isPresent());
 
     }
