@@ -239,17 +239,37 @@ class PlaceControllerTest extends AbstractTestContainers {
 
     @Test
     @WithMockUser(username = "test_mail@itmo.ru")
-    void placeDeleteTest() throws Exception {
+    void placeDeleteDefaultTest() throws Exception {
         executeSqlScript("/sql/insert_user.sql");
-
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_place.sql");
 
-        Assertions.assertTrue(placeRepository.findById(1).isPresent());
+        Assertions.assertTrue(placeRepository.findById(3).isPresent());
 
-        mockMvc.perform(delete("/api/places/1")
+        mockMvc.perform(delete("/api/places/3")
+                .with(user(getUserLoginInfo())))
+            .andExpect(status().isBadRequest());
+
+        Assertions.assertTrue(placeRepository.findById(3).isPresent());
+    }
+
+    @Test
+    @WithMockUser(username = "test_mail@itmo.ru")
+    void placeDeleteTest() throws Exception {
+        executeSqlScript("/sql/insert_user.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_place.sql");
+
+        Assertions.assertTrue(placeRepository.findById(4).isPresent());
+
+        mockMvc.perform(delete("/api/places/4")
                 .with(user(getUserLoginInfo())))
             .andExpect(status().isNoContent());
 
-        Assertions.assertFalse(placeRepository.findById(1).isPresent());
+        Assertions.assertFalse(placeRepository.findById(4).isPresent());
     }
 }

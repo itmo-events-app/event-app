@@ -63,8 +63,8 @@ public class PlaceController {
     @Operation(summary = "Удаление площадки")
     @PreAuthorize("@placeSecurityExpression.canDeletePlace()")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> placeDelete(@Min(value = 1, message = "Параметр id не может быть меньше 1!")
-                                            @PathVariable @Parameter(name = "id", description = "ID площадки", example = "1") Integer id) {
+    public ResponseEntity<Void> placeDelete(@Min(value = 4, message = "Параметр id не может быть меньше 4!")
+                                            @PathVariable @Parameter(name = "id", description = "ID площадки", example = "4") Integer id) {
         placeService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
