@@ -60,3 +60,4 @@ INSERT INTO role_privilege(role_id, privilege_id) VALUES (4,23),(4,24),(4,38),(4
 INSERT INTO place (address, name, format, description, room, latitude, longitude) VALUES ('Кронверкский проспект, 49', 'Кронверкский проспект, 49', 'OFFLINE', 'Главный корпус', '', 30.30831, 59.95717);
 INSERT INTO place (address, name, format, description, room, latitude, longitude) VALUES ('улица Ломоносова, 9', 'Ломоносова, 9', 'OFFLINE', 'Корпус на Ломоносова', '', 30.33853, 59.92665);
 INSERT INTO place (address, name, format, description, room, latitude, longitude) VALUES ('улица Гастелло, 12', 'улица Гастелло, 12', 'OFFLINE', 'Корпус на Гастелло', '', 30.32411, 59.85962);
+INSERT INTO place (address, name, format, description, room, latitude, longitude) VALUES ('Онлайн', '', 'ONLINE', 'онлайн-площадка', '', 0.0, 0.0);

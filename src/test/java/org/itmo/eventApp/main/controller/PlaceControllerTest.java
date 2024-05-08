@@ -246,13 +246,13 @@ class PlaceControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_place.sql");
 
-        Assertions.assertTrue(placeRepository.findById(3).isPresent());
+        Assertions.assertTrue(placeRepository.findById(4).isPresent());
 
-        mockMvc.perform(delete("/api/places/3")
+        mockMvc.perform(delete("/api/places/4")
                 .with(user(getUserLoginInfo())))
             .andExpect(status().isBadRequest());
 
-        Assertions.assertTrue(placeRepository.findById(3).isPresent());
+        Assertions.assertTrue(placeRepository.findById(4).isPresent());
     }
 
     @Test
@@ -263,13 +263,14 @@ class PlaceControllerTest extends AbstractTestContainers {
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_place.sql");
         executeSqlScript("/sql/insert_place.sql");
+        executeSqlScript("/sql/insert_place.sql");
 
-        Assertions.assertTrue(placeRepository.findById(4).isPresent());
+        Assertions.assertTrue(placeRepository.findById(5).isPresent());
 
-        mockMvc.perform(delete("/api/places/4")
+        mockMvc.perform(delete("/api/places/5")
                 .with(user(getUserLoginInfo())))
             .andExpect(status().isNoContent());
 
-        Assertions.assertFalse(placeRepository.findById(4).isPresent());
+        Assertions.assertFalse(placeRepository.findById(5).isPresent());
     }
 }
