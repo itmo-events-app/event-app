@@ -81,6 +81,7 @@ public class MinioService {
                 .stream(multipartFile.getInputStream(), multipartFile.getInputStream().available(), -1)
                 .bucket(bucketName)
                 .object(fileName)
+                .contentType(multipartFile.getContentType())
                 .build());
     }
 

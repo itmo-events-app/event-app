@@ -57,5 +57,7 @@ INSERT INTO role_privilege(role_id, privilege_id) VALUES (2,3),(2,5),(2,6),(2,8)
 INSERT INTO role_privilege(role_id, privilege_id) VALUES (3,10),(3,20),(3,21),(3,22),(3,23),(3,24),(3,25),(3,26),(3,27),(3,29),(3,30),(3,31),(3,32),(3,33),(3,34),(3,35),(3,36),(3,37),(3,38),(3,39),(3,40),(3,41),(3,42),(3,43),(3,44);
 INSERT INTO role_privilege(role_id, privilege_id) VALUES (4,23),(4,24),(4,38),(4,39),(4,40),(4,41),(4,42),(4,43),(4,44);
 
-INSERT INTO place (address, name, format, description, room, latitude, longitude) VALUES ('Кронверкский проспект, 49', 'Кронверкский проспект, 49', 'OFFLINE', 'Главный корпус', '', 30.308319091796875, 59.95717239379883);
-INSERT INTO place (address, name, format, description, room, latitude, longitude) VALUES ('улица Ломоносова, 9', 'Ломоносова, 9', 'OFFLINE', 'Корпус на Ломоносова', '', 30.338533401489258, 59.926658630371094);
+INSERT INTO place (address, name, format, description, room, latitude, longitude) VALUES ('Кронверкский проспект, 49', 'Кронверкский проспект, 49', 'OFFLINE', 'Главный корпус', '', 30.30831, 59.95717);
+INSERT INTO place (address, name, format, description, room, latitude, longitude) VALUES ('улица Ломоносова, 9', 'Ломоносова, 9', 'OFFLINE', 'Корпус на Ломоносова', '', 30.33853, 59.92665);
+INSERT INTO place (address, name, format, description, room, latitude, longitude) VALUES ('улица Гастелло, 12', 'улица Гастелло, 12', 'OFFLINE', 'Корпус на Гастелло', '', 30.32411, 59.85962);
+INSERT INTO place (address, name, format, description, room, latitude, longitude) VALUES ('Онлайн', '', 'ONLINE', 'онлайн-площадка', '', 0.0, 0.0);
