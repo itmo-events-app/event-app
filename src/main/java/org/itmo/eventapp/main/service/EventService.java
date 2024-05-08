@@ -81,8 +81,7 @@ public class EventService {
         eventRepository.save(e);
         MultipartFile image = eventRequest.image();
         if (!Objects.isNull(image)) {
-            String modifiedImageName = e.getId().toString() + "." + FilenameUtils.getExtension(image.getOriginalFilename());
-            minioService.uploadWithModifiedFileName(image, BUCKET_NAME, modifiedImageName);
+            minioService.uploadWithModifiedFileName(image, BUCKET_NAME, e.getId().toString());
         }
         return e;
     }
@@ -127,8 +126,7 @@ public class EventService {
         MultipartFile image = eventRequest.image();
         minioService.deleteImageByPrefix(BUCKET_NAME, updatedEvent.getId().toString());
         if (!Objects.isNull(image)) {
-            String modifiedImageName = updatedEvent.getId().toString() + "." + FilenameUtils.getExtension(image.getOriginalFilename());
-            minioService.uploadWithModifiedFileName(image, BUCKET_NAME, modifiedImageName);
+            minioService.uploadWithModifiedFileName(image, BUCKET_NAME, updatedEvent.getId().toString());
         }
         return updatedEvent;
     }

@@ -117,7 +117,7 @@ class EventControllerTest extends AbstractTestContainers {
             .andExpect(status().isCreated())
             .andExpect(content().string("3"));
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
-        boolean isImageExists = isImageExist("3.jpeg");
+        boolean isImageExists = isImageExist("3");
         assertThat(isBucketExists).isTrue();
         assertThat(isImageExists).isTrue();
         assertThat(eventRepository.findById(3).isPresent()).isTrue();
@@ -385,7 +385,7 @@ class EventControllerTest extends AbstractTestContainers {
             .andExpect(status().isCreated())
             .andExpect(content().string("3"));
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
-        boolean isObjectExists = isImageExist("3.jpeg");
+        boolean isObjectExists = isImageExist("3");
         assertThat(isBucketExists).isTrue();
         assertThat(isObjectExists).isTrue();
         // update
@@ -436,10 +436,8 @@ class EventControllerTest extends AbstractTestContainers {
                 .with(user(userLoginInfo)))
             .andExpect(status().isOk())
             .andExpect(content().json(expectedEventJson));
-        boolean isNewImageExists = isImageExist("3.png");
-        boolean isOldImageExists = isImageExist("3.jpeg");
+        boolean isNewImageExists = isImageExist("3");
         assertThat(isNewImageExists).isTrue();
-        assertThat(isOldImageExists).isFalse();
     }
 
 
@@ -476,7 +474,7 @@ class EventControllerTest extends AbstractTestContainers {
                 .andExpect(status().isCreated())
                 .andExpect(content().string("3"));
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
-        boolean isObjectExists = isImageExist("3.jpeg");
+        boolean isObjectExists = isImageExist("3");
         assertThat(isBucketExists).isTrue();
         assertThat(isObjectExists).isTrue();
         mockMvc.perform(delete("/api/events/3")
@@ -485,7 +483,7 @@ class EventControllerTest extends AbstractTestContainers {
         Optional<Event> deletedEvent = eventRepository.findById(3);
         Assertions.assertFalse(deletedEvent.isPresent());
         isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
-        isObjectExists = isImageExist("3.jpeg");
+        isObjectExists = isImageExist("3");
         assertThat(isBucketExists).isTrue();
         assertThat(isObjectExists).isFalse();
     }
@@ -559,7 +557,7 @@ class EventControllerTest extends AbstractTestContainers {
             .andExpect(status().isCreated())
             .andExpect(content().string("3"));
         boolean isBucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket("event-images").build());
-        boolean isObjectExists = isImageExist("3.jpeg");
+        boolean isObjectExists = isImageExist("3");
         assertThat(isBucketExists).isTrue();
         assertThat(isObjectExists).isTrue();
         // copy
@@ -567,7 +565,7 @@ class EventControllerTest extends AbstractTestContainers {
                 .with(user(userLoginInfo)))
             .andExpect(status().isCreated())
             .andExpect(content().string("4"));
-        boolean isNewImageExists = isImageExist("4.jpeg");
+        boolean isNewImageExists = isImageExist("4");
         assertThat(isNewImageExists).isTrue();
         assertThat(eventRepository.findById(4).isPresent()).isTrue();
     }
