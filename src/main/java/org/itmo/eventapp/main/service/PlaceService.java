@@ -37,7 +37,7 @@ public class PlaceService {
         Root<Place> root = query.from(Place.class);
         List<Predicate> predicates = new ArrayList<>();
         if (name != null) {
-            predicates.add(cb.equal(root.get("name"), name));
+            predicates.add(cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
         }
 
         query.where(predicates.toArray(new Predicate[0]));
