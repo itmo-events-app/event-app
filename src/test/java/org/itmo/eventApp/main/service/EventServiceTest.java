@@ -139,7 +139,7 @@ class EventServiceTest {
 
         PaginatedResponse<Event> result = eventService.getAllOrFilteredEvents(page, size, null, title, startDate, endDate, status, format);
 
-        verify(criteriaBuilder).equal(root.get("title"), title);
+        verify(criteriaBuilder).like(criteriaBuilder.lower(root.get("title")), "%" + title.toLowerCase() + "%");
         verify(criteriaBuilder).greaterThanOrEqualTo(root.get("startDate"), startDate);
         verify(criteriaBuilder).lessThanOrEqualTo(root.get("endDate"), endDate);
         verify(criteriaBuilder).equal(root.get("status"), status);

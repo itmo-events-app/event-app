@@ -148,7 +148,7 @@ public class EventService {
         }
 
         if (title != null) {
-            predicates.add(cb.equal(root.get("title"), title));
+            predicates.add(cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%"));
         }
         if (startDate != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("startDate"), startDate));
