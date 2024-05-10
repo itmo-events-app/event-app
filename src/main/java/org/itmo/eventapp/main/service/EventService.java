@@ -13,6 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
+import org.itmo.eventapp.main.model.dto.request.EditEventRequest;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.PaginatedResponse;
 import org.itmo.eventapp.main.model.entity.*;
@@ -111,7 +112,7 @@ public class EventService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE));
     }
 
-    public Event updateEvent(Integer id, EventRequest eventRequest) {
+    public Event updateEvent(Integer id, EditEventRequest eventRequest) {
         if (!eventRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE);
         }
@@ -121,7 +122,7 @@ public class EventService {
             parentEvent = eventRepository.findById(eventRequest.parent())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_PARENT_NOT_FOUND_MESSAGE));
         }
-        Event updatedEvent = EventMapper.eventRequestToEvent(id, eventRequest, place, parentEvent);
+        Event updatedEvent = EventMapper.editEventRequestToEvent(id, eventRequest, place, parentEvent);
         eventRepository.save(updatedEvent);
         MultipartFile image = eventRequest.image();
         minioService.deleteImageByPrefix(BUCKET_NAME, updatedEvent.getId().toString());
