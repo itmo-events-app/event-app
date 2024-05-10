@@ -115,7 +115,7 @@ public class EventRoleService {
         List<EventRole> userRoles = eventRoleRepository.findAllByUserId(userId);
         Map<String, List<String>> rolesByEvent = new HashMap<>();
         for (EventRole eventRole : userRoles) {
-            rolesByEvent.computeIfAbsent(eventRole.getEvent().getTitle(), k -> new ArrayList<>())
+            rolesByEvent.computeIfAbsent(eventRole.getEvent().getTitle() + " (id:" + eventRole.getEvent().getId() + ")", k -> new ArrayList<>())
                     .add(eventRole.getRole().getName());
         }
         return rolesByEvent;
