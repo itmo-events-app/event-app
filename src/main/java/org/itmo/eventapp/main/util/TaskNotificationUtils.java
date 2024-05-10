@@ -40,7 +40,7 @@ public class TaskNotificationUtils {
                     task.getAssignee().getName(),
                     task.getEvent().getTitle(),
                     task.getTitle(),
-                    taskFullUrl + task.getId().toString());
+                    taskFullUrl);
         }
     }
 
@@ -54,11 +54,11 @@ public class TaskNotificationUtils {
         notificationService.createNotification(notificationTitle,
             notificationDescription,
             task.getAssignee().getId(),
-            taskFullUrl + task.getId().toString());
+            taskFullUrl);
         notificationService.createNotification(notificationTitle,
             notificationDescription,
             task.getAssigner().getId(),
-            taskFullUrl + task.getId().toString());
+            taskFullUrl);
 
         if (task.getAssignee().getUserNotificationInfo().isEnableEmailNotifications()) {
             mailSenderService.sendOverdueTaskMessage(
@@ -66,7 +66,7 @@ public class TaskNotificationUtils {
                     task.getAssignee().getName(),
                     task.getEvent().getTitle(),
                     task.getTitle(),
-                    taskFullUrl + task.getId().toString());
+                    taskFullUrl);
         }
 
         if (task.getAssigner().getUserNotificationInfo().isEnableEmailNotifications()) {
@@ -75,7 +75,7 @@ public class TaskNotificationUtils {
                     task.getAssigner().getName(),
                     task.getEvent().getTitle(),
                     task.getTitle(),
-                    taskFullUrl + task.getId().toString());
+                    taskFullUrl);
         }
     }
 
@@ -89,7 +89,7 @@ public class TaskNotificationUtils {
         notificationService.createNotification(notificationTitle,
             notificationDescription,
             task.getAssignee().getId(),
-            taskFullUrl + task.getId().toString());
+            taskFullUrl);
 
         if (task.getAssignee().getUserNotificationInfo().isEnableEmailNotifications()) {
             mailSenderService.sendReminderTaskMessage(
@@ -97,7 +97,7 @@ public class TaskNotificationUtils {
                     task.getAssignee().getName(),
                     task.getEvent().getTitle(),
                     task.getTitle(),
-                    taskFullUrl + task.getId().toString());
+                    taskFullUrl);
         }
     }
 }
