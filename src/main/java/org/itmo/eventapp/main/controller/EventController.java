@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
+import org.itmo.eventapp.main.model.dto.request.EditEventRequest;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.dto.response.PaginatedResponse;
@@ -75,7 +76,7 @@ public class EventController {
     @PreAuthorize("@eventSecurityExpression.canUpdateEvent(#id)")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EventResponse> updateEvent(@Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id,
-                                                     @Valid EventRequest eventRequest) {
+                                                     @Valid EditEventRequest eventRequest) {
         return ResponseEntity.ok().body(EventMapper.eventToEventResponse(eventService.updateEvent(id, eventRequest)));
     }
 
