@@ -1,5 +1,6 @@
 package org.itmo.eventapp.main.model.mapper;
 
+import org.itmo.eventapp.main.model.dto.request.EditEventRequest;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.EventResponse;
 import org.itmo.eventapp.main.model.dto.response.EventShortDataResponse;
@@ -75,6 +76,28 @@ public final class EventMapper {
             .preparingStart(eventRequest.preparingStart())
             .preparingEnd(eventRequest.preparingEnd())
             .build();
+    }
+
+    public static Event editEventRequestToEvent(Integer id, EditEventRequest eventRequest, Place place, Event parent) {
+        return Event.builder()
+                .id(id)
+                .place(place)
+                .startDate(eventRequest.startDate())
+                .endDate(eventRequest.endDate())
+                .title(eventRequest.title())
+                .shortDescription(eventRequest.shortDescription())
+                .fullDescription(eventRequest.fullDescription())
+                .format(eventRequest.format())
+                .status(eventRequest.status())
+                .registrationStart(eventRequest.registrationStart())
+                .registrationEnd(eventRequest.registrationEnd())
+                .parent(parent)
+                .participantLimit(eventRequest.participantLimit())
+                .participantAgeLowest(eventRequest.participantAgeLowest())
+                .participantAgeHighest(eventRequest.participantAgeHighest())
+                .preparingStart(eventRequest.preparingStart())
+                .preparingEnd(eventRequest.preparingEnd())
+                .build();
     }
 
     public static List<EventResponse> eventsToEventResponseList(List<Event> events) {

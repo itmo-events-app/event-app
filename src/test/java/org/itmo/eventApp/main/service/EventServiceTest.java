@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.itmo.eventapp.main.minio.MinioService;
+import org.itmo.eventapp.main.model.dto.request.EditEventRequest;
 import org.itmo.eventapp.main.model.dto.request.EventRequest;
 import org.itmo.eventapp.main.model.dto.response.PaginatedResponse;
 import org.itmo.eventapp.main.model.entity.Event;
@@ -86,7 +87,7 @@ class EventServiceTest {
     @Test
     void testUpdateEvent() {
         Integer eventId = 1;
-        EventRequest eventRequest = new EventRequest(
+        EditEventRequest eventRequest = new EditEventRequest(
             1,
             LocalDateTime.parse("2024-03-30T21:32:23.536819"),
             LocalDateTime.parse("2024-03-30T21:32:23.536819"),
@@ -116,7 +117,7 @@ class EventServiceTest {
 
         assertAll(
             () -> assertNotNull(updatedEvent),
-            () -> assertEquals(EventMapper.eventRequestToEvent(1, eventRequest, place, null), updatedEvent)
+            () -> assertEquals(EventMapper.editEventRequestToEvent(1, eventRequest, place, null), updatedEvent)
         );
     }
 
