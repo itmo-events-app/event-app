@@ -13,15 +13,16 @@ spring:
         format_sql: true
     show_sql: true
   mail:
-    host: smtp.mail.ru
-    port: 465
+    host: ${EMAIL_HOST:smtp.mail.ru}
+    port: ${EMAIL_PORT:465}
     username: ${EMAIL_USERNAME:username}
-    password: ${EMAIL_PASSWORD:password}
+#    password: ${EMAIL_PASSWORD:password}
     properties:
       mail:
         smtp:
           ssl:
-            enable: true
+            enable: false
+          auth: false
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
