@@ -125,8 +125,8 @@ public class EventService {
         Event updatedEvent = EventMapper.editEventRequestToEvent(id, eventRequest, place, parentEvent);
         eventRepository.save(updatedEvent);
         MultipartFile image = eventRequest.image();
-        minioService.deleteImageByPrefix(BUCKET_NAME, updatedEvent.getId().toString());
         if (!Objects.isNull(image)) {
+            minioService.deleteImageByPrefix(BUCKET_NAME, updatedEvent.getId().toString());
             minioService.uploadWithModifiedFileName(image, BUCKET_NAME, updatedEvent.getId().toString());
         }
         return updatedEvent;
