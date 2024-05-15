@@ -260,11 +260,7 @@ public class TaskService {
         return taskRepository.saveAll(tasks);
     }
 
-
-    public List<Task> copyTasks(Integer dstEventId, List<Integer> taskIds) {
-
-        Event event = eventService.findById(dstEventId);
-        List<Task> tasks = taskRepository.findAllById(taskIds);
+    public List<Task> copyTasksWithEventAlreadyFetched(Event event, List<Task> tasks) {
 
         List<Task> newTasks = new ArrayList<>();
         List<String> prefixes = new ArrayList<>();
@@ -301,6 +297,15 @@ public class TaskService {
         }
 
         return newTasks;
+    }
+
+    public List<Task> copyTasks(Integer dstEventId, List<Integer> taskIds) {
+
+        Event event = eventService.findById(dstEventId);
+        List<Task> tasks = taskRepository.findAllById(taskIds);
+
+        return copyTasksWithEventAlreadyFetched(event, tasks);
+
     }
 
     public Page<Task> getEventTasksWithFilter(Integer eventId,
@@ -369,6 +374,27 @@ public class TaskService {
                         deadlineLowerLimit,
                         deadlineUpperLimit);
         return taskRepository.findAll(taskSpecification, pageRequest);
+    }
+
+
+    public Event copyEventWithTasks(Integer srcEventId, boolean deep) {
+
+        Event existingEvent = eventService.findById(srcEventId);
+        Event savedEvent = eventService.copyEventByOne(existingEvent, existingEvent.getParent());
+        List<Task> tasks = findAllByEventId(srcEventId);
+        copyTasksWithEventAlreadyFetched(savedEvent, tasks);
+
+        if (deep) {
+            List<Event> childEvents = eventService.findAllByParentId(existingEvent.getId());
+            childEvents.forEach(childEvent -> {
+                Event childOfSavedEvent = eventService.copyEventByOne(childEvent, savedEvent);
+                List<Task> childTasks = findAllByEventId(childEvent.getId());
+                copyTasksWithEventAlreadyFetched(childOfSavedEvent, childTasks);
+            });
+        }
+        return savedEvent;
+
+
     }
 
 
