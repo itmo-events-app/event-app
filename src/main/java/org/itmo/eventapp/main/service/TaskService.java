@@ -306,41 +306,6 @@ public class TaskService {
 
         return copyTasksWithEventAlreadyFetched(event, tasks);
 
-//        List<Task> newTasks = new ArrayList<>();
-//        List<String> prefixes = new ArrayList<>();
-//
-//        for (Task task : tasks) {
-//
-//            Task newTask = new Task();
-//            newTask.setEvent(event);
-//            newTask.setTitle(task.getTitle());
-//            newTask.setDescription(task.getDescription());
-//            newTask.setPlace(task.getPlace());
-//            newTask.setAssigner(task.getAssigner());
-//            newTask.setAssignee(null);
-//            newTask.setDeadline(task.getDeadline());
-//            newTask.setReminder(task.getReminder());
-//
-//            newTask.setCreationTime(LocalDateTime.now());
-//            TaskStatus status = TaskStatus.NEW;
-//            if (LocalDateTime.now().isAfter(newTask.getDeadline())) {
-//                status = TaskStatus.EXPIRED;
-//            }
-//            newTask.setStatus(status);
-//
-//            newTasks.add(newTask);
-//            prefixes.add(task.getId().toString());
-//        }
-//
-//        newTasks = taskRepository.saveAll(newTasks);
-//
-//        for (int i = 0; i < newTasks.size(); i++) {
-//
-//            minioService.copyImagesWithPrefix(BUCKET_NAME, BUCKET_NAME, prefixes.get(i), newTasks.get(i).getId().toString());
-//
-//        }
-//
-//        return newTasks;
     }
 
     public Page<Task> getEventTasksWithFilter(Integer eventId,
