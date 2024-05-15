@@ -87,10 +87,12 @@ public class TaskService {
 
         newTask = taskRepository.save(newTask);
 
+        LocalDateTime currentTime = LocalDateTime.now();
+
         if (assignee != null) {
             taskNotificationUtils.createIncomingTaskNotification(newTask);
-            taskDeadlineTriggerService.createNewDeadlineTrigger(newTask);
-            taskReminderTriggerService.createNewReminderTrigger(newTask);
+            if (taskRequest.deadline().isAfter(currentTime)) taskDeadlineTriggerService.createNewDeadlineTrigger(newTask);
+            if (taskRequest.reminder().isAfter(currentTime)) taskReminderTriggerService.createNewReminderTrigger(newTask);
         }
 
         return newTask;
@@ -125,11 +127,13 @@ public class TaskService {
 
         newTaskData = taskRepository.save(newTaskData);
 
+        LocalDateTime currentTime = LocalDateTime.now();
+
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(newTaskData);
-            taskDeadlineTriggerService.createNewDeadlineTrigger(newTaskData);
-            taskReminderTriggerService.createNewReminderTrigger(newTaskData);
+            if (taskRequest.deadline().isAfter(currentTime)) taskDeadlineTriggerService.createNewDeadlineTrigger(newTaskData);
+            if (taskRequest.reminder().isAfter(currentTime)) taskReminderTriggerService.createNewReminderTrigger(newTaskData);
 
         }
 
@@ -137,7 +141,7 @@ public class TaskService {
     }
 
     public void delete(Integer id) {
-        minioService.deleteImageByPrefix(BUCKET_NAME, id.toString());
+        minioService.deleteImageByPrefix(BUCKET_NAME, id.toString() + "_");
         taskRepository.deleteById(id);
     }
 
@@ -150,7 +154,7 @@ public class TaskService {
 
         List<Task> tasksToDelete = taskRepository.findAllByEventId(eventId);
         for (Task task : tasksToDelete) {
-            minioService.deleteImageByPrefix(BUCKET_NAME, task.getId().toString());
+            minioService.deleteImageByPrefix(BUCKET_NAME, task.getId().toString() + "_");
         }
         taskRepository.deleteAll(tasksToDelete);
     }
@@ -185,7 +189,7 @@ public class TaskService {
 
         Task task = taskRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.TASK_NOT_FOUND_MESSAGE));
 
-        boolean allBelong = fileNamesInMinio.stream().allMatch(filename -> filename.startsWith(task.getId().toString()));
+        boolean allBelong = fileNamesInMinio.stream().allMatch(filename -> filename.startsWith(task.getId().toString() + "_"));
         if (!allBelong) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ExceptionConst.INVALID_TASK_FILE_NAMES_MESSAGE);
         }
@@ -197,12 +201,12 @@ public class TaskService {
     }
 
     public List<String> getFileNames(Integer taskId) {
-        return minioService.getFileNamesByPrefix(BUCKET_NAME, taskId.toString());
+        return minioService.getFileNamesByPrefix(BUCKET_NAME, taskId.toString() + "_");
     }
 
 
     public List<FileDataResponse> getFileData(Integer taskId) {
-        return minioService.getFileDataByPrefix(BUCKET_NAME, taskId.toString());
+        return minioService.getFileDataByPrefix(BUCKET_NAME, taskId.toString() + "_");
     }
 
 
@@ -221,11 +225,13 @@ public class TaskService {
 
         task = taskRepository.save(task);
 
+        LocalDateTime currentTime = LocalDateTime.now();
+
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(task);
-            taskDeadlineTriggerService.createNewDeadlineTrigger(task);
-            taskReminderTriggerService.createNewReminderTrigger(task);
+            if (task.getDeadline().isAfter(currentTime)) taskDeadlineTriggerService.createNewDeadlineTrigger(task);
+            if (task.getReminder().isAfter(currentTime)) taskReminderTriggerService.createNewReminderTrigger(task);
 
         }
 
@@ -285,14 +291,14 @@ public class TaskService {
             newTask.setStatus(status);
 
             newTasks.add(newTask);
-            prefixes.add(task.getId().toString());
+            prefixes.add(task.getId().toString() + "_");
         }
 
         newTasks = taskRepository.saveAll(newTasks);
 
         for (int i = 0; i < newTasks.size(); i++) {
 
-            minioService.copyImagesWithPrefix(BUCKET_NAME, BUCKET_NAME, prefixes.get(i), newTasks.get(i).getId().toString());
+            minioService.copyImagesWithPrefix(BUCKET_NAME, BUCKET_NAME, prefixes.get(i), newTasks.get(i).getId().toString() + "_");
 
         }
 
