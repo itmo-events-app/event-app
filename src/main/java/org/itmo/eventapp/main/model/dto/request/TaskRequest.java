@@ -31,10 +31,10 @@ public record TaskRequest(
     @Min(value = 1, message = "Поле placeId не может быть меньше 1!")
     @Schema(example = "1")
     Integer placeId,
-//    @Future(message = "Нельзя назначить крайний срок выполнения задачи в прошлое")
+    @Future(message = "Нельзя назначить крайний срок выполнения задачи в прошлое")
     @NotNull(message = "Поле deadline не может быть null!")
     LocalDateTime deadline,
-//    @Future(message = "Нельзя назначить уведомление об окончании задачи в прошлое")
+    @Future(message = "Нельзя назначить уведомление об окончании задачи в прошлое")
     @NotNull(message = "Поле reminder не может быть null!")
     LocalDateTime reminder
 ) {

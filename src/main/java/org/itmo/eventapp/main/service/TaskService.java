@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -280,15 +281,16 @@ public class TaskService {
             newTask.setPlace(task.getPlace());
             newTask.setAssigner(task.getAssigner());
             newTask.setAssignee(null);
-            newTask.setDeadline(task.getDeadline());
-            newTask.setReminder(task.getReminder());
 
-            newTask.setCreationTime(LocalDateTime.now());
-            TaskStatus status = TaskStatus.NEW;
-            if (LocalDateTime.now().isAfter(newTask.getDeadline())) {
-                status = TaskStatus.EXPIRED;
-            }
-            newTask.setStatus(status);
+            LocalDateTime now = LocalDateTime.now();
+            Duration deadlineInterval = Duration.between(task.getDeadline(), task.getCreationTime());
+            Duration reminderInterval = Duration.between(task.getReminder(), task.getCreationTime());
+
+            newTask.setCreationTime(now);
+            newTask.setDeadline(now.plusNanos(deadlineInterval.toNanos()));
+            newTask.setReminder(now.plusNanos(reminderInterval.toNanos()));
+
+            newTask.setStatus(TaskStatus.NEW);
 
             newTasks.add(newTask);
             prefixes.add(task.getId().toString() + "_");
