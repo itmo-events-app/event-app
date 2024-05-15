@@ -260,11 +260,7 @@ public class TaskService {
         return taskRepository.saveAll(tasks);
     }
 
-
-    public List<Task> copyTasks(Integer dstEventId, List<Integer> taskIds) {
-
-        Event event = eventService.findById(dstEventId);
-        List<Task> tasks = taskRepository.findAllById(taskIds);
+    public List<Task> copyTasksWithEventAlreadyFetched(Event event, List<Task> tasks) {
 
         List<Task> newTasks = new ArrayList<>();
         List<String> prefixes = new ArrayList<>();
@@ -301,6 +297,50 @@ public class TaskService {
         }
 
         return newTasks;
+    }
+
+    public List<Task> copyTasks(Integer dstEventId, List<Integer> taskIds) {
+
+        Event event = eventService.findById(dstEventId);
+        List<Task> tasks = taskRepository.findAllById(taskIds);
+
+        return copyTasksWithEventAlreadyFetched(event, tasks);
+
+//        List<Task> newTasks = new ArrayList<>();
+//        List<String> prefixes = new ArrayList<>();
+//
+//        for (Task task : tasks) {
+//
+//            Task newTask = new Task();
+//            newTask.setEvent(event);
+//            newTask.setTitle(task.getTitle());
+//            newTask.setDescription(task.getDescription());
+//            newTask.setPlace(task.getPlace());
+//            newTask.setAssigner(task.getAssigner());
+//            newTask.setAssignee(null);
+//            newTask.setDeadline(task.getDeadline());
+//            newTask.setReminder(task.getReminder());
+//
+//            newTask.setCreationTime(LocalDateTime.now());
+//            TaskStatus status = TaskStatus.NEW;
+//            if (LocalDateTime.now().isAfter(newTask.getDeadline())) {
+//                status = TaskStatus.EXPIRED;
+//            }
+//            newTask.setStatus(status);
+//
+//            newTasks.add(newTask);
+//            prefixes.add(task.getId().toString());
+//        }
+//
+//        newTasks = taskRepository.saveAll(newTasks);
+//
+//        for (int i = 0; i < newTasks.size(); i++) {
+//
+//            minioService.copyImagesWithPrefix(BUCKET_NAME, BUCKET_NAME, prefixes.get(i), newTasks.get(i).getId().toString());
+//
+//        }
+//
+//        return newTasks;
     }
 
     public Page<Task> getEventTasksWithFilter(Integer eventId,
@@ -369,6 +409,27 @@ public class TaskService {
                         deadlineLowerLimit,
                         deadlineUpperLimit);
         return taskRepository.findAll(taskSpecification, pageRequest);
+    }
+
+
+    public Event copyEventWithTasks(Integer srcEventId, boolean deep) {
+
+        Event existingEvent = eventService.findById(srcEventId);
+        Event savedEvent = eventService.copyEventByOne(existingEvent, existingEvent.getParent());
+        List<Task> tasks = findAllByEventId(srcEventId);
+        copyTasksWithEventAlreadyFetched(savedEvent, tasks);
+
+        if (deep) {
+            List<Event> childEvents = eventService.findAllByParentId(existingEvent.getId());
+            childEvents.forEach(childEvent -> {
+                Event childOfSavedEvent = eventService.copyEventByOne(childEvent, savedEvent);
+                List<Task> childTasks = findAllByEventId(childEvent.getId());
+                copyTasksWithEventAlreadyFetched(childOfSavedEvent, childTasks);
+            });
+        }
+        return savedEvent;
+
+
     }
 
 

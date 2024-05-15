@@ -184,8 +184,10 @@ public class EventController {
     public ResponseEntity<Integer> copyEvent(
         @Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "1") Integer id,
         @RequestParam(value = "deep", defaultValue = "false") @Parameter(name = "deep", description = "Включить копирование активностей", example = "false") boolean deep) {
+//        Event event = eventService.copyEvent(id, deep);
+        Event event = taskService.copyEventWithTasks(id, deep);
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(eventService.copyEvent(id, deep).getId());
+            .body(event.getId());
     }
 }
