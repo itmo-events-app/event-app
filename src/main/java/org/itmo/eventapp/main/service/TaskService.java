@@ -87,10 +87,12 @@ public class TaskService {
 
         newTask = taskRepository.save(newTask);
 
+        LocalDateTime currentTime = LocalDateTime.now();
+
         if (assignee != null) {
             taskNotificationUtils.createIncomingTaskNotification(newTask);
-            taskDeadlineTriggerService.createNewDeadlineTrigger(newTask);
-            taskReminderTriggerService.createNewReminderTrigger(newTask);
+            if (taskRequest.deadline().isAfter(currentTime)) taskDeadlineTriggerService.createNewDeadlineTrigger(newTask);
+            if (taskRequest.reminder().isAfter(currentTime)) taskReminderTriggerService.createNewReminderTrigger(newTask);
         }
 
         return newTask;
@@ -125,11 +127,13 @@ public class TaskService {
 
         newTaskData = taskRepository.save(newTaskData);
 
+        LocalDateTime currentTime = LocalDateTime.now();
+
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(newTaskData);
-            taskDeadlineTriggerService.createNewDeadlineTrigger(newTaskData);
-            taskReminderTriggerService.createNewReminderTrigger(newTaskData);
+            if (taskRequest.deadline().isAfter(currentTime)) taskDeadlineTriggerService.createNewDeadlineTrigger(newTaskData);
+            if (taskRequest.reminder().isAfter(currentTime)) taskReminderTriggerService.createNewReminderTrigger(newTaskData);
 
         }
 
@@ -221,11 +225,13 @@ public class TaskService {
 
         task = taskRepository.save(task);
 
+        LocalDateTime currentTime = LocalDateTime.now();
+
         if (assignee != null && (prevAssignee == null || !Objects.equals(prevAssignee.getId(), assignee.getId()))) {
 
             taskNotificationUtils.createIncomingTaskNotification(task);
-            taskDeadlineTriggerService.createNewDeadlineTrigger(task);
-            taskReminderTriggerService.createNewReminderTrigger(task);
+            if (task.getDeadline().isAfter(currentTime)) taskDeadlineTriggerService.createNewDeadlineTrigger(task);
+            if (task.getReminder().isAfter(currentTime)) taskReminderTriggerService.createNewReminderTrigger(task);
 
         }
 
