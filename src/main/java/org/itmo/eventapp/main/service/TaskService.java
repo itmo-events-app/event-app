@@ -405,5 +405,8 @@ public class TaskService {
 
     }
 
-
+    public Event createEventBasedOnExistingAndCopyTasks(Integer eventId, String title, Integer userId, boolean deep){
+        Event copiedEventWithTasks = copyEventWithTasks(eventId, deep);
+        return eventService.createEventBasedOnExistingWithNewTitleAndAdmin(copiedEventWithTasks.getId(), title, userId);
+    }
 }

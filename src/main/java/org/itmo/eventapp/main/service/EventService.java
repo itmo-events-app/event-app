@@ -255,4 +255,14 @@ public class EventService {
         minioService.copyImagesWithPrefix(BUCKET_NAME, BUCKET_NAME, imagePrefix, newImagePrefix);
         return savedEvent;
     }
+
+    @Transactional
+    public Event createEventBasedOnExistingWithNewTitleAndAdmin(Integer eventId, String title, Integer userId) {
+        Event newEvent = findById(eventId);
+        newEvent.setTitle(title);
+        eventRoleService.assignOrganizationalRole(
+                userId, roleService.getOrganizerRole().getId(), newEvent.getId(), Boolean.TRUE
+        );
+        return newEvent;
+    }
 }
