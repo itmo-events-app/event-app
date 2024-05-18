@@ -190,4 +190,20 @@ public class EventController {
             .status(HttpStatus.CREATED)
             .body(event.getId());
     }
+
+    @Operation(summary = "Создание мероприятия на основе существующего с изменением названия и организатора")
+    @PreAuthorize("@eventSecurityExpression.canGetEvents()")
+    @PostMapping("/{id}/createWithNewTitleAndAdmin")
+    public ResponseEntity<Integer> createEventBasedOnExistingWithNewTitleAndAdmin(
+            @Min(1) @PathVariable("id") @Parameter(name = "id", description = "ID мероприятия", example = "7") Integer id,
+            @RequestParam(required = false) @Parameter(name = "title", description = "Новое название мероприятия",
+                    example = "Митап") String title,
+            @RequestParam(required = false) @Parameter(name = "userId",
+                    description = "ID пользователя, который будет назначен организатором", example = "7") Integer userId) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(EventMapper.eventToEventResponse(
+                        eventService.createEventBasedOnExistingWithNewTitleAndAdmin(id, title, userId)).id()
+                );
+    }
 }
