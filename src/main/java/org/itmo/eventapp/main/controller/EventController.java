@@ -199,11 +199,13 @@ public class EventController {
             @RequestParam(required = false) @Parameter(name = "title", description = "Новое название мероприятия",
                     example = "Митап") String title,
             @RequestParam(required = false) @Parameter(name = "userId",
-                    description = "ID пользователя, который будет назначен организатором", example = "7") Integer userId) {
+                    description = "ID пользователя, который будет назначен организатором", example = "7") Integer userId,
+            @RequestParam(value = "deep", defaultValue = "false") @Parameter(name = "deep",
+                    description = "Включить копирование активностей", example = "false") boolean deep) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(EventMapper.eventToEventResponse(
-                        eventService.createEventBasedOnExistingWithNewTitleAndAdmin(id, title, userId)).id()
+                        taskService.createEventBasedOnExistingAndCopyTasks(id, title, userId, deep)).id()
                 );
     }
 }

@@ -258,19 +258,11 @@ public class EventService {
 
     @Transactional
     public Event createEventBasedOnExistingWithNewTitleAndAdmin(Integer eventId, String title, Integer userId) {
-        Event existingEvent = findById(eventId);
-        Event newEvent = copyEventByOne(existingEvent, existingEvent.getParent());
+        Event newEvent = findById(eventId);
         newEvent.setTitle(title);
-
-        if (existingEvent.getParent() == null) {
-            List<Event> childEvents = findAllByParentId(existingEvent.getId());
-            childEvents.forEach(childEvent -> copyEventByOne(childEvent, newEvent));
-        }
-
         eventRoleService.assignOrganizationalRole(
                 userId, roleService.getOrganizerRole().getId(), newEvent.getId(), Boolean.TRUE
         );
-
         return newEvent;
     }
 }
