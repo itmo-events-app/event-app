@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -54,7 +55,8 @@ public class EventService {
     }
 
     public Event addEvent(EventRequest eventRequest) {
-        Place place = placeService.findById(eventRequest.placeId());
+        List<PlaceRow> places = new ArrayList<>();
+
 
         Event parent = findById(eventRequest.parent());
         if (parent.getParent() != null) {
@@ -62,7 +64,7 @@ public class EventService {
         }
 
         Event e = Event.builder()
-            .place(place)
+            .places(places)
             .startDate(eventRequest.startDate())
             .endDate(eventRequest.endDate())
             .title(eventRequest.title())
@@ -80,6 +82,19 @@ public class EventService {
             .preparingEnd(eventRequest.preparingEnd())
             .build();
         eventRepository.save(e);
+
+        Optional<Event> eventOpt = eventRepository.findById(e.getId());
+        Event event = eventOpt.get();
+        for(Integer id : eventRequest.placesIds()){
+            PlaceRow placeRow = new PlaceRow();
+            placeRow.setPlace(placeService.findById(id));
+            placeRow.setEvent(event);
+            places.add(placeRow);
+        }
+
+        event.setPlaces(places);
+        eventRepository.save(event);
+
         MultipartFile image = eventRequest.image();
         if (!Objects.isNull(image)) {
             minioService.uploadWithModifiedFileName(image, BUCKET_NAME, e.getId().toString());
@@ -116,13 +131,21 @@ public class EventService {
         if (!eventRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE);
         }
-        Place place = placeService.findById(eventRequest.placeId());
+
+        List<PlaceRow> places = new ArrayList<>();
+        for(Integer idPlace : eventRequest.placesIds()){
+            PlaceRow placeRow = new PlaceRow();
+            placeRow.setPlace(placeService.findById(idPlace));
+            placeRow.setEvent(eventRepository.findById(id).get());
+            places.add(placeRow);
+        }
+
         Event parentEvent = null;
         if (eventRequest.parent() != null) {
             parentEvent = eventRepository.findById(eventRequest.parent())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_PARENT_NOT_FOUND_MESSAGE));
         }
-        Event updatedEvent = EventMapper.editEventRequestToEvent(id, eventRequest, place, parentEvent);
+        Event updatedEvent = EventMapper.editEventRequestToEvent(id, eventRequest, places, parentEvent);
         eventRepository.save(updatedEvent);
         MultipartFile image = eventRequest.image();
         if (!Objects.isNull(image)) {

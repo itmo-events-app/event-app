@@ -6,13 +6,14 @@ import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record EventResponse(
     @Schema(example = "3242")
     Integer id,
     @Schema(example = "12")
-    Integer placeId,
+    List<Integer> placesIds,
     LocalDateTime startDate,
     LocalDateTime endDate,
     @Schema(example = "День первокурсника")

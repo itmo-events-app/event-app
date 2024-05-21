@@ -8,6 +8,7 @@ import org.itmo.eventapp.main.model.validation.annotation.StartDateBeforeEndDate
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.itmo.eventapp.main.exceptionhandling.ExceptionConst.*;
 
@@ -20,7 +21,7 @@ public record EventRequest(
     @Min(value = 1, message = "Поле eventId не может быть меньше 1!")
     @NotNull(message = "Поле placeId не может быть null!")
     @Schema(example = "67", requiredMode = Schema.RequiredMode.REQUIRED)
-    Integer placeId,
+    List<Integer> placesIds,
     @FutureOrPresent(message = "Мероприятие не может начинаться в прошлом")
     @NotNull(message = "Поле startDate не может быть null!")
     @Schema(example = "2024-09-01Е12:00:00", requiredMode = Schema.RequiredMode.REQUIRED)
