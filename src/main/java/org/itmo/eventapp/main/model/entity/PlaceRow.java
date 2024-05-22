@@ -1,12 +1,15 @@
 package org.itmo.eventapp.main.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 public class PlaceRow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

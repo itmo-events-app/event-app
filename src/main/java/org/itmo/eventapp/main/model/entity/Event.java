@@ -28,7 +28,7 @@ public class Event {
     @JoinColumn(name = "place_id")
     private Place place;*/
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlaceRow> places;
 
     private LocalDateTime startDate;
