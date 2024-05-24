@@ -57,7 +57,6 @@ public class EventService {
     public Event addEvent(EventRequest eventRequest) {
         List<PlaceRow> places = new ArrayList<>();
 
-
         Event parent = findById(eventRequest.parent());
         if (parent.getParent() != null) {
             throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, ExceptionConst.ACTIVITY_RECURSION);

@@ -79,18 +79,10 @@ create table if not exists place
     longitude float not null,
     render_info text
 );
-
-create table if not exists placerow
-(
-    id int generated always as identity primary key not null ,
-    place_id integer references place(id) on delete set null,
-    event_id integer references event(id) on delete set null,
-);
-
 create table if not exists event
 (
     id int generated always as identity primary key not null,
-    place_row integer references placerow(id) on delete set null,
+    place_row integer[],
     start_date timestamp,
     end_date timestamp,
     title varchar(256) not null,
@@ -106,6 +98,12 @@ create table if not exists event
     participant_age_highest int,
     preparing_start timestamp,
     preparing_end timestamp
+);
+create table if not exists place_row
+(
+    id int generated always as identity primary key not null ,
+    place_id integer references place(id) on delete set null,
+    event_id integer references event(id) on delete set null
 );
 create table if not exists participant(
     id int generated always as identity primary key not null,
