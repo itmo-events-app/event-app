@@ -7,7 +7,9 @@ import org.itmo.eventapp.main.model.dto.response.EventShortDataResponse;
 import org.itmo.eventapp.main.model.entity.Event;
 import org.itmo.eventapp.main.model.entity.EventRole;
 import org.itmo.eventapp.main.model.entity.Place;
+import org.itmo.eventapp.main.model.entity.PlaceRow;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class EventMapper {
@@ -16,10 +18,18 @@ public final class EventMapper {
 
     public static EventResponse eventToEventResponse(Event event) {
         Integer parent = (event.getParent() != null) ? event.getParent().getId() : null;
-        Integer placeId = event.getPlace() != null ? event.getPlace().getId() : null;
+        List<Integer>  placesIds = new ArrayList<>();
+        if(event.getPlaces() != null){
+            for(PlaceRow row : event.getPlaces()){
+                placesIds.add(row.getPlace().getId());
+            }
+        }
+        else{
+            placesIds = null;
+        }
         return new EventResponse(
             event.getId(),
-            placeId,
+            placesIds,
             event.getStartDate(),
             event.getEndDate(),
             event.getTitle(),
@@ -56,10 +66,10 @@ public final class EventMapper {
         );
     }
 
-    public static Event eventRequestToEvent(Integer id, EventRequest eventRequest, Place place, Event parent) {
+    public static Event eventRequestToEvent(Integer id, EventRequest eventRequest, List<PlaceRow> places, Event parent) {
         return Event.builder()
             .id(id)
-            .place(place)
+            .places(places)
             .startDate(eventRequest.startDate())
             .endDate(eventRequest.endDate())
             .title(eventRequest.title())
@@ -78,10 +88,10 @@ public final class EventMapper {
             .build();
     }
 
-    public static Event editEventRequestToEvent(Integer id, EditEventRequest eventRequest, Place place, Event parent) {
+    public static Event editEventRequestToEvent(Integer id, EditEventRequest eventRequest, List<PlaceRow> places, Event parent) {
         return Event.builder()
                 .id(id)
-                .place(place)
+                .places(places)
                 .startDate(eventRequest.startDate())
                 .endDate(eventRequest.endDate())
                 .title(eventRequest.title())
@@ -111,7 +121,6 @@ public final class EventMapper {
             return null;
         }
         return Event.builder()
-            .place(source.getPlace())
             .startDate(source.getStartDate())
             .endDate(source.getEndDate())
             .title(source.getTitle())
@@ -139,7 +148,7 @@ public final class EventMapper {
     public static Event eventRoleToEvent(EventRole eventRole) {
         return Event.builder()
             .id(eventRole.getEvent().getId())
-            .place(eventRole.getEvent().getPlace())
+            .places(eventRole.getEvent().getPlaces())
             .startDate(eventRole.getEvent().getStartDate())
             .endDate(eventRole.getEvent().getEndDate())
             .title(eventRole.getEvent().getTitle())

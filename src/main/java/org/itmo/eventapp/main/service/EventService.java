@@ -21,7 +21,9 @@ import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
+import org.itmo.eventapp.main.repository.PlaceRowRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -37,6 +40,7 @@ import java.util.stream.Collectors;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final PlaceRowRepository placeRowRepository;
 
     private final MinioService minioService;
     private static final String BUCKET_NAME = "event-images";
@@ -54,15 +58,12 @@ public class EventService {
     }
 
     public Event addEvent(EventRequest eventRequest) {
-        Place place = placeService.findById(eventRequest.placeId());
-
         Event parent = findById(eventRequest.parent());
         if (parent.getParent() != null) {
             throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, ExceptionConst.ACTIVITY_RECURSION);
         }
 
         Event e = Event.builder()
-            .place(place)
             .startDate(eventRequest.startDate())
             .endDate(eventRequest.endDate())
             .title(eventRequest.title())
@@ -80,6 +81,20 @@ public class EventService {
             .preparingEnd(eventRequest.preparingEnd())
             .build();
         eventRepository.save(e);
+
+        List<PlaceRow> places = new ArrayList<>();
+        Optional<Event> eventOpt = eventRepository.findById(e.getId());
+        Event event = eventOpt.get();
+        for(Integer id : eventRequest.placesIds()){
+            PlaceRow placeRow = new PlaceRow();
+            placeRow.setPlace(placeService.findById(id));
+            placeRow.setEvent(event);
+            places.add(placeRow);
+        }
+
+        event.setPlaces(places);
+        eventRepository.save(event);
+
         MultipartFile image = eventRequest.image();
         if (!Objects.isNull(image)) {
             minioService.uploadWithModifiedFileName(image, BUCKET_NAME, e.getId().toString());
@@ -116,13 +131,22 @@ public class EventService {
         if (!eventRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_NOT_FOUND_MESSAGE);
         }
-        Place place = placeService.findById(eventRequest.placeId());
+
+        List<PlaceRow> places = new ArrayList<>();
+        for(Integer idPlace : eventRequest.placesIds()){
+            PlaceRow placeRow = new PlaceRow();
+            placeRow.setPlace(placeService.findById(idPlace));
+            placeRow.setEvent(eventRepository.findById(id).get());
+            places.add(placeRow);
+            //placeRowRepository.save(placeRow);
+        }
+
         Event parentEvent = null;
         if (eventRequest.parent() != null) {
             parentEvent = eventRepository.findById(eventRequest.parent())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ExceptionConst.EVENT_PARENT_NOT_FOUND_MESSAGE));
         }
-        Event updatedEvent = EventMapper.editEventRequestToEvent(id, eventRequest, place, parentEvent);
+        Event updatedEvent = EventMapper.editEventRequestToEvent(id, eventRequest, places, parentEvent);
         eventRepository.save(updatedEvent);
         MultipartFile image = eventRequest.image();
         if (!Objects.isNull(image)) {
@@ -237,7 +261,20 @@ public class EventService {
 
     @Transactional
     public Event copyEventByOne(Event existingEvent, Event parentEvent) {
+        List<Place> newPlaces = new ArrayList<>();
+        for(PlaceRow place : existingEvent.getPlaces()){
+            newPlaces.add(place.getPlace());
+        }
+
         Event copiedEvent = EventMapper.eventToEvent(existingEvent, parentEvent);
+        List<PlaceRow> placeRows = new ArrayList<>();
+        for(Place place : newPlaces){
+            PlaceRow placeRow = new PlaceRow();
+            placeRow.setPlace(place);
+            placeRow.setEvent(copiedEvent);
+            placeRows.add(placeRow);
+        }
+        copiedEvent.setPlaces(placeRows);
         Event savedEvent = eventRepository.save(copiedEvent);
 
         List<EventRole> eventRoles = eventRoleService.findAllByEventId(existingEvent.getId());
