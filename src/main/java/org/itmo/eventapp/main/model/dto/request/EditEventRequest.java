@@ -18,7 +18,7 @@ import static org.itmo.eventapp.main.exceptionhandling.ExceptionConst.*;
         @StartDateBeforeEndDate(first = "preparingStart", second = "preparingEnd", message = EVENT_PREPARATION_START_TO_END_VALIDATION)
 })
 public record EditEventRequest(
-        @Min(value = 1, message = "Поле eventId не может быть меньше 1!")
+        //@Min(value = 1, message = "Поле eventId не может быть меньше 1!")
         @NotNull(message = "Поле placeId не может быть null!")
         @Schema(example = "67", requiredMode = Schema.RequiredMode.REQUIRED)
         List<Integer> placesIds,

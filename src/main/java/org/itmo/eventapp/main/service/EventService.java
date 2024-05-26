@@ -21,7 +21,9 @@ import org.itmo.eventapp.main.model.entity.enums.EventFormat;
 import org.itmo.eventapp.main.model.entity.enums.EventStatus;
 import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
+import org.itmo.eventapp.main.repository.PlaceRowRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,6 +40,7 @@ import java.util.stream.Collectors;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final PlaceRowRepository placeRowRepository;
 
     private final MinioService minioService;
     private static final String BUCKET_NAME = "event-images";
@@ -137,6 +140,7 @@ public class EventService {
             placeRow.setPlace(placeService.findById(idPlace));
             placeRow.setEvent(eventRepository.findById(id).get());
             places.add(placeRow);
+            //placeRowRepository.save(placeRow);
         }
 
         Event parentEvent = null;
@@ -259,7 +263,20 @@ public class EventService {
 
     @Transactional
     public Event copyEventByOne(Event existingEvent, Event parentEvent) {
+        List<Place> newPlaces = new ArrayList<>();
+        for(PlaceRow place : existingEvent.getPlaces()){
+            newPlaces.add(place.getPlace());
+        }
+
         Event copiedEvent = EventMapper.eventToEvent(existingEvent, parentEvent);
+        List<PlaceRow> placeRows = new ArrayList<>();
+        for(Place place : newPlaces){
+            PlaceRow placeRow = new PlaceRow();
+            placeRow.setPlace(place);
+            placeRow.setEvent(copiedEvent);
+            placeRows.add(placeRow);
+        }
+        copiedEvent.setPlaces(placeRows);
         Event savedEvent = eventRepository.save(copiedEvent);
 
         List<EventRole> eventRoles = eventRoleService.findAllByEventId(existingEvent.getId());

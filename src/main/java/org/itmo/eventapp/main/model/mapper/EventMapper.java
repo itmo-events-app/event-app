@@ -121,7 +121,6 @@ public final class EventMapper {
             return null;
         }
         return Event.builder()
-            .places(source.getPlaces())
             .startDate(source.getStartDate())
             .endDate(source.getEndDate())
             .title(source.getTitle())
