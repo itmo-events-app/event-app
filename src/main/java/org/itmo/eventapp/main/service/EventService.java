@@ -58,15 +58,12 @@ public class EventService {
     }
 
     public Event addEvent(EventRequest eventRequest) {
-        List<PlaceRow> places = new ArrayList<>();
-
         Event parent = findById(eventRequest.parent());
         if (parent.getParent() != null) {
             throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, ExceptionConst.ACTIVITY_RECURSION);
         }
 
         Event e = Event.builder()
-            .places(places)
             .startDate(eventRequest.startDate())
             .endDate(eventRequest.endDate())
             .title(eventRequest.title())
@@ -85,6 +82,7 @@ public class EventService {
             .build();
         eventRepository.save(e);
 
+        List<PlaceRow> places = new ArrayList<>();
         Optional<Event> eventOpt = eventRepository.findById(e.getId());
         Event event = eventOpt.get();
         for(Integer id : eventRequest.placesIds()){
