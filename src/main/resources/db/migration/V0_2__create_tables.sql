@@ -82,7 +82,6 @@ create table if not exists place
 create table if not exists event
 (
     id int generated always as identity primary key not null,
-    place_rows int[],
     start_date timestamp,
     end_date timestamp,
     title varchar(256) not null,
