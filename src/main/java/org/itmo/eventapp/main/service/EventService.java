@@ -189,6 +189,7 @@ public class EventService {
             predicates.add(cb.equal(root.get("format"), format));
         }
         query.where(predicates.toArray(new Predicate[0]));
+        query.orderBy(cb.desc(root.get("id")));
 
         TypedQuery<Event> typedQuery = entityManager.createQuery(query);
         long totalCount = typedQuery.getResultList().size();
