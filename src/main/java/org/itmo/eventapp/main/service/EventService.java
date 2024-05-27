@@ -9,7 +9,6 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FilenameUtils;
 import org.itmo.eventapp.main.exceptionhandling.ExceptionConst;
 import org.itmo.eventapp.main.minio.MinioService;
 import org.itmo.eventapp.main.model.dto.request.CreateEventRequest;
@@ -23,7 +22,6 @@ import org.itmo.eventapp.main.model.mapper.EventMapper;
 import org.itmo.eventapp.main.repository.EventRepository;
 import org.itmo.eventapp.main.repository.PlaceRowRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -297,9 +295,15 @@ public class EventService {
     public Event createEventBasedOnExistingWithNewTitleAndAdmin(Integer eventId, String title, Integer userId) {
         Event newEvent = findById(eventId);
         newEvent.setTitle(title);
-        eventRoleService.assignOrganizationalRole(
-                userId, roleService.getOrganizerRole().getId(), newEvent.getId(), Boolean.TRUE
-        );
+        try {
+            eventRoleService.assignOrganizationalRole(
+                    userId, roleService.getOrganizerRole().getId(), newEvent.getId(), Boolean.TRUE
+            );
+        } catch (ResponseStatusException e) {
+            if (!e.getMessage().contains("уже есть роль")) throw e;
+        }
         return newEvent;
     }
+
+
 }
