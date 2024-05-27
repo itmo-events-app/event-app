@@ -1,6 +1,9 @@
 spring.application.name: event-app
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:6432/db
